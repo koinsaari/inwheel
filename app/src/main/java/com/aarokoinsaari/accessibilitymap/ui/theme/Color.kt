@@ -1,3 +1,4 @@
+@file:Suppress("MagicNumber")
 package com.aarokoinsaari.accessibilitymap.ui.theme
 
 import androidx.compose.ui.graphics.Color

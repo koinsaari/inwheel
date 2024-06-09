@@ -1,3 +1,4 @@
+@file:Suppress("MatchingDeclarationName", "ForbiddenComment")
 package com.aarokoinsaari.accessibilitymap.ui.components
 
 import androidx.compose.material.icons.Icons
