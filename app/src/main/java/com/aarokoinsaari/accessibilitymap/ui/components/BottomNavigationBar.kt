@@ -1,7 +1,15 @@
 @file:Suppress("MatchingDeclarationName", "ForbiddenComment")
+<<<<<<< Updated upstream
 package com.aarokoinsaari.accessibilitymap.ui.components
 
 import androidx.compose.material.icons.Icons
+=======
+
+package com.aarokoinsaari.accessibilitymap.ui.components
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+>>>>>>> Stashed changes
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
@@ -14,7 +22,11 @@ import androidx.navigation.NavHostController
 
 enum class Screen(val route: String, val icon: ImageVector) {
     Map("map", Icons.Filled.Place), // TODO: Change to Map icon
+<<<<<<< Updated upstream
     Places("places", Icons.Filled.List)
+=======
+    Places("places", Icons.AutoMirrored.Filled.List)
+>>>>>>> Stashed changes
 }
 
 @Composable

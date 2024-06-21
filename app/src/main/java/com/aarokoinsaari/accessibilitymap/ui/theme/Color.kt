@@ -1,4 +1,8 @@
 @file:Suppress("MagicNumber")
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 package com.aarokoinsaari.accessibilitymap.ui.theme
 
 import androidx.compose.ui.graphics.Color
