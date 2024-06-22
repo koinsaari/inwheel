@@ -1,32 +1,23 @@
 @file:Suppress("MatchingDeclarationName", "ForbiddenComment")
-<<<<<<< Updated upstream
-package com.aarokoinsaari.accessibilitymap.ui.components
-
-import androidx.compose.material.icons.Icons
-=======
 
 package com.aarokoinsaari.accessibilitymap.ui.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
->>>>>>> Stashed changes
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 enum class Screen(val route: String, val icon: ImageVector) {
     Map("map", Icons.Filled.Place), // TODO: Change to Map icon
-<<<<<<< Updated upstream
-    Places("places", Icons.Filled.List)
-=======
     Places("places", Icons.AutoMirrored.Filled.List)
->>>>>>> Stashed changes
 }
 
 @Composable
@@ -57,4 +48,10 @@ fun BottomNavigationBar(navController: NavHostController) {
 
 fun NavController.currentRoute(): String? {
     return currentBackStackEntry?.destination?.route
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BottomNavigationBar_Preview() {
+    BottomNavigationBar(rememberNavController())
 }

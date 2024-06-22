@@ -18,19 +18,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-<<<<<<< Updated upstream
-=======
-
-@Composable
-fun MainScreen() {
-    TODO()
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MainScreen_Preview() {
-    AccessibilityMapTheme {
-        MainScreen()
-    }
-}
->>>>>>> Stashed changes

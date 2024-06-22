@@ -1,6 +1,5 @@
 package com.aarokoinsaari.accessibilitymap.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -23,16 +22,6 @@ private val LightColorScheme = lightColorScheme(
     tertiary = Pink40
 
     /* Other default colors to override
-<<<<<<< Updated upstream
-background = Color(0xFFFFFBFE),
-surface = Color(0xFFFFFBFE),
-onPrimary = Color.White,
-onSecondary = Color.White,
-onTertiary = Color.White,
-onBackground = Color(0xFF1C1B1F),
-onSurface = Color(0xFF1C1B1F),
-*/
-=======
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),
     onPrimary = Color.White,
@@ -41,7 +30,6 @@ onSurface = Color(0xFF1C1B1F),
     onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
     */
->>>>>>> Stashed changes
 )
 
 @Composable
