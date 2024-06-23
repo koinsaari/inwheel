@@ -3,6 +3,7 @@ package com.aarokoinsaari.accessibilitymap.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
+import com.aarokoinsaari.accessibilitymap.model.BoundingBox
 import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -67,34 +68,30 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
 
     private suspend fun loadMarkers(zoomLevel: Double, center: GeoPoint) {
         _state.value = _state.value.copy(isLoading = true)
-        val query = buildQuery(zoomLevel, center)
-        placeRepository.getPlaces(query).collect { places ->
+        val bbox = calculateBoundingBox(zoomLevel, center)
+        val categories = listOf("restaurant", "cafe", "shop")
+        placeRepository.getPlaces(bbox, categories).collect { places ->
             _state.value = _state.value.copy(markers = places, isLoading = false)
         }
     }
 
-    private fun buildQuery(zoomLevel: Double, center: GeoPoint): String {
-        val bbox = calculateBoundingBox(zoomLevel, center)
-        return """
-            [out:json];
-            node($bbox);
-            out body;
-        """.trimIndent()
-    }
-
-    private fun calculateBoundingBox(zoomLevel: Double, center: GeoPoint): String {
-        val latOffset = LAT_OFFSET_FACTOR / zoomLevel
-        val lonOffset = LON_OFFSET_FACTOR / zoomLevel
-        val south = center.latitude - latOffset
-        val north = center.latitude + latOffset
-        val west = center.longitude - lonOffset
-        val east = center.longitude + lonOffset
-        return "$south,$west,$north,$east"
+    private fun calculateBoundingBox(
+        zoomLevel: Double,
+        center: GeoPoint,
+    ): BoundingBox {
+        val latOffset = LAT_OFFSET_FACTOR / zoomLevel * EXPAND_FACTOR
+        val lonOffset = LON_OFFSET_FACTOR / zoomLevel * EXPAND_FACTOR
+        val minLat = center.latitude - latOffset
+        val maxLat = center.latitude + latOffset
+        val minLon = center.longitude - lonOffset
+        val maxLon = center.longitude + lonOffset
+        return BoundingBox(minLat, minLon, maxLat, maxLon)
     }
 
     companion object {
-        private const val ZOOM_THRESHOLD = 20.0
-        private const val LAT_OFFSET_FACTOR = 0.01
-        private const val LON_OFFSET_FACTOR = 0.01
+        private const val ZOOM_THRESHOLD = 10.0
+        private const val LAT_OFFSET_FACTOR = 0.03
+        private const val LON_OFFSET_FACTOR = 0.03
+        private const val EXPAND_FACTOR = 1.5
     }
 }
