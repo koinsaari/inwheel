@@ -3,10 +3,10 @@ package com.aarokoinsaari.accessibilitymap.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.aarokoinsaari.accessibilitymap.model.Element
+import com.aarokoinsaari.accessibilitymap.model.MapMarker
 
-@Database(entities = [Element::class], version = 1)
+@Database(entities = [MapMarker::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun elementDao(): ElementDao
+    abstract fun mapMarkerDao(): MapMarkerDao
 }

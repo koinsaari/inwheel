@@ -1,97 +1,96 @@
 package com.aarokoinsaari.accessibilitymap.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
-import com.aarokoinsaari.accessibilitymap.model.BoundingBox
-import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
+import com.aarokoinsaari.accessibilitymap.repository.MapMarkerRepository
 import com.aarokoinsaari.accessibilitymap.state.MapState
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
-import org.osmdroid.events.MapAdapter
-import org.osmdroid.events.ScrollEvent
-import org.osmdroid.events.ZoomEvent
+import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 
-class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
+class MapViewModel(private val mapMarkerRepository: MapMarkerRepository) : ViewModel() {
     private val _state = MutableStateFlow(MapState())
     val state: StateFlow<MapState> = _state
-
-    val mapListener = object : MapAdapter() {
-        override fun onZoom(event: ZoomEvent?): Boolean {
-            return handleZoomOrScroll(event)
-        }
-
-        override fun onScroll(event: ScrollEvent?): Boolean {
-            return handleZoomOrScroll(event)
-        }
-
-        private fun handleZoomOrScroll(event: Any?): Boolean {
-            val zoomLevel = getZoomLevel(event)
-            val center = getCenter(event)
-            return if (zoomLevel != null && center != null) {
-                if (zoomLevel > ZOOM_THRESHOLD) {
-                    handleIntent(MapIntent.LoadMarkers(zoomLevel, center))
-                }
-                true
-            } else {
-                false
-            }
-        }
-
-        private fun getZoomLevel(event: Any?): Double? {
-            return when (event) {
-                is ZoomEvent -> event.source.zoomLevelDouble
-                is ScrollEvent -> event.source.zoomLevelDouble
-                else -> null
-            }
-        }
-
-        private fun getCenter(event: Any?): GeoPoint? {
-            return when (event) {
-                is ZoomEvent -> event.source.mapCenter as? GeoPoint
-                is ScrollEvent -> event.source.mapCenter as? GeoPoint
-                else -> null
-            }
-        }
-    }
 
     fun handleIntent(intent: MapIntent) {
         viewModelScope.launch {
             when (intent) {
-                is MapIntent.LoadMarkers -> loadMarkers(intent.zoomLevel, intent.center)
-                MapIntent.ClearMarkers -> _state.value = _state.value.copy(markers = emptyList())
+                is MapIntent.Move -> handleMove(intent)
+                is MapIntent.LoadMarkers -> {}
+                is MapIntent.ClearMarkers -> handleClearMarkers()
             }
         }
     }
 
-    private suspend fun loadMarkers(zoomLevel: Double, center: GeoPoint) {
-        _state.value = _state.value.copy(isLoading = true)
-        val bbox = calculateBoundingBox(zoomLevel, center)
-        val categories = listOf("restaurant", "cafe", "shop")
-        placeRepository.getPlaces(bbox, categories).collect { places ->
-            _state.value = _state.value.copy(markers = places, isLoading = false)
+    private suspend fun handleMove(intent: MapIntent.Move) {
+        Log.d("MapViewModel", "Update view intent: $intent")
+        val currentState = _state.value
+
+        if (intent.zoomLevel < ZOOM_THRESHOLD) {
+            _state.value = currentState.copy(markers = emptyList())
+        } else if (intent.zoomLevel >= ZOOM_THRESHOLD) {
+            val snapshotBbox = currentState.snapshotBbox
+            val newBbox = intent.bbox
+
+            if (snapshotBbox == null || centerIsOutOfBoundingBox(intent.center, snapshotBbox)) {
+                _state.value = currentState.copy(snapshotBbox = newBbox)
+                val expandedBbox = calculateExpandedBBox(newBbox)
+                loadMarkers(expandedBbox)
+            }
         }
     }
 
-    private fun calculateBoundingBox(
-        zoomLevel: Double,
-        center: GeoPoint,
-    ): BoundingBox {
-        val latOffset = LAT_OFFSET_FACTOR / zoomLevel * EXPAND_FACTOR
-        val lonOffset = LON_OFFSET_FACTOR / zoomLevel * EXPAND_FACTOR
-        val minLat = center.latitude - latOffset
-        val maxLat = center.latitude + latOffset
-        val minLon = center.longitude - lonOffset
-        val maxLon = center.longitude + lonOffset
-        return BoundingBox(minLat, minLon, maxLat, maxLon)
+    @Suppress("TooGenericExceptionCaught", "ForbiddenComment", "MagicNumber")
+    @OptIn(FlowPreview::class)
+    private suspend fun loadMarkers(bbox: BoundingBox) {
+        _state.value = _state.value.copy(isLoading = true)
+        try {
+            mapMarkerRepository.getMarkers(bbox, listOf("restaurant"))
+                .debounce(500)
+                .collect { places ->
+                    _state.value = _state.value.copy(
+                        markers = places,
+                        isLoading = false
+                    )
+                    Log.d("MapViewModel", "MapState after marker load: ${_state.value}")
+                }
+        } catch (e: Exception) {
+            // TODO: Handle error
+            Log.e("MapViewModel", "Error loading markers", e)
+            _state.value = _state.value.copy(isLoading = false)
+        }
+    }
+
+    private fun handleClearMarkers() {
+        Log.d("MapViewModel", "Clear markers action")
+        _state.value = _state.value.copy(markers = emptyList(), currentBbox = null)
+    }
+
+    private fun calculateExpandedBBox(bbox: BoundingBox): BoundingBox {
+        val latBuffer = (bbox.latNorth - bbox.latSouth) * (EXPAND_FACTOR - 1) / 2
+        val lonBuffer = (bbox.lonEast - bbox.lonWest) * (EXPAND_FACTOR - 1) / 2
+
+        return BoundingBox(
+            bbox.latNorth + latBuffer,
+            bbox.lonEast + lonBuffer,
+            bbox.latSouth - latBuffer,
+            bbox.lonWest - lonBuffer
+        )
+    }
+
+    private fun centerIsOutOfBoundingBox(center: GeoPoint, bbox: BoundingBox): Boolean {
+        return center.latitude < bbox.latSouth || center.latitude > bbox.latNorth ||
+                center.longitude < bbox.lonWest || center.longitude > bbox.lonEast
     }
 
     companion object {
-        private const val ZOOM_THRESHOLD = 10.0
-        private const val LAT_OFFSET_FACTOR = 0.03
-        private const val LON_OFFSET_FACTOR = 0.03
+        private const val ZOOM_THRESHOLD = 17.5
         private const val EXPAND_FACTOR = 1.5
     }
 }

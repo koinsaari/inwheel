@@ -4,12 +4,16 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.state.MapState
+import com.aarokoinsaari.accessibilitymap.ui.handlers.MapListener
 import kotlinx.coroutines.flow.StateFlow
 import org.osmdroid.config.Configuration
-import org.osmdroid.events.MapListener
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -19,7 +23,7 @@ import org.osmdroid.views.overlay.Marker
 @Composable
 fun MapScreen(
     stateFlow: StateFlow<MapState>,
-    mapListener: MapListener
+    onEvent: (MapIntent) -> Unit
 ) {
     val state by stateFlow.collectAsState()
     val context = LocalContext.current
@@ -38,17 +42,19 @@ fun MapScreen(
                 zoomController.setVisibility(
                     org.osmdroid.views.CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT
                 )
-                controller.setCenter(GeoPoint(60.192059, 24.945831))
+                controller.setCenter(GeoPoint(60.192059, 24.945831)) // TODO
                 controller.setZoom(9.5)
-                addMapListener(mapListener)
+                addMapListener(
+                    MapListener(onEvent = onEvent)
+                )
             }
         },
         update = { mapView ->
             mapView.overlays.clear()
-            state.markers.forEach { element ->
+            state.markers.forEach { mapMarker ->
                 val marker = Marker(mapView).apply {
-                    position = element.lat?.let { element.lon?.let { it1 -> GeoPoint(it, it1) } }
-                    title = element.tags?.name
+                    position = GeoPoint(mapMarker.lat, mapMarker.lon)
+                    title = mapMarker.name
                 }
                 mapView.overlays.add(marker)
             }
