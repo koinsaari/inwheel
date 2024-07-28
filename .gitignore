@@ -1,18 +1,5 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
 /captures
-.externalNativeBuild
 .cxx
-local.properties
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,android,androidstudio,kotlin,java,gradle
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,android,androidstudio,kotlin,java,gradle
@@ -104,7 +91,6 @@ replay_pid*
 
 # Icon must end with two \r
 Icon
-
 
 # Thumbnails
 ._*
@@ -213,30 +199,7 @@ obj/
 /out/
 
 # User-specific configurations
-.idea/caches/
-.idea/libraries/
-.idea/shelf/
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/.name
-.idea/compiler.xml
-.idea/copyright/profiles_settings.xml
-.idea/encodings.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/scopes/scope_settings.xml
-.idea/dictionaries
-.idea/vcs.xml
-.idea/jsLibraryMappings.xml
-.idea/datasources.xml
-.idea/dataSources.ids
-.idea/sqlDataSources.xml
-.idea/dynamic.xml
-.idea/uiDesigner.xml
-.idea/assetWizardSettings.xml
-.idea/gradle.xml
-.idea/jarRepositories.xml
-.idea/navEditor.xml
+.idea
 
 # Legacy Eclipse project files
 .cproject
