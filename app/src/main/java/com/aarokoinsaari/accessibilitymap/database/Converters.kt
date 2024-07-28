@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2024 Aaro Koinsaari
+ */
 package com.aarokoinsaari.accessibilitymap.database
 
 import androidx.room.TypeConverter

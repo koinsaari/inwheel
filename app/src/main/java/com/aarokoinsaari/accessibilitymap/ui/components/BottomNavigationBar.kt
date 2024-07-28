@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2024 Aaro Koinsaari
+ */
 @file:Suppress("MatchingDeclarationName", "ForbiddenComment")
 
 package com.aarokoinsaari.accessibilitymap.ui.components
