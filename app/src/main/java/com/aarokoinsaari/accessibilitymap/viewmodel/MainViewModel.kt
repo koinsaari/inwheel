@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aarokoinsaari.accessibilitymap.intent.MainIntent
 import com.aarokoinsaari.accessibilitymap.state.MainState
-import com.aarokoinsaari.accessibilitymap.ui.components.Screen
+import com.aarokoinsaari.accessibilitymap.ui.navigation.NavigationScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -20,10 +20,10 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             when (intent) {
                 MainIntent.NavigateToMap -> _state.value =
-                    _state.value.copy(currentScreen = Screen.Map)
+                    _state.value.copy(currentScreen = NavigationScreen.Map)
 
                 MainIntent.NavigateToPlaces -> _state.value =
-                    _state.value.copy(currentScreen = Screen.Places)
+                    _state.value.copy(currentScreen = NavigationScreen.Places)
             }
         }
     }

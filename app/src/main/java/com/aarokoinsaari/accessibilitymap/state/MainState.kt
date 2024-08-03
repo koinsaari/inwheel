@@ -3,6 +3,6 @@
  */
 package com.aarokoinsaari.accessibilitymap.state
 
-import com.aarokoinsaari.accessibilitymap.ui.components.Screen
+import com.aarokoinsaari.accessibilitymap.ui.navigation.NavigationScreen
 
-data class MainState(val currentScreen: Screen = Screen.Map)
+data class MainState(val currentScreen: NavigationScreen = NavigationScreen.Map)

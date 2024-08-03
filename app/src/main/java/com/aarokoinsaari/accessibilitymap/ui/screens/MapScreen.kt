@@ -4,15 +4,16 @@
 package com.aarokoinsaari.accessibilitymap.ui.screens
 
 import android.content.Context
+import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
+import com.aarokoinsaari.accessibilitymap.network.CategoryConfig
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.aarokoinsaari.accessibilitymap.ui.handlers.MapListener
 import kotlinx.coroutines.flow.StateFlow
@@ -53,14 +54,24 @@ fun MapScreen(
             }
         },
         update = { mapView ->
-            mapView.overlays.clear()
+            val existingMarkers = mapView.overlays
+                .filterIsInstance<Marker>()
+                .associateBy { it.title }
+
             state.markers.forEach { mapMarker ->
-                val marker = Marker(mapView).apply {
-                    position = GeoPoint(mapMarker.lat, mapMarker.lon)
+                val marker = existingMarkers[mapMarker.name] ?: Marker(mapView).apply {
                     title = mapMarker.name
+                    mapView.overlays.add(this)
                 }
-                mapView.overlays.add(marker)
+                marker.position = GeoPoint(mapMarker.lat, mapMarker.lon)
+                marker.icon = getMarkerIcon(context, mapMarker.type)
             }
         }
     )
+}
+
+private fun getMarkerIcon(context: Context, type: String): Drawable? {
+    Log.d("MapScreen", "Marker type: $type")
+    val iconResId = CategoryConfig.allCategories[type] ?: CategoryConfig.allCategories["default"]!!
+    return ContextCompat.getDrawable(context, iconResId)
 }

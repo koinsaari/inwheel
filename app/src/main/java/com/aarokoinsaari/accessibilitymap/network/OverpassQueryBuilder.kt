@@ -4,10 +4,13 @@
 package com.aarokoinsaari.accessibilitymap.network
 
 object OverpassQueryBuilder {
-    fun buildQuery(bbox: String, categories: List<String>): String {
-        val categoryQueries = categories.joinToString(separator = "") { category ->
-            """node["amenity"="$category"]($bbox);"""
-        }
+    fun buildQuery(bbox: String): String {
+        val categoryQueries = CategoryConfig
+            .allCategories
+            .keys
+            .joinToString(separator = "") { category ->
+                """node["amenity"="$category"]($bbox);"""
+            }
         return """
             [out:json];
             (
