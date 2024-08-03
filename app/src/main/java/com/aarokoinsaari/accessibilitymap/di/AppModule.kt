@@ -5,9 +5,9 @@ package com.aarokoinsaari.accessibilitymap.di
 
 import androidx.room.Room
 import com.aarokoinsaari.accessibilitymap.database.AppDatabase
-import com.aarokoinsaari.accessibilitymap.database.MapMarkerDao
+import com.aarokoinsaari.accessibilitymap.database.PlacesDao
 import com.aarokoinsaari.accessibilitymap.network.OverpassApiService
-import com.aarokoinsaari.accessibilitymap.repository.MapMarkerRepository
+import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.viewmodel.MainViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
 import okhttp3.OkHttpClient
@@ -40,11 +40,11 @@ val appModule = module {
             AppDatabase::class.java
         ).build()
     }
-    single<MapMarkerDao> {
-        get<AppDatabase>().mapMarkerDao()
+    single<PlacesDao> {
+        get<AppDatabase>().placesDao()
     }
     single {
-        MapMarkerRepository(get(), get())
+        PlaceRepository(get(), get())
     }
     viewModel {
         MainViewModel()

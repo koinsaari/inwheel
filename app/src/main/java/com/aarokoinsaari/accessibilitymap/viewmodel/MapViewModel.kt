@@ -7,17 +7,18 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
-import com.aarokoinsaari.accessibilitymap.repository.MapMarkerRepository
+import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 
-class MapViewModel(private val mapMarkerRepository: MapMarkerRepository) : ViewModel() {
+class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
     private val _state = MutableStateFlow(MapState())
     val state: StateFlow<MapState> = _state
 
@@ -54,8 +55,9 @@ class MapViewModel(private val mapMarkerRepository: MapMarkerRepository) : ViewM
     private suspend fun loadMarkers(bbox: BoundingBox) {
         _state.value = _state.value.copy(isLoading = true)
         try {
-            mapMarkerRepository.getMarkers(bbox, listOf("restaurant"))
+            placeRepository.getPlaces(bbox)
                 .debounce(500)
+                .distinctUntilChanged()
                 .collect { places ->
                     _state.value = _state.value.copy(
                         markers = places,
@@ -94,6 +96,6 @@ class MapViewModel(private val mapMarkerRepository: MapMarkerRepository) : ViewM
 
     companion object {
         private const val ZOOM_THRESHOLD = 17.5
-        private const val EXPAND_FACTOR = 1.5
+        private const val EXPAND_FACTOR = 3.0
     }
 }

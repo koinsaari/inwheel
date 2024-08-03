@@ -7,24 +7,24 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.aarokoinsaari.accessibilitymap.model.MapMarker
+import com.aarokoinsaari.accessibilitymap.model.Place
 
 @Dao
-interface MapMarkerDao {
+interface PlacesDao {
     @Query(
         """
-        SELECT * FROM map_markers 
+        SELECT * FROM places 
         WHERE lat BETWEEN :southLat AND :northLat 
         AND lon BETWEEN :westLon AND :eastLon
     """
     )
-    fun getMarkers(
+    fun getPlaces(
         northLat: Double,
         eastLon: Double,
         southLat: Double,
         westLon: Double
-    ): List<MapMarker>
+    ): List<Place>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(mapMarkers: List<MapMarker>)
+    fun insertAll(places: List<Place>)
 }

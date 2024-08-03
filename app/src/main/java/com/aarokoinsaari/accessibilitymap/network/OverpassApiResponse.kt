@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2024 Aaro Koinsaari
  */
-package com.aarokoinsaari.accessibilitymap.model
+package com.aarokoinsaari.accessibilitymap.network
 
 data class OverpassApiResponse(
     val elements: List<ApiMapMarkers>

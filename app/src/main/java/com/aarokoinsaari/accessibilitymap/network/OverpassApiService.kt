@@ -3,7 +3,6 @@
  */
 package com.aarokoinsaari.accessibilitymap.network
 
-import com.aarokoinsaari.accessibilitymap.model.OverpassApiResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 
