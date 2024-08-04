@@ -25,14 +25,14 @@ data class MapState(
     val snapshotBbox: BoundingBox? = null,
     val isLoading: Boolean = false
 ) {
-    override fun toString(): String {
-        return """
+    override fun toString(): String =
+        """
             MapState(
                 markers=${markers.size},
                 zoomLevel=$zoomLevel,
-                isLoading=$isLoading,
-                currentBoundingBox=$currentBbox
+                currentBoundingBox=$currentBbox,
+                snapshotBoundingBox=$snapshotBbox,
+                isLoading=$isLoading
             )
         """.trimIndent()
-    }
 }

@@ -22,6 +22,7 @@ import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
@@ -30,45 +31,54 @@ import kotlinx.coroutines.launch
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 
+@OptIn(FlowPreview::class)
 class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
     private val _state = MutableStateFlow(MapState())
+    private val moveIntents = MutableSharedFlow<MapIntent.Move>()
     val state: StateFlow<MapState> = _state
+
+    init {
+        viewModelScope.launch {
+            moveIntents
+                .debounce(DEBOUNCE_VALUE)
+                .collect { intent ->
+                    handleMove(intent)
+                }
+        }
+    }
 
     fun handleIntent(intent: MapIntent) {
         viewModelScope.launch {
-            when (intent) {
-                is MapIntent.Move -> handleMove(intent)
-                is MapIntent.LoadMarkers -> {}
-                is MapIntent.ClearMarkers -> handleClearMarkers()
-            }
+            moveIntents.emit(intent as MapIntent.Move)
         }
     }
 
     private suspend fun handleMove(intent: MapIntent.Move) {
-        Log.d("MapViewModel", "Update view intent: $intent")
-        val currentState = _state.value
-
         if (intent.zoomLevel < ZOOM_THRESHOLD) {
-            _state.value = currentState.copy(markers = emptyList())
-        } else if (intent.zoomLevel >= ZOOM_THRESHOLD) {
-            val snapshotBbox = currentState.snapshotBbox
+            handleClearMarkers()
+        } else {
+            Log.d("MapViewModel", "Update view intent: $intent")
+            _state.value = _state.value.copy(zoomLevel = intent.zoomLevel)
+            val currentState = _state.value
             val newBbox = intent.bbox
 
-            if (snapshotBbox == null || centerIsOutOfBoundingBox(intent.center, snapshotBbox)) {
-                _state.value = currentState.copy(snapshotBbox = newBbox)
+            if (currentState.snapshotBbox == null ||
+                centerIsOutOfBBox(intent.center, currentState.snapshotBbox)
+            ) {
                 val expandedBbox = calculateExpandedBBox(newBbox)
+                _state.value = currentState.copy(snapshotBbox = newBbox)
+                _state.value = currentState.copy(currentBbox = expandedBbox)
                 loadMarkers(expandedBbox)
             }
         }
+        Log.d("MapViewModel", "MapState after move: ${_state.value}")
     }
 
-    @Suppress("TooGenericExceptionCaught", "ForbiddenComment", "MagicNumber")
-    @OptIn(FlowPreview::class)
+    @Suppress("TooGenericExceptionCaught")
     private suspend fun loadMarkers(bbox: BoundingBox) {
         _state.value = _state.value.copy(isLoading = true)
         try {
             placeRepository.getPlaces(bbox)
-                .debounce(500)
                 .distinctUntilChanged()
                 .collect { places ->
                     _state.value = _state.value.copy(
@@ -85,14 +95,19 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
     }
 
     private fun handleClearMarkers() {
-        Log.d("MapViewModel", "Clear markers action")
-        _state.value = _state.value.copy(markers = emptyList(), currentBbox = null)
+        if (_state.value.markers.isNotEmpty()) {
+            _state.value = _state.value.copy(
+                markers = emptyList(),
+                currentBbox = null,
+                snapshotBbox = null
+            )
+            Log.d("MapViewModel", "Clear markers action, current state: ${_state.value}")
+        }
     }
 
     private fun calculateExpandedBBox(bbox: BoundingBox): BoundingBox {
         val latBuffer = (bbox.latNorth - bbox.latSouth) * (EXPAND_FACTOR - 1) / 2
         val lonBuffer = (bbox.lonEast - bbox.lonWest) * (EXPAND_FACTOR - 1) / 2
-
         return BoundingBox(
             bbox.latNorth + latBuffer,
             bbox.lonEast + lonBuffer,
@@ -101,13 +116,13 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
         )
     }
 
-    private fun centerIsOutOfBoundingBox(center: GeoPoint, bbox: BoundingBox): Boolean {
-        return center.latitude < bbox.latSouth || center.latitude > bbox.latNorth ||
+    private fun centerIsOutOfBBox(center: GeoPoint, bbox: BoundingBox): Boolean =
+        center.latitude < bbox.latSouth || center.latitude > bbox.latNorth ||
                 center.longitude < bbox.lonWest || center.longitude > bbox.lonEast
-    }
 
     companion object {
-        private const val ZOOM_THRESHOLD = 17.5
+        private const val ZOOM_THRESHOLD = 16.0
         private const val EXPAND_FACTOR = 3.0
+        private const val DEBOUNCE_VALUE = 200L
     }
 }

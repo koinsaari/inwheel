@@ -66,17 +66,24 @@ fun MapScreen(
             }
         },
         update = { mapView ->
-            val existingMarkers = mapView.overlays
-                .filterIsInstance<Marker>()
-                .associateBy { it.title }
-
-            state.markers.forEach { mapMarker ->
-                val marker = existingMarkers[mapMarker.name] ?: Marker(mapView).apply {
-                    title = mapMarker.name
-                    mapView.overlays.add(this)
+            if (state.markers.isEmpty()) {
+                mapView.overlays.clear()
+            } else {
+                mapView.overlays.retainAll { overlay ->
+                    overlay is Marker && state.markers.any { it.name == overlay.title }
                 }
-                marker.position = GeoPoint(mapMarker.lat, mapMarker.lon)
-                marker.icon = getMarkerIcon(context, mapMarker.type)
+                val existingMarkers = mapView.overlays
+                    .filterIsInstance<Marker>()
+                    .associateBy { it.title }
+
+                state.markers.forEach { mapMarker ->
+                    val marker = existingMarkers[mapMarker.name] ?: Marker(mapView).apply {
+                        title = mapMarker.name
+                        mapView.overlays.add(this)
+                    }
+                    marker.position = GeoPoint(mapMarker.lat, mapMarker.lon)
+                    marker.icon = getMarkerIcon(context, mapMarker.type)
+                }
             }
         }
     )

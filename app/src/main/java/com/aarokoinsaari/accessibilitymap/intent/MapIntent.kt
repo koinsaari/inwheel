@@ -24,11 +24,4 @@ sealed class MapIntent {
         val zoomLevel: Double,
         val bbox: BoundingBox
     ) : MapIntent()
-
-    data class LoadMarkers(
-        val zoomLevel: Double,
-        val center: GeoPoint
-    ) : MapIntent()
-
-    data object ClearMarkers : MapIntent()
 }
