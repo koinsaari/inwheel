@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.aarokoinsaari.accessibilitymap.intent
+package com.aarokoinsaari.accessibilitymap.ui.navigation
 
-import org.osmdroid.util.BoundingBox
-import org.osmdroid.util.GeoPoint
+import androidx.annotation.DrawableRes
+import com.aarokoinsaari.accessibilitymap.R
 
-sealed class MapIntent {
-    data class Move(
-        val center: GeoPoint,
-        val zoomLevel: Double,
-        val bbox: BoundingBox
-    ) : MapIntent()
+enum class NavigationScreen(val route: String, @DrawableRes val iconResId: Int) {
+    Map("map", R.drawable.ic_map),
+    Places("places", R.drawable.ic_places_list)
 }

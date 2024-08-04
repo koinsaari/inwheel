@@ -13,15 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.aarokoinsaari.accessibilitymap.intent
+package com.aarokoinsaari.accessibilitymap.model
 
-import org.osmdroid.util.BoundingBox
-import org.osmdroid.util.GeoPoint
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-sealed class MapIntent {
-    data class Move(
-        val center: GeoPoint,
-        val zoomLevel: Double,
-        val bbox: BoundingBox
-    ) : MapIntent()
-}
+@Entity(tableName = "places")
+data class Place(
+    @PrimaryKey val id: Long,
+    val name: String,
+    val type: String,
+    val lat: Double,
+    val lon: Double,
+    val tags: Map<String, String>?,
+    val accessibility: AccessibilityInfo?
+)
+
+data class AccessibilityInfo(
+    val wheelchairAccess: WheelchairAccessStatus?,
+    val entry: EntryAccessibilityStatus?,
+    val hasAccessibleToilet: Boolean?,
+    val hasElevator: Boolean?,
+    val additionalInfo: String?
+)

@@ -13,15 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.aarokoinsaari.accessibilitymap.intent
+package com.aarokoinsaari.accessibilitymap.model
 
-import org.osmdroid.util.BoundingBox
-import org.osmdroid.util.GeoPoint
-
-sealed class MapIntent {
-    data class Move(
-        val center: GeoPoint,
-        val zoomLevel: Double,
-        val bbox: BoundingBox
-    ) : MapIntent()
+enum class WheelchairAccessStatus {
+    FULLY_ACCESSIBLE,
+    LIMITED_ACCESSIBILITY,
+    NOT_ACCESSIBLE,
+    UNKNOWN
 }
