@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.ui.screens
 
 import android.content.Context
@@ -21,28 +22,43 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.network.CategoryConfig
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.aarokoinsaari.accessibilitymap.ui.handlers.MapListener
+import com.aarokoinsaari.accessibilitymap.utils.Utils.drawableToBitmap
 import kotlinx.coroutines.flow.StateFlow
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 
-@Suppress("MagicNumber")
 @Composable
 fun MapScreen(
     stateFlow: StateFlow<MapState>,
-    onEvent: (MapIntent) -> Unit
+    onEvent: (MapIntent) -> Unit = { }
 ) {
     val state by stateFlow.collectAsState()
     val context = LocalContext.current
+    val clusterer = remember { RadiusMarkerClusterer(context) }
+    val mapView = remember {
+        MapView(context).apply {
+            setTileSource(TileSourceFactory.MAPNIK)
+            setMultiTouchControls(true)
+            zoomController.setVisibility(
+                org.osmdroid.views.CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT
+            )
+            controller.setCenter(GeoPoint(46.462, 6.841))
+            controller.setZoom(9.5)
+        }
+    }
 
     Configuration.getInstance().load(
         context, context.getSharedPreferences(
@@ -51,39 +67,24 @@ fun MapScreen(
     )
 
     AndroidView(
-        factory = { ctx ->
-            MapView(ctx).apply {
-                setTileSource(TileSourceFactory.MAPNIK)
-                setMultiTouchControls(true)
-                zoomController.setVisibility(
-                    org.osmdroid.views.CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT
-                )
-                controller.setCenter(GeoPoint(60.192059, 24.945831)) // TODO
-                controller.setZoom(9.5)
-                addMapListener(
-                    MapListener(onEvent = onEvent)
-                )
-            }
-        },
-        update = { mapView ->
-            if (state.markers.isEmpty()) {
-                mapView.overlays.clear()
-            } else {
-                mapView.overlays.retainAll { overlay ->
-                    overlay is Marker && state.markers.any { it.name == overlay.title }
-                }
-                val existingMarkers = mapView.overlays
-                    .filterIsInstance<Marker>()
-                    .associateBy { it.title }
+        factory = { mapView },
+        update = { map ->
+            map.overlays.clear()
+            map.overlays.add(clusterer)
+            map.addMapListener(MapListener(onEvent))
 
+            clusterer.apply {
+                setIcon(drawableToBitmap(context, R.drawable.ic_clusterer))
+                items.clear()
                 state.markers.forEach { mapMarker ->
-                    val marker = existingMarkers[mapMarker.name] ?: Marker(mapView).apply {
+                    val marker = Marker(map).apply {
+                        position = GeoPoint(mapMarker.lat, mapMarker.lon)
                         title = mapMarker.name
-                        mapView.overlays.add(this)
+                        icon = getMarkerIcon(context, mapMarker.type)
                     }
-                    marker.position = GeoPoint(mapMarker.lat, mapMarker.lon)
-                    marker.icon = getMarkerIcon(context, mapMarker.type)
+                    add(marker)
                 }
+                map.invalidate()
             }
         }
     )
