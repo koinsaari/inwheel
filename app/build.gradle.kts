@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.ksp)
     id("io.gitlab.arturbosch.detekt").version("1.23.6")
+    id("com.github.jk1.dependency-license-report").version("2.8")
 }
 
 android {
@@ -69,6 +70,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.osmbonuspack)
     ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
