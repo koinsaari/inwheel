@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.aarokoinsaari.accessibilitymap.ui.components
+package com.aarokoinsaari.accessibilitymap.view.components
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.aarokoinsaari.accessibilitymap.ui.navigation.NavigationScreen
+import com.aarokoinsaari.accessibilitymap.view.navigation.NavigationScreen
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {

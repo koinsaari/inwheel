@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.aarokoinsaari.accessibilitymap.ui.screens
+package com.aarokoinsaari.accessibilitymap.view.screens
 
 import android.content.Context
 import android.graphics.drawable.Drawable
@@ -30,7 +30,7 @@ import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.network.CategoryConfig
 import com.aarokoinsaari.accessibilitymap.state.MapState
-import com.aarokoinsaari.accessibilitymap.ui.handlers.MapListener
+import com.aarokoinsaari.accessibilitymap.view.handlers.MapListener
 import com.aarokoinsaari.accessibilitymap.utils.Utils.drawableToBitmap
 import kotlinx.coroutines.flow.StateFlow
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer

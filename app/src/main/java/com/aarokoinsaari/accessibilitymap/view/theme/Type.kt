@@ -1,4 +1,4 @@
-package com.aarokoinsaari.accessibilitymap.ui.theme
+package com.aarokoinsaari.accessibilitymap.view.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

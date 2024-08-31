@@ -19,8 +19,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.aarokoinsaari.accessibilitymap.ui.screens.MainScreen
-import com.aarokoinsaari.accessibilitymap.ui.theme.AccessibilityMapTheme
+import com.aarokoinsaari.accessibilitymap.view.screens.MainScreen
+import com.aarokoinsaari.accessibilitymap.view.theme.AccessibilityMapTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

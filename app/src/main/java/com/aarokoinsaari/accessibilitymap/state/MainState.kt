@@ -15,6 +15,6 @@
  */
 package com.aarokoinsaari.accessibilitymap.state
 
-import com.aarokoinsaari.accessibilitymap.ui.navigation.NavigationScreen
+import com.aarokoinsaari.accessibilitymap.view.navigation.NavigationScreen
 
 data class MainState(val currentScreen: NavigationScreen = NavigationScreen.Map)

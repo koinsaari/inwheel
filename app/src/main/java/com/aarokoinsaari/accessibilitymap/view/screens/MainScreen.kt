@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.aarokoinsaari.accessibilitymap.ui.screens
+package com.aarokoinsaari.accessibilitymap.view.screens
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.aarokoinsaari.accessibilitymap.ui.components.BottomNavigationBar
+import com.aarokoinsaari.accessibilitymap.view.components.BottomNavigationBar
 import com.aarokoinsaari.accessibilitymap.viewmodel.MainViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
 import org.koin.androidx.compose.koinViewModel

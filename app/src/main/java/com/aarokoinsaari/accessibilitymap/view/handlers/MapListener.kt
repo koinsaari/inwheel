@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.aarokoinsaari.accessibilitymap.ui.handlers
+package com.aarokoinsaari.accessibilitymap.view.handlers
 
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import org.osmdroid.events.MapListener

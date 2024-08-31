@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.aarokoinsaari.accessibilitymap.ui.navigation
+package com.aarokoinsaari.accessibilitymap.view.navigation
 
 import androidx.annotation.DrawableRes
 import com.aarokoinsaari.accessibilitymap.R

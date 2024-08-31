@@ -1,4 +1,4 @@
-package com.aarokoinsaari.accessibilitymap.ui.theme
+package com.aarokoinsaari.accessibilitymap.view.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

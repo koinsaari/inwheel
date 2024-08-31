@@ -19,7 +19,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aarokoinsaari.accessibilitymap.intent.MainIntent
 import com.aarokoinsaari.accessibilitymap.state.MainState
-import com.aarokoinsaari.accessibilitymap.ui.navigation.NavigationScreen
+import com.aarokoinsaari.accessibilitymap.view.navigation.NavigationScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
