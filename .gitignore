@@ -1,5 +1,6 @@
 /captures
 .cxx
+/app/release
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,android,androidstudio,kotlin,java,gradle
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,android,androidstudio,kotlin,java,gradle
