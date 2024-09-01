@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.view.screens
 
 import androidx.compose.foundation.layout.padding
@@ -49,7 +50,7 @@ fun MainScreen(
             composable("map") {
                 MapScreen(
                     stateFlow = mapState,
-                    onEvent = { intent -> mapViewModel.handleIntent(intent) }
+                    onIntent = { intent -> mapViewModel.handleIntent(intent) }
                 )
             }
             composable("places") { PlacesListScreen() }

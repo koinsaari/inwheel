@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.state
 
 import com.aarokoinsaari.accessibilitymap.model.Place
-import org.osmdroid.util.BoundingBox
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 
 data class MapState(
     val markers: List<Place> = emptyList(),
-    val zoomLevel: Double? = null,
-    val currentBbox: BoundingBox? = null,
-    val snapshotBbox: BoundingBox? = null,
+    val zoomLevel: Float? = 10f,
+    val center: LatLng? = null,
+    val currentBounds: LatLngBounds? = null,
+    val snapshotBounds: LatLngBounds? = null,
     val isLoading: Boolean = false
 ) {
     override fun toString(): String =
@@ -30,8 +33,9 @@ data class MapState(
             MapState(
                 markers=${markers.size},
                 zoomLevel=$zoomLevel,
-                currentBoundingBox=$currentBbox,
-                snapshotBoundingBox=$snapshotBbox,
+                center=$center,
+                currentBoundingBox=$currentBounds,
+                snapshotBoundingBox=$snapshotBounds,
                 isLoading=$isLoading
             )
         """.trimIndent()

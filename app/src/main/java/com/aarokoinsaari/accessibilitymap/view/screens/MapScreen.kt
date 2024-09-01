@@ -16,82 +16,68 @@
 
 package com.aarokoinsaari.accessibilitymap.view.screens
 
-import android.content.Context
-import android.graphics.drawable.Drawable
-import android.util.Log
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
-import com.aarokoinsaari.accessibilitymap.R
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
-import com.aarokoinsaari.accessibilitymap.network.CategoryConfig
 import com.aarokoinsaari.accessibilitymap.state.MapState
-import com.aarokoinsaari.accessibilitymap.view.handlers.MapListener
-import com.aarokoinsaari.accessibilitymap.utils.Utils.drawableToBitmap
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.flow.StateFlow
-import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer
-import org.osmdroid.config.Configuration
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
-import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.Marker
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
 fun MapScreen(
     stateFlow: StateFlow<MapState>,
-    onEvent: (MapIntent) -> Unit = { }
+    onIntent: (MapIntent) -> Unit = { }
 ) {
+    val vevey = LatLng(46.462, 6.841)
+
     val state by stateFlow.collectAsState()
-    val context = LocalContext.current
-    val clusterer = remember { RadiusMarkerClusterer(context) }
-    val mapView = remember {
-        MapView(context).apply {
-            setTileSource(TileSourceFactory.MAPNIK)
-            setMultiTouchControls(true)
-            zoomController.setVisibility(
-                org.osmdroid.views.CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT
-            )
-            controller.setCenter(GeoPoint(46.462, 6.841))
-            controller.setZoom(9.5)
-        }
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(
+            state.center ?: vevey, state.zoomLevel ?: 10f
+        )
     }
 
-    Configuration.getInstance().load(
-        context, context.getSharedPreferences(
-            "osmdroid", Context.MODE_PRIVATE
-        )
-    )
-
-    AndroidView(
-        factory = { mapView },
-        update = { map ->
-            map.overlays.clear()
-            map.overlays.add(clusterer)
-            map.addMapListener(MapListener(onEvent))
-
-            clusterer.apply {
-                setIcon(drawableToBitmap(context, R.drawable.ic_clusterer))
-                items.clear()
-                state.markers.forEach { mapMarker ->
-                    val marker = Marker(map).apply {
-                        position = GeoPoint(mapMarker.lat, mapMarker.lon)
-                        title = mapMarker.name
-                        icon = getMarkerIcon(context, mapMarker.type)
-                    }
-                    add(marker)
-                }
-                map.invalidate()
+    LaunchedEffect(cameraPositionState) {
+        snapshotFlow { cameraPositionState.position }
+            .distinctUntilChanged()
+            .collect { position ->
+                onIntent(
+                    MapIntent.Move(
+                        center = LatLng(position.target.latitude, position.target.longitude),
+                        zoomLevel = position.zoom,
+                        bounds = cameraPositionState.projection?.visibleRegion?.latLngBounds
+                            ?: return@collect
+                    )
+                )
             }
-        }
-    )
-}
+    }
 
-private fun getMarkerIcon(context: Context, type: String): Drawable? {
-    Log.d("MapScreen", "Marker type: $type")
-    val iconResId = CategoryConfig.allCategories[type] ?: CategoryConfig.allCategories["default"]!!
-    return ContextCompat.getDrawable(context, iconResId)
+    GoogleMap(
+        modifier = Modifier.fillMaxSize(),
+        cameraPositionState = cameraPositionState
+    ) {
+        state.markers.forEach { place ->
+            val markerState = rememberMarkerState(position = LatLng(place.lat, place.lon))
+            Marker(
+                state = markerState,
+                title = place.name,
+                snippet = "Marker in ${place.name}",
+                onClick = {
+                    onIntent(MapIntent.MarkerClick(place))
+                    true
+                }
+            )
+        }
+    }
 }

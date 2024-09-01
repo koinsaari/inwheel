@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.viewmodel
 
 import android.util.Log
@@ -21,6 +22,8 @@ import androidx.lifecycle.viewModelScope
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.state.MapState
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,13 +31,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import org.osmdroid.util.BoundingBox
-import org.osmdroid.util.GeoPoint
 
 @OptIn(FlowPreview::class)
 class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
     private val _state = MutableStateFlow(MapState())
-    private val moveIntents = MutableSharedFlow<MapIntent.Move>()
+    private val moveIntents = MutableSharedFlow<MapIntent.Move>(extraBufferCapacity = 64)
     val state: StateFlow<MapState> = _state
 
     init {
@@ -48,9 +49,23 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
     }
 
     fun handleIntent(intent: MapIntent) {
-        viewModelScope.launch {
-            moveIntents.emit(intent as MapIntent.Move)
+        when (intent) {
+            is MapIntent.Move -> {
+                viewModelScope.launch {
+                    moveIntents.emit(intent)
+                }
+            }
+
+            is MapIntent.MarkerClick -> {
+                viewModelScope.launch {
+                    handleMarkerClick(intent)
+                }
+            }
         }
+    }
+
+    private suspend fun handleMarkerClick(intent: MapIntent.MarkerClick) {
+        TODO("Not yet implemented")
     }
 
     private suspend fun handleMove(intent: MapIntent.Move) {
@@ -60,25 +75,25 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
             Log.d("MapViewModel", "Update view intent: $intent")
             _state.value = _state.value.copy(zoomLevel = intent.zoomLevel)
             val currentState = _state.value
-            val newBbox = intent.bbox
+            val newBounds = intent.bounds
 
-            if (currentState.snapshotBbox == null ||
-                centerIsOutOfBBox(intent.center, currentState.snapshotBbox)
+            if (currentState.snapshotBounds == null ||
+                centerIsOutOfBounds(intent.center, currentState.snapshotBounds)
             ) {
-                val expandedBbox = calculateExpandedBBox(newBbox)
-                _state.value = currentState.copy(snapshotBbox = newBbox)
-                _state.value = currentState.copy(currentBbox = expandedBbox)
-                loadMarkers(expandedBbox)
+                val expandedBounds = calculateExpandedBounds(newBounds)
+                _state.value = currentState.copy(snapshotBounds = newBounds)
+                _state.value = currentState.copy(currentBounds = expandedBounds)
+                loadMarkers(expandedBounds)
             }
         }
         Log.d("MapViewModel", "MapState after move: ${_state.value}")
     }
 
     @Suppress("TooGenericExceptionCaught")
-    private suspend fun loadMarkers(bbox: BoundingBox) {
+    private suspend fun loadMarkers(bounds: LatLngBounds) {
         _state.value = _state.value.copy(isLoading = true)
         try {
-            placeRepository.getPlaces(bbox)
+            placeRepository.getPlaces(bounds)
                 .distinctUntilChanged()
                 .collect { places ->
                     _state.value = _state.value.copy(
@@ -98,27 +113,37 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
         if (_state.value.markers.isNotEmpty()) {
             _state.value = _state.value.copy(
                 markers = emptyList(),
-                currentBbox = null,
-                snapshotBbox = null
+                currentBounds = null,
+                snapshotBounds = null
             )
             Log.d("MapViewModel", "Clear markers action, current state: ${_state.value}")
         }
     }
 
-    private fun calculateExpandedBBox(bbox: BoundingBox): BoundingBox {
-        val latBuffer = (bbox.latNorth - bbox.latSouth) * (EXPAND_FACTOR - 1) / 2
-        val lonBuffer = (bbox.lonEast - bbox.lonWest) * (EXPAND_FACTOR - 1) / 2
-        return BoundingBox(
-            bbox.latNorth + latBuffer,
-            bbox.lonEast + lonBuffer,
-            bbox.latSouth - latBuffer,
-            bbox.lonWest - lonBuffer
+    private fun calculateExpandedBounds(bounds: LatLngBounds): LatLngBounds {
+        val latBuffer =
+            (bounds.northeast.latitude - bounds.southwest.latitude) * (EXPAND_FACTOR - 1) / 2
+        val lonBuffer =
+            (bounds.northeast.longitude - bounds.southwest.longitude) * (EXPAND_FACTOR - 1) / 2
+        return LatLngBounds(
+            LatLng(
+                bounds.southwest.latitude - latBuffer,
+                bounds.southwest.longitude - lonBuffer
+            ),
+            LatLng(
+                bounds.northeast.latitude + latBuffer,
+                bounds.northeast.longitude + lonBuffer
+            )
         )
     }
 
-    private fun centerIsOutOfBBox(center: GeoPoint, bbox: BoundingBox): Boolean =
-        center.latitude < bbox.latSouth || center.latitude > bbox.latNorth ||
-                center.longitude < bbox.lonWest || center.longitude > bbox.lonEast
+    private fun centerIsOutOfBounds(center: LatLng, bounds: LatLngBounds?): Boolean {
+        if (bounds == null) return true
+        return center.latitude < bounds.southwest.latitude ||
+                center.latitude > bounds.northeast.latitude ||
+                center.longitude < bounds.southwest.longitude ||
+                center.longitude > bounds.northeast.longitude
+    }
 
     companion object {
         private const val ZOOM_THRESHOLD = 16.0

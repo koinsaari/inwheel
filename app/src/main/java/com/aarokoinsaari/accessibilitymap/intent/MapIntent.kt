@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.intent
 
-import org.osmdroid.util.BoundingBox
-import org.osmdroid.util.GeoPoint
+import com.aarokoinsaari.accessibilitymap.model.Place
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 
 sealed class MapIntent {
     data class Move(
-        val center: GeoPoint,
-        val zoomLevel: Double,
-        val bbox: BoundingBox
+        val center: LatLng,
+        val zoomLevel: Float,
+        val bounds: LatLngBounds
     ) : MapIntent()
+
+    data class MarkerClick(val place: Place) : MapIntent()
 }
