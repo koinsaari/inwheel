@@ -1,7 +1,7 @@
 [versions]
-agp = "8.5.2"
+agp = "8.6.0"
 google-services = "4.4.2"
-firebaseBom = "33.1.2"
+firebaseBom = "33.2.0"
 converterGson = "2.9.0"
 koinAndroid = "3.5.6"
 kotlin = "2.0.0"
@@ -11,14 +11,15 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.4"
 activityCompose = "1.9.1"
-composeBom = "2024.06.00"
+composeBom = "2024.08.00"
 loggingInterceptor = "4.9.0"
+mapsCompose = "6.1.0"
 navigationCompose = "2.7.7"
-osmbonuspack = "6.9.0"
-osmdroidAndroid = "6.1.18"
+playServicesMaps = "19.0.0"
 retrofit = "2.11.0"
 roomKtx = "2.6.1"
 ksp = "2.0.0-1.0.23"
+secretsGradlePlugin = "2.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,8 +42,8 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinAndroid" }
 koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinAndroid" }
 logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
-osmbonuspack = { module = "com.github.MKergall:osmbonuspack", version.ref = "osmbonuspack" }
-osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroid" }
+maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomKtx" }
@@ -53,3 +54,4 @@ jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = 
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+secrets-gradle-plugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
