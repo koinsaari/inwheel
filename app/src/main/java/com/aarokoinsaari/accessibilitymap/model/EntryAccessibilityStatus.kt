@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.model
 
 enum class EntryAccessibilityStatus {
     STEP_FREE,
-    LIMITED_STEPS,
-    SIGNIFICANT_STEPS,
-    STEPS_ONLY,
+    ONE_STEP,
+    FEW_STEPS,
+    SEVERAL_STEPS,
     UNKNOWN
 }
