@@ -23,28 +23,47 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.state.MapState
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MapsComposeExperimentalApi
+import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 
+@OptIn(MapsComposeExperimentalApi::class)
 @Composable
 fun MapScreen(
     stateFlow: StateFlow<MapState>,
     onIntent: (MapIntent) -> Unit = { }
 ) {
     val vevey = LatLng(46.462, 6.841)
-
     val state by stateFlow.collectAsState()
+    val context = LocalContext.current
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
             state.center ?: vevey, state.zoomLevel ?: 10f
+        )
+    }
+
+    GoogleMap(
+        modifier = Modifier.fillMaxSize(),
+        cameraPositionState = cameraPositionState
+    ) {
+        Clustering(
+            items = state.clusterItems,
+            onClusterClick = {
+                cameraPositionState.move(
+                    CameraUpdateFactory.zoomIn()
+                )
+                false
+            },
+            onClusterItemClick = { _ -> true }
         )
     }
 
@@ -61,23 +80,5 @@ fun MapScreen(
                     )
                 )
             }
-    }
-
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState
-    ) {
-        state.markers.forEach { place ->
-            val markerState = rememberMarkerState(position = LatLng(place.lat, place.lon))
-            Marker(
-                state = markerState,
-                title = place.name,
-                snippet = "Marker in ${place.name}",
-                onClick = {
-                    onIntent(MapIntent.MarkerClick(place))
-                    true
-                }
-            )
-        }
     }
 }

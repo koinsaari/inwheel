@@ -17,11 +17,13 @@
 package com.aarokoinsaari.accessibilitymap.state
 
 import com.aarokoinsaari.accessibilitymap.model.Place
+import com.aarokoinsaari.accessibilitymap.model.PlaceClusterItem
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 
 data class MapState(
     val markers: List<Place> = emptyList(),
+    val clusterItems: List<PlaceClusterItem> = emptyList(),
     val zoomLevel: Float? = 10f,
     val center: LatLng? = null,
     val currentBounds: LatLngBounds? = null,
@@ -32,6 +34,7 @@ data class MapState(
         """
             MapState(
                 markers=${markers.size},
+                clusterItems=${clusterItems.size},
                 zoomLevel=$zoomLevel,
                 center=$center,
                 currentBoundingBox=$currentBounds,

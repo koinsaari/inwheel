@@ -20,6 +20,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
+import com.aarokoinsaari.accessibilitymap.model.PlaceClusterItem
 import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.google.android.gms.maps.model.LatLng
@@ -49,31 +50,25 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
     }
 
     fun handleIntent(intent: MapIntent) {
-        when (intent) {
-            is MapIntent.Move -> {
-                viewModelScope.launch {
-                    moveIntents.emit(intent)
-                }
-            }
-
-            is MapIntent.MarkerClick -> {
-                viewModelScope.launch {
-                    handleMarkerClick(intent)
-                }
+        viewModelScope.launch {
+            when (intent) {
+                is MapIntent.Move -> moveIntents.emit(intent)
+                is MapIntent.MarkerClick -> handleMarkerClick(intent)
             }
         }
     }
 
-    private suspend fun handleMarkerClick(intent: MapIntent.MarkerClick) {
-        TODO("Not yet implemented")
-    }
 
     private suspend fun handleMove(intent: MapIntent.Move) {
         if (intent.zoomLevel < ZOOM_THRESHOLD) {
             handleClearMarkers()
         } else {
             Log.d("MapViewModel", "Update view intent: $intent")
-            _state.value = _state.value.copy(zoomLevel = intent.zoomLevel)
+            _state.value = _state.value.copy(
+                zoomLevel = intent.zoomLevel,
+                center = intent.center,
+                currentBounds = intent.bounds
+            )
             val currentState = _state.value
             val newBounds = intent.bounds
 
@@ -83,30 +78,35 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
                 val expandedBounds = calculateExpandedBounds(newBounds)
                 _state.value = currentState.copy(snapshotBounds = newBounds)
                 _state.value = currentState.copy(currentBounds = expandedBounds)
-                loadMarkers(expandedBounds)
+                loadClusterItems(expandedBounds)
             }
         }
         Log.d("MapViewModel", "MapState after move: ${_state.value}")
     }
 
     @Suppress("TooGenericExceptionCaught")
-    private suspend fun loadMarkers(bounds: LatLngBounds) {
+    private suspend fun loadClusterItems(bounds: LatLngBounds) {
         _state.value = _state.value.copy(isLoading = true)
         try {
             placeRepository.getPlaces(bounds)
                 .distinctUntilChanged()
                 .collect { places ->
+                    val clusterItems = places.map { PlaceClusterItem(it, zIndex = 1f) }
                     _state.value = _state.value.copy(
-                        markers = places,
+                        clusterItems = clusterItems,
                         isLoading = false
                     )
-                    Log.d("MapViewModel", "MapState after marker load: ${_state.value}")
+                    Log.d("MapViewModel", "MapState after cluster item load: ${_state.value}")
                 }
         } catch (e: Exception) {
             // TODO: Handle error
-            Log.e("MapViewModel", "Error loading markers", e)
+            Log.e("MapViewModel", "Error loading cluster items", e)
             _state.value = _state.value.copy(isLoading = false)
         }
+    }
+
+    private suspend fun handleMarkerClick(intent: MapIntent.MarkerClick) {
+        TODO("Not yet implemented")
     }
 
     private fun handleClearMarkers() {
@@ -146,8 +146,8 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
     }
 
     companion object {
-        private const val ZOOM_THRESHOLD = 16.0
+        private const val ZOOM_THRESHOLD = 14.0
         private const val EXPAND_FACTOR = 3.0
-        private const val DEBOUNCE_VALUE = 200L
+        private const val DEBOUNCE_VALUE = 300L
     }
 }
