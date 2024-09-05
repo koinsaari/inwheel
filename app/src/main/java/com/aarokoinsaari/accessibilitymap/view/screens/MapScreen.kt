@@ -23,7 +23,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -44,7 +43,6 @@ fun MapScreen(
 ) {
     val vevey = LatLng(46.462, 6.841)
     val state by stateFlow.collectAsState()
-    val context = LocalContext.current
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
             state.center ?: vevey, state.zoomLevel ?: 10f

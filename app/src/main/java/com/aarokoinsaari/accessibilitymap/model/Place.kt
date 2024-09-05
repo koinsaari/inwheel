@@ -36,6 +36,10 @@ data class PlaceClusterItem(
     private val place: Place,
     private val zIndex: Float?
 ) : ClusterItem {
+
+    val placeData: Place
+        get() = place
+
     override fun getPosition(): LatLng = LatLng(place.lat, place.lon)
     override fun getTitle(): String = place.name
     override fun getSnippet(): String = place.type

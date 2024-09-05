@@ -53,59 +53,58 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
         viewModelScope.launch {
             when (intent) {
                 is MapIntent.Move -> moveIntents.emit(intent)
-                is MapIntent.MarkerClick -> handleMarkerClick(intent)
+                is MapIntent.MarkerClick -> handleMarkerClick()
             }
         }
     }
-
 
     private suspend fun handleMove(intent: MapIntent.Move) {
         if (intent.zoomLevel < ZOOM_THRESHOLD) {
             handleClearMarkers()
-        } else {
-            Log.d("MapViewModel", "Update view intent: $intent")
-            _state.value = _state.value.copy(
-                zoomLevel = intent.zoomLevel,
-                center = intent.center,
-                currentBounds = intent.bounds
-            )
-            val currentState = _state.value
-            val newBounds = intent.bounds
+            return
+        }
 
-            if (currentState.snapshotBounds == null ||
-                centerIsOutOfBounds(intent.center, currentState.snapshotBounds)
-            ) {
-                val expandedBounds = calculateExpandedBounds(newBounds)
-                _state.value = currentState.copy(snapshotBounds = newBounds)
-                _state.value = currentState.copy(currentBounds = expandedBounds)
-                loadClusterItems(expandedBounds)
-            }
+        Log.d("MapViewModel", "Update view intent: $intent")
+        _state.value = _state.value.copy(
+            zoomLevel = intent.zoomLevel,
+            center = intent.center,
+            currentBounds = intent.bounds
+        )
+        val currentState = _state.value
+        if (currentState.snapshotBounds == null ||
+            centerIsOutOfBounds(intent.center, currentState.snapshotBounds)
+        ) {
+            val expandedBounds = calculateExpandedBounds(intent.bounds)
+            _state.value = _state.value.copy(
+                currentBounds = intent.bounds,
+                snapshotBounds = expandedBounds
+            )
+            fetchAndSetPlaces(intent.bounds, expandedBounds)
         }
         Log.d("MapViewModel", "MapState after move: ${_state.value}")
     }
 
-    @Suppress("TooGenericExceptionCaught")
-    private suspend fun loadClusterItems(bounds: LatLngBounds) {
-        _state.value = _state.value.copy(isLoading = true)
-        try {
-            placeRepository.getPlaces(bounds)
-                .distinctUntilChanged()
-                .collect { places ->
-                    val clusterItems = places.map { PlaceClusterItem(it, zIndex = 1f) }
-                    _state.value = _state.value.copy(
-                        clusterItems = clusterItems,
-                        isLoading = false
-                    )
-                    Log.d("MapViewModel", "MapState after cluster item load: ${_state.value}")
-                }
-        } catch (e: Exception) {
-            // TODO: Handle error
-            Log.e("MapViewModel", "Error loading cluster items", e)
-            _state.value = _state.value.copy(isLoading = false)
-        }
+    private suspend fun fetchAndSetPlaces(
+        currentBounds: LatLngBounds,
+        expandedBounds: LatLngBounds
+    ) {
+        placeRepository.getPlaces(currentBounds, expandedBounds)
+            .distinctUntilChanged()
+            .collect { newPlaces ->
+                val currentClusterItems = _state.value.clusterItems
+                val combinedClusterItems =
+                    (currentClusterItems + newPlaces.map {
+                        PlaceClusterItem(it, 1f)
+                    }).distinctBy { it.placeData.id }
+
+                _state.value = _state.value.copy(
+                    clusterItems = combinedClusterItems,
+                    isLoading = false
+                )
+            }
     }
 
-    private suspend fun handleMarkerClick(intent: MapIntent.MarkerClick) {
+    private fun handleMarkerClick() {
         TODO("Not yet implemented")
     }
 
@@ -121,33 +120,27 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
     }
 
     private fun calculateExpandedBounds(bounds: LatLngBounds): LatLngBounds {
-        val latBuffer =
-            (bounds.northeast.latitude - bounds.southwest.latitude) * (EXPAND_FACTOR - 1) / 2
-        val lonBuffer =
-            (bounds.northeast.longitude - bounds.southwest.longitude) * (EXPAND_FACTOR - 1) / 2
-        return LatLngBounds(
-            LatLng(
-                bounds.southwest.latitude - latBuffer,
-                bounds.southwest.longitude - lonBuffer
-            ),
-            LatLng(
-                bounds.northeast.latitude + latBuffer,
-                bounds.northeast.longitude + lonBuffer
-            )
+        val latDiff = bounds.northeast.latitude - bounds.southwest.latitude
+        val lonDiff = bounds.northeast.longitude - bounds.southwest.longitude
+
+        val expandedSouthwest = LatLng(
+            bounds.southwest.latitude - latDiff * (EXPAND_FACTOR - 1) / 2,
+            bounds.southwest.longitude - lonDiff * (EXPAND_FACTOR - 1) / 2
         )
+        val expandedNortheast = LatLng(
+            bounds.northeast.latitude + latDiff * (EXPAND_FACTOR - 1) / 2,
+            bounds.northeast.longitude + lonDiff * (EXPAND_FACTOR - 1) / 2
+        )
+
+        return LatLngBounds(expandedSouthwest, expandedNortheast)
     }
 
-    private fun centerIsOutOfBounds(center: LatLng, bounds: LatLngBounds?): Boolean {
-        if (bounds == null) return true
-        return center.latitude < bounds.southwest.latitude ||
-                center.latitude > bounds.northeast.latitude ||
-                center.longitude < bounds.southwest.longitude ||
-                center.longitude > bounds.northeast.longitude
-    }
+    private fun centerIsOutOfBounds(center: LatLng, bounds: LatLngBounds): Boolean =
+        !bounds.contains(center)
 
     companion object {
-        private const val ZOOM_THRESHOLD = 14.0
+        private const val ZOOM_THRESHOLD = 12.0
         private const val EXPAND_FACTOR = 3.0
-        private const val DEBOUNCE_VALUE = 300L
+        private const val DEBOUNCE_VALUE = 200L
     }
 }
