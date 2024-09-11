@@ -112,6 +112,7 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
         if (_state.value.markers.isNotEmpty()) {
             _state.value = _state.value.copy(
                 markers = emptyList(),
+                clusterItems = emptyList(),
                 currentBounds = null,
                 snapshotBounds = null
             )
@@ -139,7 +140,7 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
         !bounds.contains(center)
 
     companion object {
-        private const val ZOOM_THRESHOLD = 12.0
+        private const val ZOOM_THRESHOLD = 13.5
         private const val EXPAND_FACTOR = 3.0
         private const val DEBOUNCE_VALUE = 200L
     }

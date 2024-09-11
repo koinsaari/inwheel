@@ -22,7 +22,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 
 data class MapState(
-    val markers: List<Place> = emptyList(),
+    val markers: List<Place> = emptyList(), // TODO: No use currently
     val clusterItems: List<PlaceClusterItem> = emptyList(),
     val zoomLevel: Float? = 10f,
     val center: LatLng? = null,
