@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.network
 
 object OverpassQueryBuilder {
-    fun buildQuery(bbox: String): String {
+    fun buildQuery(bounds: String): String {
         val categoryQueries = CategoryConfig
             .allCategories
             .keys
             .joinToString(separator = "") { category ->
-                """node["amenity"="$category"]($bbox);"""
+                """node["amenity"="$category"]($bounds);"""
             }
         return """
             [out:json];

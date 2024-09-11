@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.clustering.ClusterItem
 
 @Entity(tableName = "places")
 data class Place(
@@ -28,6 +31,20 @@ data class Place(
     val tags: Map<String, String>?,
     val accessibility: AccessibilityInfo?
 )
+
+data class PlaceClusterItem(
+    private val place: Place,
+    private val zIndex: Float?
+) : ClusterItem {
+
+    val placeData: Place
+        get() = place
+
+    override fun getPosition(): LatLng = LatLng(place.lat, place.lon)
+    override fun getTitle(): String = place.name
+    override fun getSnippet(): String = place.type
+    override fun getZIndex(): Float? = null
+}
 
 data class AccessibilityInfo(
     val wheelchairAccess: WheelchairAccessStatus?,

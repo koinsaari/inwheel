@@ -13,25 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.state
 
 import com.aarokoinsaari.accessibilitymap.model.Place
-import org.osmdroid.util.BoundingBox
+import com.aarokoinsaari.accessibilitymap.model.PlaceClusterItem
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 
 data class MapState(
-    val markers: List<Place> = emptyList(),
-    val zoomLevel: Double? = null,
-    val currentBbox: BoundingBox? = null,
-    val snapshotBbox: BoundingBox? = null,
+    val markers: List<Place> = emptyList(), // TODO: No use currently
+    val clusterItems: List<PlaceClusterItem> = emptyList(),
+    val zoomLevel: Float? = 10f,
+    val center: LatLng? = null,
+    val currentBounds: LatLngBounds? = null,
+    val snapshotBounds: LatLngBounds? = null,
     val isLoading: Boolean = false
 ) {
     override fun toString(): String =
         """
             MapState(
                 markers=${markers.size},
+                clusterItems=${clusterItems.size},
                 zoomLevel=$zoomLevel,
-                currentBoundingBox=$currentBbox,
-                snapshotBoundingBox=$snapshotBbox,
+                center=$center,
+                currentBoundingBox=$currentBounds,
+                snapshotBoundingBox=$snapshotBounds,
                 isLoading=$isLoading
             )
         """.trimIndent()

@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.ksp)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.secrets.gradle.plugin)
     id("io.gitlab.arturbosch.detekt").version("1.23.6")
     id("com.github.jk1.dependency-license-report").version("2.8")
 }
@@ -31,6 +32,16 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
+            )
+        }
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-DEBUG"
+            isMinifyEnabled = false
+            isDebuggable = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android.txt"),
+                "proguard-rules-debug.pro"
             )
         }
     }
@@ -65,15 +76,20 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.osmdroid.android)
-    implementation(libs.koin.android)
-    implementation(libs.koin.compose)
+    implementation(libs.play.services.maps)
+    implementation(libs.maps.utils.ktx)
+    implementation(libs.maps.compose)
+    implementation(libs.maps.compose.utils)
+    implementation(libs.maps.compose.widgets)
+    implementation(libs.android.maps.utils)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.room.ktx)
-    implementation(libs.osmbonuspack)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
+    implementation(libs.kotlinx.collections.immutable)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -81,6 +97,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+secrets {
+    propertiesFileName = "secrets.properties"
+    defaultPropertiesFileName = "local.defaults.properties"
 }
 
 detekt {

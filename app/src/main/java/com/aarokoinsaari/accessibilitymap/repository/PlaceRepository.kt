@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.repository
 
 import android.util.Log
@@ -20,47 +21,62 @@ import com.aarokoinsaari.accessibilitymap.database.PlacesDao
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.network.OverpassApiService
 import com.aarokoinsaari.accessibilitymap.network.OverpassQueryBuilder
+import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import org.osmdroid.util.BoundingBox
 
 class PlaceRepository(
     private val apiService: OverpassApiService,
     private val placesDao: PlacesDao
 ) {
     @Suppress("TooGenericExceptionCaught")
-    fun getPlaces(bbox: BoundingBox): Flow<List<Place>> = flow {
+    fun getPlaces(bounds: LatLngBounds, snapshotBounds: LatLngBounds): Flow<List<Place>> = flow {
         val cachedPlaces = placesDao.getPlaces(
-            bbox.latSouth,
-            bbox.lonWest,
-            bbox.latNorth,
-            bbox.lonEast
+            snapshotBounds.southwest.latitude,
+            snapshotBounds.southwest.longitude,
+            snapshotBounds.northeast.latitude,
+            snapshotBounds.northeast.longitude
         )
-        if (cachedPlaces.isNotEmpty()) {
-            emit(cachedPlaces)
-            Log.d("Repository", "Using cached places: $cachedPlaces")
-        } else {
-            val bboxStr = "${bbox.latSouth},${bbox.lonWest},${bbox.latNorth},${bbox.lonEast}"
-            val query = OverpassQueryBuilder.buildQuery(bboxStr)
-            Log.d("Repository", "Query: $query")
+        emit(cachedPlaces)
+        Log.d("Repository", "Using cached places: $cachedPlaces")
+
+        if (!dataCoversBounds(cachedPlaces, bounds)) {
             try {
+                val boundStr = "${bounds.southwest.latitude}," +
+                        "${bounds.southwest.longitude}," +
+                        "${bounds.northeast.latitude}," +
+                        "${bounds.northeast.longitude}"
+                val query = OverpassQueryBuilder.buildQuery(boundStr)
+                Log.d("Repository", "Query: $query")
                 val response = apiService.getMarkers(query)
-                Log.d("Repository", "Response: $response")
-                val places = response.elements.mapNotNull {
+                val apiPlaces = response.elements.mapNotNull {
                     ApiDataConverter.convertMapMarkersToPlace(it)
                 }
-                if (places.isNotEmpty()) {
-                    placesDao.insertAll(places)
-                    Log.d("Repository", "Inserted places into database: $places")
-                    emit(places)
-                } else {
-                    Log.d("Repository", "No places found from API")
+
+                if (apiPlaces.isNotEmpty()) {
+                    placesDao.insertAll(apiPlaces)
+                    Log.d("Repository", "Inserted places into database: $apiPlaces")
+                    emit(apiPlaces)
                 }
             } catch (e: Exception) {
                 Log.e("Repository", "Failed to fetch or save places", e)
             }
         }
     }.flowOn(Dispatchers.IO)
+
+    private fun dataCoversBounds(cachedPlaces: List<Place>, bounds: LatLngBounds): Boolean {
+        if (cachedPlaces.isEmpty()) return false
+
+        val minLat = cachedPlaces.minOf { it.lat }
+        val maxLat = cachedPlaces.maxOf { it.lat }
+        val minLon = cachedPlaces.minOf { it.lon }
+        val maxLon = cachedPlaces.maxOf { it.lon }
+
+        return minLat <= bounds.southwest.latitude &&
+                maxLat >= bounds.northeast.latitude &&
+                minLon <= bounds.southwest.longitude &&
+                maxLon >= bounds.northeast.longitude
+    }
 }
