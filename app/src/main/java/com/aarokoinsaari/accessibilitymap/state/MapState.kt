@@ -28,7 +28,8 @@ data class MapState(
     val center: LatLng? = null,
     val currentBounds: LatLngBounds? = null,
     val snapshotBounds: LatLngBounds? = null,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    var selectedClusterItem: PlaceClusterItem? = null,
 ) {
     override fun toString(): String =
         """
@@ -39,7 +40,8 @@ data class MapState(
                 center=$center,
                 currentBoundingBox=$currentBounds,
                 snapshotBoundingBox=$snapshotBounds,
-                isLoading=$isLoading
+                isLoading=$isLoading,
+                selectedClusterItem=$selectedClusterItem
             )
         """.trimIndent()
 }

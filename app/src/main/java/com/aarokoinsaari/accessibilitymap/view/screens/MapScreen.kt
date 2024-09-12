@@ -16,15 +16,31 @@
 
 package com.aarokoinsaari.accessibilitymap.view.screens
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
+import com.aarokoinsaari.accessibilitymap.model.AccessibilityInfo
+import com.aarokoinsaari.accessibilitymap.model.EntryAccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.model.Place
+import com.aarokoinsaari.accessibilitymap.model.PlaceClusterItem
+import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus
 import com.aarokoinsaari.accessibilitymap.state.MapState
+import com.aarokoinsaari.accessibilitymap.utils.CategoryConfig
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -49,22 +65,6 @@ fun MapScreen(
         )
     }
 
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState
-    ) {
-        Clustering(
-            items = state.clusterItems,
-            onClusterClick = {
-                cameraPositionState.move(
-                    CameraUpdateFactory.zoomIn()
-                )
-                false
-            },
-            onClusterItemClick = { _ -> true }
-        )
-    }
-
     LaunchedEffect(cameraPositionState) {
         snapshotFlow { cameraPositionState.position }
             .distinctUntilChanged()
@@ -78,5 +78,88 @@ fun MapScreen(
                     )
                 )
             }
+    }
+
+    GoogleMap(
+        modifier = Modifier.fillMaxSize(),
+        cameraPositionState = cameraPositionState
+    ) {
+        Clustering(
+            items = state.clusterItems,
+            onClusterClick = {
+                cameraPositionState.move(
+                    CameraUpdateFactory.zoomIn()
+                )
+                false
+            },
+            onClusterItemClick = { item ->
+                if (state.selectedClusterItem == item) {
+                    state.selectedClusterItem = null
+                    true
+                } else {
+                    state.selectedClusterItem = item
+                    false
+                }
+            },
+            // Workaround for issue: https://github.com/googlemaps/android-maps-compose/issues/409
+            // Seems like Google's Marker Composable cannot be used here, so for now workaround
+            // is using basic Composables instead.
+            clusterItemContent = { item ->
+                CustomMarker(
+                    iconType = item.placeData.type
+                )
+            }
+        )
+    }
+}
+
+@Composable
+fun CustomMarker(iconType: String) {
+    val iconResId =
+        CategoryConfig.allCategories[iconType] ?: CategoryConfig.allCategories["default"]!!
+
+    Image(
+        painter = painterResource(id = iconResId),
+        contentDescription = null
+    )
+}
+
+@Composable
+fun MapInfoPopup(item: PlaceClusterItem, modifier: Modifier = Modifier) {
+    Box(modifier) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(all = 10.dp)
+        ) {
+            Text(text = item.placeData.name)
+            Text(text = item.placeData.type)
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun MapInfoPopup_Preview() {
+    MaterialTheme {
+        MapInfoPopup(
+            PlaceClusterItem(
+                place = Place(
+                    id = 1L,
+                    name = "Example Cafe",
+                    type = "Cafe",
+                    lat = -37.813,
+                    lon = 144.962,
+                    tags = mapOf("category" to "cafe"),
+                    accessibility = AccessibilityInfo(
+                        wheelchairAccess = WheelchairAccessStatus.FULLY_ACCESSIBLE,
+                        entry = EntryAccessibilityStatus.STEP_FREE,
+                        hasAccessibleToilet = true,
+                        hasElevator = false,
+                        additionalInfo = "Located on the ground floor"
+                    )
+                ),
+                zIndex = 1f
+            )
+        )
     }
 }

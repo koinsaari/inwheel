@@ -16,6 +16,8 @@
 
 package com.aarokoinsaari.accessibilitymap.network
 
+import com.aarokoinsaari.accessibilitymap.utils.CategoryConfig
+
 object OverpassQueryBuilder {
     fun buildQuery(bounds: String): String {
         val categoryQueries = CategoryConfig
