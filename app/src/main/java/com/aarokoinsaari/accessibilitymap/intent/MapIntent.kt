@@ -16,7 +16,7 @@
 
 package com.aarokoinsaari.accessibilitymap.intent
 
-import com.aarokoinsaari.accessibilitymap.model.Place
+import com.aarokoinsaari.accessibilitymap.model.PlaceClusterItem
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 
@@ -27,5 +27,5 @@ sealed class MapIntent {
         val bounds: LatLngBounds
     ) : MapIntent()
 
-    data class MarkerClick(val place: Place) : MapIntent()
+    data class ClusterItemClick(val item: PlaceClusterItem) : MapIntent()
 }

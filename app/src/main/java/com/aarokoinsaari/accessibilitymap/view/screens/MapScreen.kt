@@ -92,14 +92,9 @@ fun MapScreen(
                 )
                 false
             },
-            onClusterItemClick = { item ->
-                if (state.selectedClusterItem == item) {
-                    state.selectedClusterItem = null
-                    true
-                } else {
-                    state.selectedClusterItem = item
-                    false
-                }
+            onClusterItemClick = {
+                onIntent(MapIntent.ClusterItemClick(it))
+                false
             },
             // Workaround for issue: https://github.com/googlemaps/android-maps-compose/issues/409
             // Seems like Google's Marker Composable cannot be used here, so for now workaround

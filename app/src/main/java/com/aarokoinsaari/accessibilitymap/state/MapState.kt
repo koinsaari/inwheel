@@ -29,7 +29,7 @@ data class MapState(
     val currentBounds: LatLngBounds? = null,
     val snapshotBounds: LatLngBounds? = null,
     val isLoading: Boolean = false,
-    var selectedClusterItem: PlaceClusterItem? = null,
+    val selectedClusterItem: PlaceClusterItem? = null,
 ) {
     override fun toString(): String =
         """

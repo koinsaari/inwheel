@@ -53,7 +53,7 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
         viewModelScope.launch {
             when (intent) {
                 is MapIntent.Move -> moveIntents.emit(intent)
-                is MapIntent.MarkerClick -> handleMarkerClick()
+                is MapIntent.ClusterItemClick -> handleClusterItemClick(intent.item)
             }
         }
     }
@@ -104,8 +104,14 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
             }
     }
 
-    private fun handleMarkerClick() {
-        TODO("Not yet implemented")
+    private fun handleClusterItemClick(item: PlaceClusterItem) {
+        _state.value = _state.value.copy(
+            selectedClusterItem = if (_state.value.selectedClusterItem == item) {
+                null
+            } else {
+                item
+            }
+        )
     }
 
     private fun handleClearMarkers() {
