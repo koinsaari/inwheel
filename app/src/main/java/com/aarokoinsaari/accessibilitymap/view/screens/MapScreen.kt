@@ -17,11 +17,14 @@
 package com.aarokoinsaari.accessibilitymap.view.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,7 +32,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -101,7 +106,9 @@ fun MapScreen(
             // is using basic Composables instead.
             clusterItemContent = { item ->
                 CustomMarker(
-                    iconType = item.placeData.type
+                    iconType = item.placeData.type,
+                    iconBackgroundColor =
+                    item.placeData.accessibility.wheelchairAccess.getAccessibilityColor()
                 )
             }
         )
@@ -109,14 +116,22 @@ fun MapScreen(
 }
 
 @Composable
-fun CustomMarker(iconType: String) {
+fun CustomMarker(iconType: String, iconBackgroundColor: Color) {
     val iconResId =
         CategoryConfig.allCategories[iconType] ?: CategoryConfig.allCategories["default"]!!
 
-    Image(
-        painter = painterResource(id = iconResId),
-        contentDescription = null
-    )
+    Box(
+        modifier = Modifier
+            .size(24.dp)
+            .background(color = iconBackgroundColor, shape = CircleShape)
+            .padding(all = 6.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(id = iconResId),
+            contentDescription = null
+        )
+    }
 }
 
 @Composable

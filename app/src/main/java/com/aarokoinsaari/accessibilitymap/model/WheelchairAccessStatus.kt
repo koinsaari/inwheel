@@ -13,11 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.model
+
+import androidx.compose.ui.graphics.Color
 
 enum class WheelchairAccessStatus {
     FULLY_ACCESSIBLE,
+    PARTIALLY_ACCESSIBLE,
     LIMITED_ACCESSIBILITY,
     NOT_ACCESSIBLE,
-    UNKNOWN
+    UNKNOWN;
+
+    fun getAccessibilityColor(): Color =
+        when (this) { // TODO: Change to MaterialTheme
+            FULLY_ACCESSIBLE -> Color.Green
+            PARTIALLY_ACCESSIBLE -> Color.Yellow
+            LIMITED_ACCESSIBILITY -> Color.Yellow // TODO: Change to orange
+            NOT_ACCESSIBLE -> Color.Red
+            UNKNOWN -> Color.Gray
+        }
 }

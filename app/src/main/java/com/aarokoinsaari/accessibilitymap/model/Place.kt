@@ -29,7 +29,7 @@ data class Place(
     val lat: Double,
     val lon: Double,
     val tags: Map<String, String>?,
-    val accessibility: AccessibilityInfo?
+    val accessibility: AccessibilityInfo
 )
 
 data class PlaceClusterItem(
@@ -47,8 +47,8 @@ data class PlaceClusterItem(
 }
 
 data class AccessibilityInfo(
-    val wheelchairAccess: WheelchairAccessStatus?,
-    val entry: EntryAccessibilityStatus?,
+    val wheelchairAccess: WheelchairAccessStatus,
+    val entry: EntryAccessibilityStatus,
     val hasAccessibleToilet: Boolean?,
     val hasElevator: Boolean?,
     val additionalInfo: String?
