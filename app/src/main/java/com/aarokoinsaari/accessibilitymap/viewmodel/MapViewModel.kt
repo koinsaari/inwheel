@@ -115,7 +115,7 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
     }
 
     private fun handleClearMarkers() {
-        if (_state.value.markers.isNotEmpty()) {
+        if (_state.value.clusterItems.isNotEmpty()) {
             _state.value = _state.value.copy(
                 markers = emptyList(),
                 clusterItems = emptyList(),
