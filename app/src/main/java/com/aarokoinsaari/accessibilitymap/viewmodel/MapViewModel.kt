@@ -53,7 +53,7 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
         viewModelScope.launch {
             when (intent) {
                 is MapIntent.Move -> moveIntents.emit(intent)
-                is MapIntent.ClusterItemClick -> handleClusterItemClick(intent.item)
+                is MapIntent.MapClick -> handleMapClick(intent.item)
             }
         }
     }
@@ -104,13 +104,9 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
             }
     }
 
-    private fun handleClusterItemClick(item: PlaceClusterItem) {
+    private fun handleMapClick(item: PlaceClusterItem?) {
         _state.value = _state.value.copy(
-            selectedClusterItem = if (_state.value.selectedClusterItem == item) {
-                null
-            } else {
-                item
-            }
+            selectedClusterItem = item
         )
     }
 
@@ -120,7 +116,8 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
                 markers = emptyList(),
                 clusterItems = emptyList(),
                 currentBounds = null,
-                snapshotBounds = null
+                snapshotBounds = null,
+                selectedClusterItem = null
             )
             Log.d("MapViewModel", "Clear markers action, current state: ${_state.value}")
         }
@@ -146,7 +143,7 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
         !bounds.contains(center)
 
     companion object {
-        private const val ZOOM_THRESHOLD = 13.5
+        private const val ZOOM_THRESHOLD = 13
         private const val EXPAND_FACTOR = 3.0
         private const val DEBOUNCE_VALUE = 200L
     }

@@ -27,5 +27,5 @@ sealed class MapIntent {
         val bounds: LatLngBounds
     ) : MapIntent()
 
-    data class ClusterItemClick(val item: PlaceClusterItem) : MapIntent()
+    data class MapClick(val item: PlaceClusterItem?) : MapIntent()
 }

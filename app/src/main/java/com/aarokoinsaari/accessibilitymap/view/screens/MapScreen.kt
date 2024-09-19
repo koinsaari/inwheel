@@ -87,7 +87,8 @@ fun MapScreen(
 
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState
+        cameraPositionState = cameraPositionState,
+        onMapClick = { onIntent(MapIntent.MapClick(null)) }
     ) {
         Clustering(
             items = state.clusterItems,
@@ -98,7 +99,7 @@ fun MapScreen(
                 false
             },
             onClusterItemClick = {
-                onIntent(MapIntent.ClusterItemClick(it))
+                onIntent(MapIntent.MapClick(it))
                 false
             },
             // Workaround for issue: https://github.com/googlemaps/android-maps-compose/issues/409
