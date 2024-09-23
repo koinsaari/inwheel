@@ -47,8 +47,8 @@ data class PlaceClusterItem(
 }
 
 data class AccessibilityInfo(
-    val wheelchairAccess: WheelchairAccessStatus,
-    val entry: EntryAccessibilityStatus,
+    val wheelchairAccess: WheelchairAccessStatus = WheelchairAccessStatus.UNKNOWN,
+    val entryAccessibility: EntryAccessibilityStatus = EntryAccessibilityStatus.UNKNOWN,
     val hasAccessibleToilet: Boolean?,
     val hasElevator: Boolean?,
     val additionalInfo: String?

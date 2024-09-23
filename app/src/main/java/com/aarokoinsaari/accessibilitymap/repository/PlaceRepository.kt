@@ -39,8 +39,11 @@ class PlaceRepository(
             snapshotBounds.northeast.latitude,
             snapshotBounds.northeast.longitude
         )
-        emit(cachedPlaces)
-        Log.d("Repository", "Using cached places: $cachedPlaces")
+        Log.d("Repository", "Cached places: $cachedPlaces")
+        if (cachedPlaces.isNotEmpty()) {
+            emit(cachedPlaces)
+            Log.d("Repository", "Using cached places: $cachedPlaces")
+        }
 
         if (!dataCoversBounds(cachedPlaces, bounds)) {
             try {

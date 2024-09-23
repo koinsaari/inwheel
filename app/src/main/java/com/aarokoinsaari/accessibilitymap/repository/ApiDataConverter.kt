@@ -45,10 +45,10 @@ object ApiDataConverter {
     private fun parseAccessibilityInfo(tags: Map<String, String>): AccessibilityInfo =
         AccessibilityInfo(
             wheelchairAccess = parseWheelchairAccessStatus(tags["wheelchair"]),
-            entry = parseEntryStatus(tags["entry"]),
+            entryAccessibility = parseEntryStatus(tags["entry"]),
             hasAccessibleToilet = tags["toilet:wheelchair"] == "yes",
             hasElevator = tags["elevator"] == "yes",
-            additionalInfo = tags["note"]
+            additionalInfo = tags["wheelchair:description"] ?: tags["note"]
         )
 
     private fun parseWheelchairAccessStatus(status: String?): WheelchairAccessStatus =
