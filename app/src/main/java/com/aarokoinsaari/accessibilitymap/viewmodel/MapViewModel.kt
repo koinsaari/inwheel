@@ -115,9 +115,15 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
     }
 
     private fun handleMapClick(item: PlaceClusterItem?) {
-        _state.value = _state.value.copy(
-            selectedClusterItem = item
-        )
+        if (item == _state.value.selectedClusterItem) {
+            _state.value = _state.value.copy(
+                selectedClusterItem = null
+            )
+        } else {
+            _state.value = _state.value.copy(
+                selectedClusterItem = item
+            )
+        }
     }
 
     private fun handleClearMarkers() {
