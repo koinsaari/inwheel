@@ -37,14 +37,23 @@ import kotlinx.coroutines.launch
 class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
     private val _state = MutableStateFlow(MapState())
     private val moveIntents = MutableSharedFlow<MapIntent.Move>(extraBufferCapacity = 64)
+    private val apiCallFlow =
+        MutableSharedFlow<Pair<LatLngBounds, LatLngBounds>>(extraBufferCapacity = 64)
     val state: StateFlow<MapState> = _state
 
     init {
         viewModelScope.launch {
             moveIntents
-                .debounce(DEBOUNCE_VALUE)
                 .collect { intent ->
                     handleMove(intent)
+                }
+        }
+
+        viewModelScope.launch {
+            apiCallFlow
+                .debounce(DEBOUNCE_VALUE)
+                .collect { (currentBounds, expandedBounds) ->
+                    fetchAndSetPlaces(currentBounds, expandedBounds)
                 }
         }
     }
@@ -56,32 +65,6 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
                 is MapIntent.MapClick -> handleMapClick(intent.item)
             }
         }
-    }
-
-    private suspend fun handleMove(intent: MapIntent.Move) {
-        if (intent.zoomLevel < ZOOM_THRESHOLD) {
-            handleClearMarkers()
-            return
-        }
-
-        Log.d("MapViewModel", "Update view intent: $intent")
-        _state.value = _state.value.copy(
-            zoomLevel = intent.zoomLevel,
-            center = intent.center,
-            currentBounds = intent.bounds
-        )
-        val currentState = _state.value
-        if (currentState.snapshotBounds == null ||
-            centerIsOutOfBounds(intent.center, currentState.snapshotBounds)
-        ) {
-            val expandedBounds = calculateExpandedBounds(intent.bounds)
-            _state.value = _state.value.copy(
-                currentBounds = intent.bounds,
-                snapshotBounds = expandedBounds
-            )
-            fetchAndSetPlaces(intent.bounds, expandedBounds)
-        }
-        Log.d("MapViewModel", "MapState after move: ${_state.value}")
     }
 
     private suspend fun fetchAndSetPlaces(
@@ -102,6 +85,33 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
                     isLoading = false
                 )
             }
+    }
+
+    private fun handleMove(intent: MapIntent.Move) {
+        Log.d("MapViewModel", "Update view intent: $intent")
+        _state.value = _state.value.copy(
+            zoomLevel = intent.zoomLevel,
+            center = intent.center,
+            currentBounds = intent.bounds
+        )
+
+        if (intent.zoomLevel < ZOOM_THRESHOLD) {
+            handleClearMarkers()
+            return
+        }
+
+        val currentState = _state.value
+        if (currentState.snapshotBounds == null ||
+            centerIsOutOfBounds(intent.center, currentState.snapshotBounds)
+        ) {
+            val expandedBounds = calculateExpandedBounds(intent.bounds)
+            _state.value = _state.value.copy(
+                currentBounds = intent.bounds,
+                snapshotBounds = expandedBounds
+            )
+            apiCallFlow.tryEmit(intent.bounds to expandedBounds)
+        }
+        Log.d("MapViewModel", "MapState after move: ${_state.value}")
     }
 
     private fun handleMapClick(item: PlaceClusterItem?) {
@@ -145,6 +155,6 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
     companion object {
         private const val ZOOM_THRESHOLD = 13
         private const val EXPAND_FACTOR = 3.0
-        private const val DEBOUNCE_VALUE = 200L
+        private const val DEBOUNCE_VALUE = 250L
     }
 }
