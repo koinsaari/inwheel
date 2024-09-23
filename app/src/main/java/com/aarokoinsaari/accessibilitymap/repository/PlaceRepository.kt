@@ -34,10 +34,10 @@ class PlaceRepository(
     @Suppress("TooGenericExceptionCaught")
     fun getPlaces(bounds: LatLngBounds, snapshotBounds: LatLngBounds): Flow<List<Place>> = flow {
         val cachedPlaces = placesDao.getPlaces(
-            snapshotBounds.southwest.latitude,
-            snapshotBounds.southwest.longitude,
-            snapshotBounds.northeast.latitude,
-            snapshotBounds.northeast.longitude
+            southLat = snapshotBounds.southwest.latitude,
+            northLat = snapshotBounds.northeast.latitude,
+            westLon = snapshotBounds.southwest.longitude,
+            eastLon = snapshotBounds.northeast.longitude
         )
         Log.d("Repository", "Cached places: $cachedPlaces")
         if (cachedPlaces.isNotEmpty()) {

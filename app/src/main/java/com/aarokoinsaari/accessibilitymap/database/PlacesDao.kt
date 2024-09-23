@@ -31,10 +31,10 @@ interface PlacesDao {
     """
     )
     fun getPlaces(
-        northLat: Double,
-        eastLon: Double,
         southLat: Double,
-        westLon: Double
+        northLat: Double,
+        westLon: Double,
+        eastLon: Double
     ): List<Place>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
