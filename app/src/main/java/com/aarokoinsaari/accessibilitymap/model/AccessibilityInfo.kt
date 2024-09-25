@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package com.aarokoinsaari.accessibilitymap.intent
+package com.aarokoinsaari.accessibilitymap.model
 
-import com.aarokoinsaari.accessibilitymap.view.model.PlaceClusterItem
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-
-sealed class MapIntent {
-    data class Move(
-        val center: LatLng,
-        val zoomLevel: Float,
-        val bounds: LatLngBounds
-    ) : MapIntent()
-
-    data class MapClick(val item: PlaceClusterItem?) : MapIntent()
-}
+data class AccessibilityInfo(
+    val wheelchairAccess: WheelchairAccessStatus = WheelchairAccessStatus.UNKNOWN,
+    val entryAccessibility: EntryAccessibilityStatus = EntryAccessibilityStatus.UNKNOWN,
+    val hasAccessibleToilet: Boolean?,
+    val hasElevator: Boolean?,
+    val additionalInfo: String?
+)

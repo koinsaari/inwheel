@@ -16,10 +16,10 @@
 package com.aarokoinsaari.accessibilitymap.network
 
 data class OverpassApiResponse(
-    val elements: List<ApiMapMarkers>
+    val elements: List<ApiMapMarker>
 )
 
-data class ApiMapMarkers(
+data class ApiMapMarker(
     val type: String,
     val id: Long,
     val lat: Double,

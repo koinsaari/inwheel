@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package com.aarokoinsaari.accessibilitymap.intent
+package com.aarokoinsaari.accessibilitymap.view.model
 
-import com.aarokoinsaari.accessibilitymap.view.model.PlaceClusterItem
+import com.aarokoinsaari.accessibilitymap.model.Place
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.clustering.ClusterItem
 
-sealed class MapIntent {
-    data class Move(
-        val center: LatLng,
-        val zoomLevel: Float,
-        val bounds: LatLngBounds
-    ) : MapIntent()
+data class PlaceClusterItem(
+    private val place: Place,
+    private val zIndex: Float?
+) : ClusterItem {
 
-    data class MapClick(val item: PlaceClusterItem?) : MapIntent()
+    val placeData: Place
+        get() = place
+
+    override fun getPosition(): LatLng = LatLng(place.lat, place.lon)
+    override fun getTitle(): String = place.name
+    override fun getSnippet(): String = place.category.name
+    override fun getZIndex(): Float? = null
 }

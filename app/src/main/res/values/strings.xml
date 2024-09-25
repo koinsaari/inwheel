@@ -1,6 +1,20 @@
 <resources>
     <string name="app_name">Accessibility Map</string>
 
+    <string name="category_cafe">Cafe</string>
+    <string name="category_restaurant">Restaurant</string>
+    <string name="category_toilets">Toilets</string>
+    <string name="category_bus_station">Bus Station</string>
+    <string name="category_train_station">Train Station</string>
+    <string name="category_subway_station">Subway Station</string>
+    <string name="category_parking">Parking</string>
+    <string name="category_supermarket">Supermarket</string>
+    <string name="category_shop">Shop</string>
+    <string name="category_pharmacy">Pharmacy</string>
+    <string name="category_hospital">Hospital</string>
+    <string name="category_beach">Beach</string>
+    <string name="category_default">Unknown</string>
+
     <string name="accessibility_status_yes">Yes</string>
     <string name="accessibility_status_no">No</string>
     <string name="accessibility_status_unknown">Unknown</string>
