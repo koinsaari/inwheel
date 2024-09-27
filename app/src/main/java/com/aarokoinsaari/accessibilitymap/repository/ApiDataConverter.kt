@@ -15,9 +15,7 @@
  */
 package com.aarokoinsaari.accessibilitymap.repository
 
-import android.util.Log
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityInfo
-import com.aarokoinsaari.accessibilitymap.model.EntryAccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus
 import com.aarokoinsaari.accessibilitymap.network.ApiMapMarker
@@ -44,9 +42,8 @@ object ApiDataConverter {
     private fun parseAccessibilityInfo(tags: Map<String, String>): AccessibilityInfo =
         AccessibilityInfo(
             wheelchairAccess = parseWheelchairAccessStatus(tags["wheelchair"]),
-            entryAccessibility = parseEntryStatus(tags["entry"]),
-            hasAccessibleToilet = tags["toilet:wheelchair"] == "yes",
-            hasElevator = tags["elevator"] == "yes",
+            hasAccessibleToilet = parseBooleanAccessibilityStatus(tags["toilet:wheelchair"]),
+            hasElevator = parseBooleanAccessibilityStatus(tags["elevator"]),
             additionalInfo = tags["wheelchair:description"] ?: tags["note"]
         )
 
@@ -58,17 +55,10 @@ object ApiDataConverter {
             else -> WheelchairAccessStatus.UNKNOWN
         }
 
-    private fun parseEntryStatus(status: String?): EntryAccessibilityStatus =
-        try {
-            if (status != null) {
-                EntryAccessibilityStatus.valueOf(
-                    status.replace(" ", "_").uppercase()
-                )
-            } else {
-                EntryAccessibilityStatus.UNKNOWN
-            }
-        } catch (e: IllegalArgumentException) {
-            Log.e("ApiDataConverter", "Invalid entry status: $status", e)
-            EntryAccessibilityStatus.UNKNOWN
+    private fun parseBooleanAccessibilityStatus(status: String?): Boolean? =
+        when (status?.lowercase()) {
+            "yes" -> true
+            "no" -> false
+            else -> null
         }
 }

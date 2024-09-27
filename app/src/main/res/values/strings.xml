@@ -21,17 +21,10 @@
 
     <string name="accessibility_toilet_label">Accessible toilet:</string>
     <string name="accessibility_elevator_label">Elevator:</string>
-    <string name="accessibility_entrance_label">Entrance:</string>
 
     <string name="wheelchair_access_fully_accessible">Fully accessible</string>
     <string name="wheelchair_access_partially_accessible">Partially accessible</string>
     <string name="wheelchair_access_limited_accessibility">Limited accessibility</string>
     <string name="wheelchair_access_not_accessible">Not accessible</string>
     <string name="wheelchair_access_unknown">Unknown accessibility</string>
-
-    <string name="entry_accessibility_step_free">Step-free access</string>
-    <string name="entry_accessibility_one_step">One step</string>
-    <string name="entry_accessibility_few_steps">Few steps</string>
-    <string name="entry_accessibility_several_steps">Several steps</string>
-    <string name="entry_accessibility_unknown">Unknown</string>
 </resources>
