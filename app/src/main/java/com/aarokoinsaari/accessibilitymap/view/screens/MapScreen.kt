@@ -22,11 +22,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +49,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -171,8 +176,11 @@ fun MapScreen(
                                 y = screenPosition.y - popupSize.height - markerHeight
                             )
                         }
-                        .background(Color.White)
-                        .padding(8.dp)
+                        .background(
+                            color = Color.White,
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        .padding(16.dp)
                 )
             }
         }
@@ -199,66 +207,97 @@ fun CustomMarker(iconType: String, modifier: Modifier = Modifier) {
 fun MarkerInfoWindow(item: PlaceClusterItem, modifier: Modifier = Modifier) {
     Column(
         verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.Start,
         modifier = modifier
     ) {
-        // TODO: Image representing the accessibility status here
+        InfoWindowAccessibilityImage(
+            status = item.placeData.accessibility.wheelchairAccess,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .size(96.dp)
+                .background(
+                    color = item.placeData.accessibility.wheelchairAccess.getAccessibilityColor(),
+                    shape = CircleShape
+                )
+        )
+        Spacer(Modifier.height(24.dp))
         Text(
             text = item.placeData.name,
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.widthIn(max = 200.dp)
         )
         Text(
             text = item.placeData.type,
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(id = R.string.accessibility_elevator_label),
-                style = MaterialTheme.typography.bodyMedium
+        InfoWindowAccessibilityInfo(
+            infoLabel = stringResource(id = R.string.accessibility_elevator_label),
+            status = stringResource(
+                id = item.placeData.accessibility.hasElevator.getAccessibilityStatusStringRes()
             )
-            Text(
-                text = stringResource(
-                    id = item.placeData.accessibility.hasElevator
-                        .getAccessibilityStatusStringRes()
-                ),
-                style = MaterialTheme.typography.titleSmall
+        )
+        InfoWindowAccessibilityInfo(
+            infoLabel = stringResource(id = R.string.accessibility_toilet_label),
+            status = stringResource(
+                id = item.placeData.accessibility.hasAccessibleToilet
+                    .getAccessibilityStatusStringRes()
             )
-        }
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(id = R.string.accessibility_toilet_label),
-                style = MaterialTheme.typography.bodyMedium
+        )
+        InfoWindowAccessibilityInfo(
+            infoLabel = stringResource(id = R.string.accessibility_entrance_label),
+            status = stringResource(
+                id = item.placeData.accessibility.entryAccessibility
+                    .getEntryAccessibilityStringRes()
             )
-            Text(
-                text = stringResource(
-                    id = item.placeData.accessibility.hasAccessibleToilet
-                        .getAccessibilityStatusStringRes()
-                ),
-                style = MaterialTheme.typography.titleSmall
-            )
-        }
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(id = R.string.accessibility_entrance_label),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = stringResource(
-                    id = item.placeData.accessibility.entryAccessibility
-                        .getEntryAccessibilityStringRes(),
-                ),
-                style = MaterialTheme.typography.titleSmall
-            )
-        }
+        )
+    }
+}
+
+@Composable
+fun InfoWindowAccessibilityImage(
+    status: WheelchairAccessStatus?,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+    ) {
+        Image(
+            painter = painterResource(
+                id = if (status != NOT_ACCESSIBLE) {
+                    R.drawable.ic_accessible
+                } else {
+                    R.drawable.ic_not_accessible
+                }
+            ),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(0.8f)
+        )
+    }
+}
+
+@Composable
+fun InfoWindowAccessibilityInfo(
+    infoLabel: String,
+    status: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+    ) {
+        Text(
+            text = infoLabel,
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Text(
+            text = status,
+            style = MaterialTheme.typography.titleSmall
+        )
     }
 }
 
