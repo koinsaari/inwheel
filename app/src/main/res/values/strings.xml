@@ -19,8 +19,9 @@
     <string name="accessibility_status_no">No</string>
     <string name="accessibility_status_unknown">Unknown</string>
 
-    <string name="accessibility_toilet_label">Accessible toilet:</string>
-    <string name="accessibility_elevator_label">Elevator:</string>
+    <string name="accessibility_wheelchair_label">Wheelchair: </string>
+    <string name="accessibility_toilet_label">Accessible toilet: </string>
+    <string name="accessibility_elevator_label">Elevator: </string>
 
     <string name="wheelchair_access_fully_accessible">Fully accessible</string>
     <string name="wheelchair_access_partially_accessible">Partially accessible</string>

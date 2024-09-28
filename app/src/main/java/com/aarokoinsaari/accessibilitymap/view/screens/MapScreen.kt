@@ -230,6 +230,13 @@ fun MarkerInfoWindow(item: PlaceClusterItem, modifier: Modifier = Modifier) {
             modifier = Modifier.padding(bottom = 16.dp)
         )
         InfoWindowAccessibilityInfo(
+            infoLabel = stringResource(id = R.string.accessibility_wheelchair_label),
+            status = stringResource(
+                id = item.placeData.accessibility.wheelchairAccess
+                    .getWheelchairAccessibilityStatusStringRes()
+            )
+        )
+        InfoWindowAccessibilityInfo(
             infoLabel = stringResource(id = R.string.accessibility_elevator_label),
             status = stringResource(
                 id = item.placeData.accessibility.hasElevator.getAccessibilityStatusStringRes()
@@ -275,7 +282,7 @@ fun InfoWindowAccessibilityInfo(
     modifier: Modifier = Modifier
 ) {
     Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
@@ -289,6 +296,15 @@ fun InfoWindowAccessibilityInfo(
         )
     }
 }
+
+private fun WheelchairAccessStatus.getWheelchairAccessibilityStatusStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.wheelchair_access_fully_accessible
+        PARTIALLY_ACCESSIBLE -> R.string.wheelchair_access_partially_accessible
+        LIMITED_ACCESSIBILITY -> R.string.wheelchair_access_limited_accessibility
+        NOT_ACCESSIBLE -> R.string.wheelchair_access_not_accessible
+        UNKNOWN -> R.string.wheelchair_access_unknown
+    }
 
 private fun WheelchairAccessStatus.getAccessibilityColor(): Color =
     when (this) { // TODO: Change to MaterialTheme
