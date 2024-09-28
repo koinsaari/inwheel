@@ -16,20 +16,19 @@
 
 package com.aarokoinsaari.accessibilitymap.network
 
-import com.aarokoinsaari.accessibilitymap.utils.CategoryConfig
+import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory
 
 object OverpassQueryBuilder {
     fun buildQuery(bounds: String): String {
-        val categoryQueries = CategoryConfig
-            .allCategories
-            .keys
-            .joinToString(separator = "") { category ->
-                """node["amenity"="$category"]($bounds);"""
-            }
+        val categories = PlaceCategory.entries
+            .filter { it != PlaceCategory.DEFAULT }
+            .map { it.amenityTag }
+        val categoryQuery = categories.joinToString(separator = "|") { it }
+
         return """
-            [out:json];
+            [out:json][timeout:25];
             (
-              $categoryQueries
+              node["amenity"~"^($categoryQuery)$"]($bounds);
             );
             out body;
             >;

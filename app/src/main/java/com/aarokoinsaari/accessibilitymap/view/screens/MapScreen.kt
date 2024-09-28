@@ -57,9 +57,7 @@ import androidx.compose.ui.unit.dp
 import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityInfo
-import com.aarokoinsaari.accessibilitymap.model.EntryAccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.model.Place
-import com.aarokoinsaari.accessibilitymap.model.PlaceClusterItem
 import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus
 import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.FULLY_ACCESSIBLE
 import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.LIMITED_ACCESSIBILITY
@@ -67,7 +65,8 @@ import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.NOT_ACCES
 import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.PARTIALLY_ACCESSIBLE
 import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.UNKNOWN
 import com.aarokoinsaari.accessibilitymap.state.MapState
-import com.aarokoinsaari.accessibilitymap.utils.CategoryConfig
+import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory
+import com.aarokoinsaari.accessibilitymap.view.model.PlaceClusterItem
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -138,7 +137,7 @@ fun MapScreen(
                 // is using basic Composables instead.
                 clusterItemContent = { item ->
                     CustomMarker(
-                        iconType = item.placeData.type,
+                        category = item.placeData.category,
                         modifier = Modifier
                             .size(24.dp)
                             .background(
@@ -188,16 +187,13 @@ fun MapScreen(
 }
 
 @Composable
-fun CustomMarker(iconType: String, modifier: Modifier = Modifier) {
-    val iconResId =
-        CategoryConfig.allCategories[iconType] ?: CategoryConfig.allCategories["default"]!!
-
+fun CustomMarker(category: PlaceCategory, modifier: Modifier = Modifier) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
     ) {
         Image(
-            painter = painterResource(id = iconResId),
+            painter = painterResource(id = category.iconResId),
             contentDescription = null
         )
     }
@@ -229,7 +225,7 @@ fun MarkerInfoWindow(item: PlaceClusterItem, modifier: Modifier = Modifier) {
             modifier = Modifier.widthIn(max = 200.dp)
         )
         Text(
-            text = item.placeData.type,
+            text = stringResource(id = item.placeData.category.nameResId),
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(bottom = 16.dp)
         )
@@ -244,13 +240,6 @@ fun MarkerInfoWindow(item: PlaceClusterItem, modifier: Modifier = Modifier) {
             status = stringResource(
                 id = item.placeData.accessibility.hasAccessibleToilet
                     .getAccessibilityStatusStringRes()
-            )
-        )
-        InfoWindowAccessibilityInfo(
-            infoLabel = stringResource(id = R.string.accessibility_entrance_label),
-            status = stringResource(
-                id = item.placeData.accessibility.entryAccessibility
-                    .getEntryAccessibilityStringRes()
             )
         )
     }
@@ -310,15 +299,6 @@ private fun WheelchairAccessStatus.getAccessibilityColor(): Color =
         UNKNOWN -> Color.Gray
     }
 
-private fun EntryAccessibilityStatus.getEntryAccessibilityStringRes(): Int =
-    when (this) {
-        EntryAccessibilityStatus.STEP_FREE -> R.string.entry_accessibility_step_free
-        EntryAccessibilityStatus.ONE_STEP -> R.string.entry_accessibility_one_step
-        EntryAccessibilityStatus.FEW_STEPS -> R.string.entry_accessibility_few_steps
-        EntryAccessibilityStatus.SEVERAL_STEPS -> R.string.entry_accessibility_several_steps
-        EntryAccessibilityStatus.UNKNOWN -> R.string.entry_accessibility_unknown
-    }
-
 private fun Boolean?.getAccessibilityStatusStringRes(): Int =
     when (this) {
         true -> R.string.accessibility_status_yes
@@ -335,13 +315,12 @@ private fun MapInfoPopup_Preview() {
                 place = Place(
                     id = 1L,
                     name = "Example Cafe",
-                    type = "Cafe",
+                    category = PlaceCategory.CAFE,
                     lat = -37.813,
                     lon = 144.962,
                     tags = mapOf("category" to "cafe"),
                     accessibility = AccessibilityInfo(
                         wheelchairAccess = FULLY_ACCESSIBLE,
-                        entryAccessibility = EntryAccessibilityStatus.STEP_FREE,
                         hasAccessibleToilet = true,
                         hasElevator = false,
                         additionalInfo = "Located on the ground floor"

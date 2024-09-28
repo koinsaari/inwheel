@@ -15,39 +15,35 @@
  */
 package com.aarokoinsaari.accessibilitymap.repository
 
-import android.util.Log
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityInfo
-import com.aarokoinsaari.accessibilitymap.model.EntryAccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus
-import com.aarokoinsaari.accessibilitymap.network.ApiMapMarkers
+import com.aarokoinsaari.accessibilitymap.network.ApiMapMarker
+import com.aarokoinsaari.accessibilitymap.utils.mapApiTagToCategory
 
 object ApiDataConverter {
-    fun convertMapMarkersToPlace(apiMarkers: ApiMapMarkers): Place? {
-        apiMarkers.tags?.let { tags ->
-            val name = tags["name"]
-            val type = tags["amenity"]
-            if (name != null && type != null) {
-                return Place(
-                    id = apiMarkers.id,
-                    name = name,
-                    type = type,
-                    lat = apiMarkers.lat,
-                    lon = apiMarkers.lon,
-                    tags = tags,
-                    accessibility = parseAccessibilityInfo(tags)
-                )
-            }
-        }
-        return null
+    fun convertMapMarkersToPlace(apiMarker: ApiMapMarker): Place? {
+        val tags = apiMarker.tags ?: return null
+        val name = tags["name"] ?: "Unknown"
+        val amenity = tags["amenity"] ?: "default"
+        val category = mapApiTagToCategory(amenity)
+
+        return Place(
+            id = apiMarker.id,
+            name = name,
+            category = category,
+            lat = apiMarker.lat,
+            lon = apiMarker.lon,
+            tags = tags,
+            accessibility = parseAccessibilityInfo(tags)
+        )
     }
 
     private fun parseAccessibilityInfo(tags: Map<String, String>): AccessibilityInfo =
         AccessibilityInfo(
             wheelchairAccess = parseWheelchairAccessStatus(tags["wheelchair"]),
-            entryAccessibility = parseEntryStatus(tags["entry"]),
-            hasAccessibleToilet = tags["toilet:wheelchair"] == "yes",
-            hasElevator = tags["elevator"] == "yes",
+            hasAccessibleToilet = parseBooleanAccessibilityStatus(tags["toilet:wheelchair"]),
+            hasElevator = parseBooleanAccessibilityStatus(tags["elevator"]),
             additionalInfo = tags["wheelchair:description"] ?: tags["note"]
         )
 
@@ -59,17 +55,10 @@ object ApiDataConverter {
             else -> WheelchairAccessStatus.UNKNOWN
         }
 
-    private fun parseEntryStatus(status: String?): EntryAccessibilityStatus =
-        try {
-            if (status != null) {
-                EntryAccessibilityStatus.valueOf(
-                    status.replace(" ", "_").uppercase()
-                )
-            } else {
-                EntryAccessibilityStatus.UNKNOWN
-            }
-        } catch (e: IllegalArgumentException) {
-            Log.e("ApiDataConverter", "Invalid entry status: $status", e)
-            EntryAccessibilityStatus.UNKNOWN
+    private fun parseBooleanAccessibilityStatus(status: String?): Boolean? =
+        when (status?.lowercase()) {
+            "yes" -> true
+            "no" -> false
+            else -> null
         }
 }

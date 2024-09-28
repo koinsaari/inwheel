@@ -14,12 +14,22 @@
  * limitations under the License.
  */
 
-package com.aarokoinsaari.accessibilitymap.model
+package com.aarokoinsaari.accessibilitymap.view.model
 
-enum class EntryAccessibilityStatus {
-    STEP_FREE,
-    ONE_STEP,
-    FEW_STEPS,
-    SEVERAL_STEPS,
-    UNKNOWN
+import com.aarokoinsaari.accessibilitymap.model.Place
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.clustering.ClusterItem
+
+data class PlaceClusterItem(
+    private val place: Place,
+    private val zIndex: Float?
+) : ClusterItem {
+
+    val placeData: Place
+        get() = place
+
+    override fun getPosition(): LatLng = LatLng(place.lat, place.lon)
+    override fun getTitle(): String = place.name
+    override fun getSnippet(): String = place.category.name
+    override fun getZIndex(): Float? = null
 }

@@ -18,38 +18,15 @@ package com.aarokoinsaari.accessibilitymap.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.clustering.ClusterItem
+import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory
 
 @Entity(tableName = "places")
 data class Place(
     @PrimaryKey val id: Long,
     val name: String,
-    val type: String,
+    val category: PlaceCategory,
     val lat: Double,
     val lon: Double,
     val tags: Map<String, String>?,
     val accessibility: AccessibilityInfo
-)
-
-data class PlaceClusterItem(
-    private val place: Place,
-    private val zIndex: Float?
-) : ClusterItem {
-
-    val placeData: Place
-        get() = place
-
-    override fun getPosition(): LatLng = LatLng(place.lat, place.lon)
-    override fun getTitle(): String = place.name
-    override fun getSnippet(): String = place.type
-    override fun getZIndex(): Float? = null
-}
-
-data class AccessibilityInfo(
-    val wheelchairAccess: WheelchairAccessStatus = WheelchairAccessStatus.UNKNOWN,
-    val entryAccessibility: EntryAccessibilityStatus = EntryAccessibilityStatus.UNKNOWN,
-    val hasAccessibleToilet: Boolean?,
-    val hasElevator: Boolean?,
-    val additionalInfo: String?
 )

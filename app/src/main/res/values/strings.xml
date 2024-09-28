@@ -1,23 +1,30 @@
 <resources>
     <string name="app_name">Accessibility Map</string>
 
+    <string name="category_cafe">Cafe</string>
+    <string name="category_restaurant">Restaurant</string>
+    <string name="category_toilets">Toilets</string>
+    <string name="category_bus_station">Bus Station</string>
+    <string name="category_train_station">Train Station</string>
+    <string name="category_subway_station">Subway Station</string>
+    <string name="category_parking">Parking</string>
+    <string name="category_supermarket">Supermarket</string>
+    <string name="category_shop">Shop</string>
+    <string name="category_pharmacy">Pharmacy</string>
+    <string name="category_hospital">Hospital</string>
+    <string name="category_beach">Beach</string>
+    <string name="category_default">Unknown</string>
+
     <string name="accessibility_status_yes">Yes</string>
     <string name="accessibility_status_no">No</string>
     <string name="accessibility_status_unknown">Unknown</string>
 
     <string name="accessibility_toilet_label">Accessible toilet:</string>
     <string name="accessibility_elevator_label">Elevator:</string>
-    <string name="accessibility_entrance_label">Entrance:</string>
 
     <string name="wheelchair_access_fully_accessible">Fully accessible</string>
     <string name="wheelchair_access_partially_accessible">Partially accessible</string>
     <string name="wheelchair_access_limited_accessibility">Limited accessibility</string>
     <string name="wheelchair_access_not_accessible">Not accessible</string>
     <string name="wheelchair_access_unknown">Unknown accessibility</string>
-
-    <string name="entry_accessibility_step_free">Step-free access</string>
-    <string name="entry_accessibility_one_step">One step</string>
-    <string name="entry_accessibility_few_steps">Few steps</string>
-    <string name="entry_accessibility_several_steps">Several steps</string>
-    <string name="entry_accessibility_unknown">Unknown</string>
 </resources>
