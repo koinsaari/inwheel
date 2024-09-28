@@ -17,8 +17,8 @@ android {
         applicationId = "com.aarokoinsaari.accessibilitymap"
         minSdk = 29
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.0.1d"
+        versionCode = 2
+        versionName = "0.0.2d"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
