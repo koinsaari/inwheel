@@ -29,5 +29,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
+      - name: Create local.properties
+        run: |
+          echo "MAPS_API_KEY=DEFAULT_API_KEY" > ./local.defaults.properties
+
       - name: Run Detekt
         run: ./gradlew detekt
