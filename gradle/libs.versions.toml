@@ -25,6 +25,8 @@ retrofit = "2.11.0"
 roomKtx = "2.6.1"
 ksp = "2.0.0-1.0.23"
 secretsGradlePlugin = "2.0.1"
+accompanistPermissions = "0.36.0"
+playServicesLocation = "21.3.0"
 
 [libraries]
 android-maps-utils = { module = "com.google.maps.android:android-maps-utils", version.ref = "androidMapsUtils" }
@@ -57,6 +59,8 @@ play-services-maps = { module = "com.google.android.gms:play-services-maps", ver
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomKtx" }
+accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermissions" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

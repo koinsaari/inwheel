@@ -85,6 +85,8 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.accompanist.permissions)
+    implementation(libs.play.services.location)
     ksp(libs.androidx.room.compiler)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
