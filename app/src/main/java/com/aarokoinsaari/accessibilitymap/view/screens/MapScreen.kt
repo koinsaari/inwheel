@@ -16,6 +16,9 @@
 
 package com.aarokoinsaari.accessibilitymap.view.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +43,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -49,6 +53,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -74,8 +79,10 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @OptIn(MapsComposeExperimentalApi::class)
@@ -92,6 +99,8 @@ fun MapScreen(
             state.center ?: vevey, state.zoomLevel ?: 10f
         )
     }
+    // For remembering the state when the screen is rotated for example
+    var showNotification by rememberSaveable { mutableStateOf(true) }
 
     LaunchedEffect(cameraPositionState) {
         snapshotFlow { cameraPositionState.position }
@@ -108,7 +117,25 @@ fun MapScreen(
             }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    // Notification is shown for either 5 seconds or until user moves the map
+    LaunchedEffect(Unit) {
+        delay(5000L)
+        if (showNotification) {
+            showNotification = false
+        }
+    }
+
+    LaunchedEffect(cameraPositionState) {
+        snapshotFlow { cameraPositionState.isMoving }
+            .filter { it }
+            .collect {
+                if (showNotification) {
+                    showNotification = false
+                }
+            }
+    }
+
+    Box(Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
@@ -136,7 +163,7 @@ fun MapScreen(
                 // Google's Marker Composable cannot be used here, so for now a workaround
                 // is using basic Composables instead.
                 clusterItemContent = { item ->
-                    CustomMarker(
+                    MapPlaceMarker(
                         category = item.placeData.category,
                         modifier = Modifier
                             .size(24.dp)
@@ -150,6 +177,24 @@ fun MapScreen(
                 }
             )
         }
+
+        AnimatedVisibility(
+            visible = showNotification,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                NotificationBar(
+                    message = stringResource(id = R.string.map_zoom_notification),
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 64.dp)
+                )
+            }
+        }
+
         // Since ClusterItem info windows currently cannot be customized,
         // for now the only reasonable solution is to insert the custom info
         // window according to the selected cluster item. This should be changed
@@ -187,7 +232,7 @@ fun MapScreen(
 }
 
 @Composable
-fun CustomMarker(category: PlaceCategory, modifier: Modifier = Modifier) {
+fun MapPlaceMarker(category: PlaceCategory, modifier: Modifier = Modifier) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
@@ -293,6 +338,29 @@ fun InfoWindowAccessibilityInfo(
         Text(
             text = status,
             style = MaterialTheme.typography.titleSmall
+        )
+    }
+}
+
+@Composable
+fun NotificationBar(
+    message: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .background(
+                color = Color.White.copy(alpha = 0.8f),
+                shape = RoundedCornerShape(8.dp)
+            )
+            .padding(horizontal = 56.dp, vertical = 12.dp)
+            .widthIn(min = 200.dp, max = 300.dp)
+    ) {
+        Text(
+            text = message,
+            color = Color.Black,
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center
         )
     }
 }

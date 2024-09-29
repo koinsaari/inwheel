@@ -28,4 +28,6 @@
     <string name="wheelchair_access_limited_accessibility">Limited accessibility</string>
     <string name="wheelchair_access_not_accessible">Not accessible</string>
     <string name="wheelchair_access_unknown">Unknown accessibility</string>
+
+    <string name="map_zoom_notification">Zoom in to see more places</string>
 </resources>
