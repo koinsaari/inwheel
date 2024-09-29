@@ -16,6 +16,7 @@
 
 package com.aarokoinsaari.accessibilitymap.view.screens
 
+import android.Manifest
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -50,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -71,10 +73,17 @@ import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.PARTIALLY
 import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.UNKNOWN
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory
+import com.aarokoinsaari.accessibilitymap.utils.getLastLocationSuspended
 import com.aarokoinsaari.accessibilitymap.view.model.PlaceClusterItem
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.clustering.Clustering
@@ -85,24 +94,36 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
-@OptIn(MapsComposeExperimentalApi::class)
+@OptIn(MapsComposeExperimentalApi::class, ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(
     stateFlow: StateFlow<MapState>,
     onIntent: (MapIntent) -> Unit = { }
 ) {
-    val vevey = LatLng(46.462, 6.841)
     val state by stateFlow.collectAsState()
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val defaultLocation = LatLng(46.462, 6.841) // Vevey
+    val fusedLocationProviderClient = remember {
+        LocationServices.getFusedLocationProviderClient(context)
+    }
+    val locationPermissionState = rememberPermissionState(
+        permission = Manifest.permission.ACCESS_FINE_LOCATION
+    )
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
-            state.center ?: vevey, state.zoomLevel ?: 10f
+            state.center ?: defaultLocation, state.zoomLevel ?: 10f
         )
     }
     // For remembering the state when the screen is rotated for example
     var showNotification by rememberSaveable { mutableStateOf(true) }
 
-    LaunchedEffect(cameraPositionState) {
+    LaunchedEffect(locationPermissionState.status.isGranted, cameraPositionState) {
+        if (locationPermissionState.status.isGranted) {
+            moveCameraToUserLocation(fusedLocationProviderClient, cameraPositionState)
+        }
+
+        // Track map movement and update state
         snapshotFlow { cameraPositionState.position }
             .distinctUntilChanged()
             .collect { position ->
@@ -118,19 +139,18 @@ fun MapScreen(
     }
 
     // Notification is shown for either 5 seconds or until user moves the map
-    LaunchedEffect(Unit) {
-        delay(5000L)
-        if (showNotification) {
+    LaunchedEffect(cameraPositionState, showNotification) {
+        val delayJob = launch {
+            delay(5000L)
             showNotification = false
         }
-    }
 
-    LaunchedEffect(cameraPositionState) {
         snapshotFlow { cameraPositionState.isMoving }
             .filter { it }
             .collect {
                 if (showNotification) {
                     showNotification = false
+                    delayJob.cancel()
                 }
             }
     }
@@ -362,6 +382,17 @@ fun NotificationBar(
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center
         )
+    }
+}
+
+private fun moveCameraToUserLocation(
+    fusedLocationProviderClient: FusedLocationProviderClient,
+    cameraPositionState: CameraPositionState
+) {
+    val location = fusedLocationProviderClient.getLastLocationSuspended()
+    location?.let {
+        val userLatLng = LatLng(it.latitude, it.longitude)
+        cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(userLatLng, 15f))
     }
 }
 
