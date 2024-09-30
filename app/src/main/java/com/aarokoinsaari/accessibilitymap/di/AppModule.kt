@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.di
 
 import androidx.room.Room
@@ -22,6 +23,7 @@ import com.aarokoinsaari.accessibilitymap.network.OverpassApiService
 import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.viewmodel.MainViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
+import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceListViewModel
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -63,5 +65,8 @@ val appModule = module {
     }
     viewModel {
         MapViewModel(get())
+    }
+    viewModel {
+        PlaceListViewModel(get())
     }
 }

@@ -30,4 +30,5 @@
     <string name="wheelchair_access_unknown">Unknown accessibility</string>
 
     <string name="map_zoom_notification">Zoom in to see more places</string>
+    <string name="search_placeholder">Search for a place</string>
 </resources>

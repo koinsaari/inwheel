@@ -28,15 +28,18 @@ import androidx.navigation.compose.rememberNavController
 import com.aarokoinsaari.accessibilitymap.view.components.BottomNavigationBar
 import com.aarokoinsaari.accessibilitymap.viewmodel.MainViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
+import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceListViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel = koinViewModel(),
-    mapViewModel: MapViewModel = koinViewModel()
+    mapViewModel: MapViewModel = koinViewModel(),
+    placeListViewModel: PlaceListViewModel = koinViewModel()
 ) {
-    val state by mainViewModel.state.collectAsState()
+    val mainState by mainViewModel.state.collectAsState()
     val mapState = mapViewModel.state
+    val placeListState = placeListViewModel.state
     val navController = rememberNavController()
 
     Scaffold(
@@ -44,7 +47,7 @@ fun MainScreen(
     ) { innerPadding ->
         NavHost(
             navController,
-            startDestination = state.currentScreen.route,
+            startDestination = mainState.currentScreen.route,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("map") {
@@ -53,7 +56,12 @@ fun MainScreen(
                     onIntent = { intent -> mapViewModel.handleIntent(intent) }
                 )
             }
-            composable("places") { PlacesListScreen() }
+            composable("places") {
+                PlaceListScreen(
+                    stateFlow = placeListState,
+                    onIntent = { intent -> placeListViewModel.handleIntent(intent) }
+                )
+            }
         }
     }
 }
