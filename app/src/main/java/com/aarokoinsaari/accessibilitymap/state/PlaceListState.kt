@@ -17,9 +17,14 @@
 package com.aarokoinsaari.accessibilitymap.state
 
 import com.aarokoinsaari.accessibilitymap.model.Place
+import com.google.android.gms.maps.model.LatLng
 
 data class PlaceListState(
     val searchQuery: String = "",
+    val places: List<Place> = emptyList(),
     val filteredPlaces: List<Place> = emptyList(),
     val selectedPlace: Place? = null,
+    val userLocation: LatLng? = null,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
 )

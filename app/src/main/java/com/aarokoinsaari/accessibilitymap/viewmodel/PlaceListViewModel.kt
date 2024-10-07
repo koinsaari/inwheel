@@ -44,7 +44,13 @@ class PlaceListViewModel(private val repository: PlaceRepository) : ViewModel() 
                 .filter { it.isNotBlank() }
                 .distinctUntilChanged()
                 .collect { query ->
-                    performSearch(query)
+                    if (query.isNotBlank()) {
+                        performSearch(query)
+                    } else {
+                        _state.value = _state.value.copy(
+                            filteredPlaces = emptyList()
+                        )
+                    }
                 }
         }
     }
@@ -58,14 +64,31 @@ class PlaceListViewModel(private val repository: PlaceRepository) : ViewModel() 
                     )
                 }
 
-                is PlaceListIntent.Search -> TODO()
+                is PlaceListIntent.Search -> performSearch(intent.query)
             }
         }
     }
 
-    @Suppress("UnusedParameter")
-    private suspend fun performSearch(query: String): String {
-        TODO("Not yet implemented")
+    @Suppress("TooGenericExceptionCaught")
+    private suspend fun performSearch(query: String) {
+        _state.value = _state.value.copy(isLoading = true, errorMessage = null)
+        try {
+            val places = repository.searchPlacesByName(
+                query = query,
+                userLat = _state.value.userLocation?.latitude ?: 0.0,
+                userLon = _state.value.userLocation?.longitude ?: 0.0
+            )
+            _state.value = _state.value.copy(
+                filteredPlaces = places,
+                isLoading = false
+            )
+        } catch (e: Exception) {
+            _state.value = _state.value.copy(
+                filteredPlaces = emptyList(),
+                isLoading = false,
+                errorMessage = e.message ?: "An error occurred" // TODO
+            )
+        }
     }
 
     companion object {

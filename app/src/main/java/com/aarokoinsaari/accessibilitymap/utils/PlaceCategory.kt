@@ -19,7 +19,6 @@ package com.aarokoinsaari.accessibilitymap.utils
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.aarokoinsaari.accessibilitymap.R
-import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory.DEFAULT
 
 enum class PlaceCategory(
     val amenityTag: String,
@@ -38,8 +37,14 @@ enum class PlaceCategory(
     PHARMACY("pharmacy", R.drawable.ic_pharmacy, R.string.category_pharmacy),
     HOSPITAL("hospital", R.drawable.ic_hospital, R.string.category_hospital),
     BEACH("beach", R.drawable.ic_beach, R.string.category_beach),
-    DEFAULT("default", R.drawable.ic_default_marker, R.string.category_default)
-}
+    DEFAULT("default", R.drawable.ic_default_marker, R.string.category_default);
 
-fun mapApiTagToCategory(apiTag: String): PlaceCategory =
-    PlaceCategory.entries.find { it.amenityTag == apiTag.lowercase() } ?: DEFAULT
+    companion object {
+        fun mapApiTagToCategory(apiTag: String): PlaceCategory =
+            PlaceCategory.entries.find { it.amenityTag == apiTag.lowercase() } ?: DEFAULT
+
+        // Used in data converter for Room
+        fun fromAmenityTag(tag: String): PlaceCategory =
+            entries.find { it.amenityTag.equals(tag, ignoreCase = true) } ?: DEFAULT
+    }
+}

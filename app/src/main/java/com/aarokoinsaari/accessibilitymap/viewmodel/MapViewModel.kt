@@ -71,7 +71,7 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
         currentBounds: LatLngBounds,
         expandedBounds: LatLngBounds
     ) {
-        placeRepository.getPlaces(currentBounds, expandedBounds)
+        placeRepository.getPlacesWithinBounds(currentBounds, expandedBounds)
             .distinctUntilChanged()
             .collect { newPlaces ->
                 val currentClusterItems = _state.value.clusterItems

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.database
 
 import androidx.room.Dao
@@ -20,6 +21,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.aarokoinsaari.accessibilitymap.model.Place
+import com.aarokoinsaari.accessibilitymap.model.PlaceFts
 
 @Dao
 interface PlacesDao {
@@ -30,7 +32,7 @@ interface PlacesDao {
         AND lon BETWEEN :westLon AND :eastLon
     """
     )
-    fun getPlaces(
+    suspend fun getPlacesFromBounds(
         southLat: Double,
         northLat: Double,
         westLon: Double,
@@ -38,5 +40,23 @@ interface PlacesDao {
     ): List<Place>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(places: List<Place>)
+    suspend fun insertPlaces(places: List<Place>)
+}
+
+@Dao
+interface PlacesFtsDao {
+    @Query(
+        """
+        SELECT p.*, 
+        ((p.lat - :userLat)*(p.lat - :userLat) + (p.lon - :userLon)*(p.lon - :userLon)) AS distance 
+        FROM places p 
+        JOIN places_fts fts ON p.id = fts.rowid 
+        WHERE fts.name MATCH :query 
+        ORDER BY distance LIMIT 50
+    """
+    )
+    suspend fun searchPlacesByName(query: String, userLat: Double, userLon: Double): List<Place>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPlaces(placesFts: List<PlaceFts>)
 }

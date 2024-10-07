@@ -19,6 +19,7 @@ package com.aarokoinsaari.accessibilitymap.di
 import androidx.room.Room
 import com.aarokoinsaari.accessibilitymap.database.AppDatabase
 import com.aarokoinsaari.accessibilitymap.database.PlacesDao
+import com.aarokoinsaari.accessibilitymap.database.PlacesFtsDao
 import com.aarokoinsaari.accessibilitymap.network.OverpassApiService
 import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.viewmodel.MainViewModel
@@ -49,16 +50,20 @@ val appModule = module {
             .create(OverpassApiService::class.java)
     }
     single {
-        Room.inMemoryDatabaseBuilder(
+        Room.databaseBuilder(
             androidContext(),
-            AppDatabase::class.java
-        ).build()
+            AppDatabase::class.java,
+            "app_database"
+        ).fallbackToDestructiveMigration().build()
     }
     single<PlacesDao> {
         get<AppDatabase>().placesDao()
     }
     single {
-        PlaceRepository(get(), get())
+        PlaceRepository(get(), get(), get())
+    }
+    single<PlacesFtsDao> {
+        get<AppDatabase>().placesFtsDao()
     }
     viewModel {
         MainViewModel()

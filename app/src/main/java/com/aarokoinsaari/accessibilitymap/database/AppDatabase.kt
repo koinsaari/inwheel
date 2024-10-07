@@ -13,15 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.aarokoinsaari.accessibilitymap.model.Place
+import com.aarokoinsaari.accessibilitymap.model.PlaceFts
 
-@Database(entities = [Place::class], version = 1, exportSchema = false)
+@Database(
+    entities = [Place::class, PlaceFts::class],
+    version = 1,
+    exportSchema = false
+)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun placesDao(): PlacesDao
+    abstract fun placesFtsDao(): PlacesFtsDao
 }

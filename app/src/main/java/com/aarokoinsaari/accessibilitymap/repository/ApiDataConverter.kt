@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.repository
 
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityInfo
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus
 import com.aarokoinsaari.accessibilitymap.network.ApiMapMarker
-import com.aarokoinsaari.accessibilitymap.utils.mapApiTagToCategory
+import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory.Companion.mapApiTagToCategory
 
 object ApiDataConverter {
     fun convertMapMarkersToPlace(apiMarker: ApiMapMarker): Place? {

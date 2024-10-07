@@ -16,7 +16,9 @@
 
 package com.aarokoinsaari.accessibilitymap.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Fts4
 import androidx.room.PrimaryKey
 import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory
 
@@ -29,4 +31,13 @@ data class Place(
     val lon: Double,
     val tags: Map<String, String>?,
     val accessibility: AccessibilityInfo
+)
+
+@Entity(tableName = "places_fts")
+@Fts4(contentEntity = Place::class)
+data class PlaceFts(
+    @PrimaryKey
+    @ColumnInfo(name = "rowid")
+    val rowId: Long,
+    val name: String
 )
