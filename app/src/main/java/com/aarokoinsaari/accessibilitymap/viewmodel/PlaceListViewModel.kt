@@ -16,6 +16,7 @@
 
 package com.aarokoinsaari.accessibilitymap.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aarokoinsaari.accessibilitymap.intent.PlaceListIntent
@@ -26,7 +27,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -38,57 +38,47 @@ class PlaceListViewModel(private val repository: PlaceRepository) : ViewModel() 
 
     init {
         viewModelScope.launch {
+            repository.placesFlow.collect { places ->
+                _state.value = _state.value.copy(places = places)
+                applyFilter(_state.value.searchQuery)
+            }
+        }
+
+        viewModelScope.launch {
             _state
                 .map { it.searchQuery }
                 .debounce(DEBOUNCE_VALUE)
-                .filter { it.isNotBlank() }
                 .distinctUntilChanged()
                 .collect { query ->
-                    if (query.isNotBlank()) {
-                        performSearch(query)
-                    } else {
-                        _state.value = _state.value.copy(
-                            filteredPlaces = emptyList()
-                        )
-                    }
+                    applyFilter(query)
                 }
         }
     }
 
     fun handleIntent(intent: PlaceListIntent) {
-        viewModelScope.launch {
-            when (intent) {
-                is PlaceListIntent.UpdateQuery -> {
-                    _state.value = _state.value.copy(
-                        searchQuery = intent.text
-                    )
-                }
-
-                is PlaceListIntent.Search -> performSearch(intent.query)
+        when (intent) {
+            is PlaceListIntent.UpdateQuery -> {
+                _state.value = _state.value.copy(
+                    searchQuery = intent.text
+                )
+                Log.d("PlaceListViewModel", "New query: ${intent.text}")
             }
+
+            is PlaceListIntent.Search -> applyFilter(intent.query)
         }
     }
 
-    @Suppress("TooGenericExceptionCaught")
-    private suspend fun performSearch(query: String) {
-        _state.value = _state.value.copy(isLoading = true, errorMessage = null)
-        try {
-            val places = repository.searchPlacesByName(
-                query = query,
-                userLat = _state.value.userLocation?.latitude ?: 0.0,
-                userLon = _state.value.userLocation?.longitude ?: 0.0
-            )
-            _state.value = _state.value.copy(
-                filteredPlaces = places,
-                isLoading = false
-            )
-        } catch (e: Exception) {
-            _state.value = _state.value.copy(
-                filteredPlaces = emptyList(),
-                isLoading = false,
-                errorMessage = e.message ?: "An error occurred" // TODO
-            )
+    private fun applyFilter(query: String) {
+        val allPlaces = _state.value.places
+        val filtered = if (query.isBlank()) {
+            emptyList()
+        } else {
+            allPlaces.filter { place ->
+                place.name.contains(query, ignoreCase = true)
+            }
         }
+        _state.value = _state.value.copy(filteredPlaces = filtered)
+        Log.d("PlaceListViewModel", "Filtered places: ${_state.value.filteredPlaces}")
     }
 
     companion object {

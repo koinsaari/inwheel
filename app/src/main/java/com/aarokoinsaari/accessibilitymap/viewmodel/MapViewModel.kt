@@ -20,9 +20,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
-import com.aarokoinsaari.accessibilitymap.view.model.PlaceClusterItem
 import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.state.MapState
+import com.aarokoinsaari.accessibilitymap.view.model.PlaceClusterItem
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.FlowPreview
@@ -43,10 +43,16 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            moveIntents
-                .collect { intent ->
-                    handleMove(intent)
-                }
+            placeRepository.placesFlow.collect { places ->
+                val clusterItems = places.map { PlaceClusterItem(it, zIndex = null) }
+                _state.value = _state.value.copy(clusterItems = clusterItems)
+            }
+        }
+
+        viewModelScope.launch {
+            moveIntents.collect { intent ->
+                handleMove(intent)
+            }
         }
 
         viewModelScope.launch {

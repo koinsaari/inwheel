@@ -39,6 +39,9 @@ interface PlacesDao {
         eastLon: Double
     ): List<Place>
 
+    @Query("SELECT * FROM places")
+    suspend fun getAllPlaces(): List<Place>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlaces(places: List<Place>)
 }
