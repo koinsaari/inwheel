@@ -18,11 +18,14 @@ package com.aarokoinsaari.accessibilitymap.view.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -40,6 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.intent.PlaceListIntent
+import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.state.PlaceListState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -82,10 +86,28 @@ fun PlaceListScreen(
                 expanded = expanded,
                 onExpandedChange = { }
             ) {
-
+                LazyColumn(Modifier.fillMaxSize()) {
+                    items(state.filteredPlaces) { place ->
+                        PlaceListItem(
+                            place = place,
+                            onClick = {
+                                onIntent(PlaceListIntent.Search(place.name))
+                            }
+                        )
+                    }
+                }
             }
         }
     }
+}
+
+@Suppress("UnusedParameter")
+@Composable
+fun PlaceListItem(place: Place, onClick: () -> Unit) {
+    ListItem(
+        headlineContent = { Text(place.name) },
+        overlineContent = { Text(place.category.name) }
+    )
 }
 
 @Preview(showBackground = true)
