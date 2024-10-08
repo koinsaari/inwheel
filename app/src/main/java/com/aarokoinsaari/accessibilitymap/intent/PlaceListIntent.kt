@@ -16,7 +16,10 @@
 
 package com.aarokoinsaari.accessibilitymap.intent
 
+import com.aarokoinsaari.accessibilitymap.model.Place
+
 sealed class PlaceListIntent {
     data class UpdateQuery(val text: String) : PlaceListIntent()
     data class Search(val query: String) : PlaceListIntent()
+    data class SelectPlace(val place: Place) : PlaceListIntent()
 }

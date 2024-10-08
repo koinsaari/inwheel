@@ -65,6 +65,11 @@ class PlaceListViewModel(private val repository: PlaceRepository) : ViewModel() 
             }
 
             is PlaceListIntent.Search -> applyFilter(intent.query)
+            is PlaceListIntent.SelectPlace -> {
+                _state.value = _state.value.copy(selectedPlace = intent.place)
+                Log.d("PlaceListViewModel", "Selected place: ${intent.place}")
+                // TODO: Navigate to place details view
+            }
         }
     }
 

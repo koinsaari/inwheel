@@ -16,6 +16,7 @@
 
 package com.aarokoinsaari.accessibilitymap.view.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -56,6 +57,7 @@ fun PlaceListScreen(
 ) {
     val state by stateFlow.collectAsState()
     var expanded by rememberSaveable { mutableStateOf(false) }
+
     Surface(
         color = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
@@ -86,12 +88,17 @@ fun PlaceListScreen(
                 expanded = expanded,
                 onExpandedChange = { }
             ) {
-                LazyColumn(Modifier.fillMaxSize()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable { expanded = false }
+                ) {
                     items(state.filteredPlaces) { place ->
                         PlaceListItem(
                             place = place,
                             onClick = {
-                                onIntent(PlaceListIntent.Search(place.name))
+                                onIntent(PlaceListIntent.SelectPlace(place))
+                                expanded = false
                             }
                         )
                     }
@@ -101,12 +108,12 @@ fun PlaceListScreen(
     }
 }
 
-@Suppress("UnusedParameter")
 @Composable
-fun PlaceListItem(place: Place, onClick: () -> Unit) {
+fun PlaceListItem(place: Place, onClick: () -> Unit = { }) {
     ListItem(
         headlineContent = { Text(place.name) },
-        overlineContent = { Text(place.category.name) }
+        overlineContent = { Text(place.category.name) },
+        modifier = Modifier.clickable { onClick() }
     )
 }
 
