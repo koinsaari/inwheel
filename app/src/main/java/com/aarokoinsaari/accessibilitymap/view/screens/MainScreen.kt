@@ -35,11 +35,9 @@ import org.koin.androidx.compose.koinViewModel
 fun MainScreen(
     mainViewModel: MainViewModel = koinViewModel(),
     mapViewModel: MapViewModel = koinViewModel(),
-    placeListViewModel: PlaceListViewModel = koinViewModel()
 ) {
     val mainState by mainViewModel.state.collectAsState()
     val mapState = mapViewModel.state
-    val placeListState = placeListViewModel.state
     val navController = rememberNavController()
 
     Scaffold(
@@ -57,8 +55,9 @@ fun MainScreen(
                 )
             }
             composable("places") {
+                val placeListViewModel: PlaceListViewModel = koinViewModel()
                 PlaceListScreen(
-                    stateFlow = placeListState,
+                    stateFlow = placeListViewModel.state,
                     onIntent = { intent -> placeListViewModel.handleIntent(intent) }
                 )
             }

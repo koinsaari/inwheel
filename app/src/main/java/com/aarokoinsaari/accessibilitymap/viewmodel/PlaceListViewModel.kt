@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-@Suppress("UnusedPrivateProperty")
 @OptIn(FlowPreview::class)
 class PlaceListViewModel(private val repository: PlaceRepository) : ViewModel() {
     private val _state = MutableStateFlow(PlaceListState())
@@ -40,7 +39,6 @@ class PlaceListViewModel(private val repository: PlaceRepository) : ViewModel() 
         viewModelScope.launch {
             repository.placesFlow.collect { places ->
                 _state.value = _state.value.copy(places = places)
-                applyFilter(_state.value.searchQuery)
             }
         }
 
@@ -50,7 +48,9 @@ class PlaceListViewModel(private val repository: PlaceRepository) : ViewModel() 
                 .debounce(DEBOUNCE_VALUE)
                 .distinctUntilChanged()
                 .collect { query ->
-                    applyFilter(query)
+                    if (query.isNotBlank()) {
+                        applyFilter(query)
+                    }
                 }
         }
     }
