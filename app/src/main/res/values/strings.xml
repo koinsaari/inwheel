@@ -31,4 +31,9 @@
 
     <string name="map_zoom_notification">Zoom in to see more places</string>
     <string name="search_placeholder">Search for a place</string>
+
+    <string name="map_error_no_internet">You\'re offline. Please check your internet connection</string>
+    <string name="map_error_timeout">Request timed out. Try again</string>
+    <string name="map_error_api_failure">Unable to load places. Please try again</string>
+    <string name="map_error_unknown">An error occurred. Please check your connection and try again</string>
 </resources>

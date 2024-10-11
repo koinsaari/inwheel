@@ -24,12 +24,13 @@ import com.google.android.gms.maps.model.LatLngBounds
 data class MapState(
     val markers: List<Place> = emptyList(), // TODO: No use currently
     val clusterItems: List<PlaceClusterItem> = emptyList(),
+    val selectedClusterItem: PlaceClusterItem? = null,
     val zoomLevel: Float? = 10f,
     val center: LatLng? = null,
     val currentBounds: LatLngBounds? = null,
     val snapshotBounds: LatLngBounds? = null,
     val isLoading: Boolean = false,
-    val selectedClusterItem: PlaceClusterItem? = null,
+    val errorState: ErrorState = ErrorState.None
 ) {
     override fun toString(): String =
         """

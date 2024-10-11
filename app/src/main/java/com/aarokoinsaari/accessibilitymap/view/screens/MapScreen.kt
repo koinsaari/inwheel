@@ -71,6 +71,7 @@ import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.LIMITED_A
 import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.NOT_ACCESSIBLE
 import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.PARTIALLY_ACCESSIBLE
 import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.UNKNOWN
+import com.aarokoinsaari.accessibilitymap.state.ErrorState
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.utils.getLastLocationSuspended
@@ -115,10 +116,12 @@ fun MapScreen(
             state.center ?: defaultLocation, state.zoomLevel ?: 10f
         )
     }
-    // For remembering the state when the screen is rotated for example
-    var showNotification by rememberSaveable { mutableStateOf(true) }
+    val errorMessage = state.errorState.getErrorStringRes()?.let { stringResource(it) }
 
-    LaunchedEffect(locationPermissionState.status.isGranted, cameraPositionState) {
+    var showNotification by rememberSaveable { mutableStateOf(true) }
+    var showError by remember { mutableStateOf(false) }
+
+    LaunchedEffect(locationPermissionState, cameraPositionState) {
         if (locationPermissionState.status.isGranted) {
             moveCameraToUserLocation(fusedLocationProviderClient, cameraPositionState)
         }
@@ -138,7 +141,7 @@ fun MapScreen(
             }
     }
 
-    // Notification is shown for either 5 seconds or until user moves the map
+    // Startup notification
     LaunchedEffect(cameraPositionState, showNotification) {
         val delayJob = launch {
             delay(5000L)
@@ -153,6 +156,17 @@ fun MapScreen(
                     delayJob.cancel()
                 }
             }
+    }
+
+    // Error message
+    LaunchedEffect(state.errorState) {
+        if (state.errorState != ErrorState.None) {
+            showError = true
+            delay(5000L)
+            showError = false
+        } else {
+            showError = false
+        }
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -208,6 +222,23 @@ fun MapScreen(
             ) {
                 NotificationBar(
                     message = stringResource(id = R.string.map_zoom_notification),
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 64.dp)
+                )
+            }
+        }
+
+        AnimatedVisibility(
+            visible = showError && errorMessage != null,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                NotificationBar(
+                    message = errorMessage!!,
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .padding(top = 64.dp)
@@ -419,6 +450,15 @@ private fun Boolean?.getAccessibilityStatusStringRes(): Int =
         true -> R.string.accessibility_status_yes
         false -> R.string.accessibility_status_no
         null -> R.string.accessibility_status_unknown
+    }
+
+private fun ErrorState.getErrorStringRes(): Int? =
+    when (this) {
+        is ErrorState.NoInternet -> R.string.map_error_no_internet
+        is ErrorState.Timeout -> R.string.map_error_timeout
+        is ErrorState.ApiError -> R.string.map_error_api_failure
+        is ErrorState.Unknown -> R.string.map_error_unknown
+        ErrorState.None -> null
     }
 
 @Preview(showBackground = true)

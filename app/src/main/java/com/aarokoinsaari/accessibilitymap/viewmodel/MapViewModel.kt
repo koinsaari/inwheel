@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
+import com.aarokoinsaari.accessibilitymap.state.ErrorState
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.aarokoinsaari.accessibilitymap.view.model.PlaceClusterItem
 import com.google.android.gms.maps.model.LatLng
@@ -29,9 +30,14 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 @OptIn(FlowPreview::class)
 class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
@@ -79,6 +85,31 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
     ) {
         placeRepository.getPlacesWithinBounds(currentBounds, expandedBounds)
             .distinctUntilChanged()
+            .catch { e ->
+                when (e) {
+                    is UnknownHostException, is ConnectException -> {
+                        _state.value = _state.value.copy(errorState = ErrorState.NoInternet)
+                    }
+
+                    is SocketTimeoutException -> {
+                        _state.value = _state.value.copy(errorState = ErrorState.Timeout)
+                    }
+
+                    is HttpException -> {
+                        _state.value = _state.value.copy(
+                            errorState = ErrorState.ApiError(
+                                e.code(),
+                                e.message()
+                            )
+                        )
+                    }
+
+                    else -> {
+                        _state.value = _state.value.copy(errorState = ErrorState.Unknown(e))
+                        Log.e("MapViewModel", "Unknown fetching places", e)
+                    }
+                }
+            }
             .collect { newPlaces ->
                 val currentClusterItems = _state.value.clusterItems
                 val combinedClusterItems =

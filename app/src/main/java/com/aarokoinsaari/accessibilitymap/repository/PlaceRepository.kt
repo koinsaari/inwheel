@@ -38,7 +38,6 @@ class PlaceRepository(
     private val _placesFlow = MutableStateFlow<List<Place>>(emptyList())
     val placesFlow: Flow<List<Place>> = _placesFlow
 
-    @Suppress("TooGenericExceptionCaught")
     fun getPlacesWithinBounds(
         bounds: LatLngBounds,
         snapshotBounds: LatLngBounds
@@ -57,26 +56,22 @@ class PlaceRepository(
         }
 
         if (!dataCoversBounds(cachedPlaces, bounds)) {
-            try {
-                val boundStr = "${bounds.southwest.latitude}," +
-                        "${bounds.southwest.longitude}," +
-                        "${bounds.northeast.latitude}," +
-                        "${bounds.northeast.longitude}"
-                val query = OverpassQueryBuilder.buildQuery(boundStr)
-                Log.d("Repository", "Query: $query")
-                val response = apiService.getMarkers(query)
-                val apiPlaces = response.elements.mapNotNull {
-                    ApiDataConverter.convertMapMarkersToPlace(it)
-                }
+            val boundStr = "${bounds.southwest.latitude}," +
+                    "${bounds.southwest.longitude}," +
+                    "${bounds.northeast.latitude}," +
+                    "${bounds.northeast.longitude}"
+            val query = OverpassQueryBuilder.buildQuery(boundStr)
+            Log.d("Repository", "Query: $query")
+            val response = apiService.getMarkers(query)
+            val apiPlaces = response.elements.mapNotNull {
+                ApiDataConverter.convertMapMarkersToPlace(it)
+            }
 
-                if (apiPlaces.isNotEmpty()) {
-                    placesDao.insertPlaces(apiPlaces)
-                    _placesFlow.value = apiPlaces
-                    emit(apiPlaces)
-                    Log.d("Repository", "Inserted places into database: $apiPlaces")
-                }
-            } catch (e: Exception) {
-                Log.e("Repository", "Failed to fetch or save places", e)
+            if (apiPlaces.isNotEmpty()) {
+                placesDao.insertPlaces(apiPlaces)
+                _placesFlow.value = apiPlaces
+                emit(apiPlaces)
+                Log.d("Repository", "Inserted places into database: $apiPlaces")
             }
         }
     }.flowOn(Dispatchers.IO)
