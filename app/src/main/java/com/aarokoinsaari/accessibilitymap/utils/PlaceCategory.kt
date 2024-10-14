@@ -23,21 +23,87 @@ import com.aarokoinsaari.accessibilitymap.R
 enum class PlaceCategory(
     val amenityTag: String,
     @DrawableRes val iconResId: Int,
-    @StringRes val nameResId: Int
+    @StringRes val nameResId: Int,
+    val defaultName: String // Fallback when place does not have a name tag
 ) {
-    CAFE("cafe", R.drawable.ic_cafe, R.string.category_cafe),
-    RESTAURANT("restaurant", R.drawable.ic_restaurant, R.string.category_restaurant),
-    TOILETS("toilets", R.drawable.ic_wc, R.string.category_toilets),
-    BUS_STATION("bus_station", R.drawable.ic_bus_station, R.string.category_bus_station),
-    TRAIN_STATION("train_station", R.drawable.ic_train_station, R.string.category_train_station),
-    SUBWAY_STATION("subway_station", R.drawable.ic_subway_station, R.string.category_subway_station),
-    PARKING("parking", R.drawable.ic_parking_area, R.string.category_parking),
-    SUPERMARKET("supermarket", R.drawable.ic_grocery_store, R.string.category_supermarket),
-    SHOP("shop", R.drawable.ic_shop, R.string.category_shop),
-    PHARMACY("pharmacy", R.drawable.ic_pharmacy, R.string.category_pharmacy),
-    HOSPITAL("hospital", R.drawable.ic_hospital, R.string.category_hospital),
-    BEACH("beach", R.drawable.ic_beach, R.string.category_beach),
-    DEFAULT("default", R.drawable.ic_default_marker, R.string.category_default);
+    CAFE(
+        "cafe",
+        R.drawable.ic_cafe,
+        R.string.category_cafe,
+        "Cafe"
+    ),
+    RESTAURANT(
+        "restaurant",
+        R.drawable.ic_restaurant,
+        R.string.category_restaurant,
+        "Restaurant"
+    ),
+    TOILETS(
+        "toilets",
+        R.drawable.ic_wc,
+        R.string.category_toilets,
+        "Toilets"
+    ),
+    BUS_STATION(
+        "bus_station",
+        R.drawable.ic_bus_station,
+        R.string.category_bus_station,
+        "Bus Station"
+    ),
+    TRAIN_STATION(
+        "train_station",
+        R.drawable.ic_train_station,
+        R.string.category_train_station,
+        "Train Station"
+    ),
+    SUBWAY_STATION(
+        "subway_station",
+        R.drawable.ic_subway_station,
+        R.string.category_subway_station,
+        "Subway Station"
+    ),
+    PARKING(
+        "parking",
+        R.drawable.ic_parking_area,
+        R.string.category_parking,
+        "Parking Area"
+    ),
+    SUPERMARKET(
+        "supermarket",
+        R.drawable.ic_grocery_store,
+        R.string.category_supermarket,
+        "Supermarket"
+    ),
+    SHOP(
+        "shop",
+        R.drawable.ic_shop,
+        R.string.category_shop,
+        "Shop"
+    ),
+    PHARMACY(
+        "pharmacy",
+        R.drawable.ic_pharmacy,
+        R.string.category_pharmacy,
+        "Pharmacy"
+    ),
+    HOSPITAL(
+        "hospital",
+        R.drawable.ic_hospital,
+        R.string.category_hospital,
+        "Hospital"
+    ),
+    BEACH(
+        "beach",
+        R.drawable.ic_beach,
+        R.string.category_beach,
+        "Beach"
+    ),
+    DEFAULT(
+        "default",
+        R.drawable.ic_default_marker,
+        R.string.category_default,
+        "Unknown"
+    );
 
     companion object {
         fun mapApiTagToCategory(apiTag: String): PlaceCategory =

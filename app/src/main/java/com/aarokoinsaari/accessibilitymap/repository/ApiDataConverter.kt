@@ -25,9 +25,9 @@ import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory.Companion.mapApiTa
 object ApiDataConverter {
     fun convertMapMarkersToPlace(apiMarker: ApiMapMarker): Place? {
         val tags = apiMarker.tags ?: return null
-        val name = tags["name"] ?: "Unknown"
         val amenity = tags["amenity"] ?: "default"
         val category = mapApiTagToCategory(amenity)
+        val name = tags["name"] ?: category.defaultName
 
         return Place(
             id = apiMarker.id,
