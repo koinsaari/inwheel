@@ -23,6 +23,7 @@ import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.state.ErrorState
 import com.aarokoinsaari.accessibilitymap.state.MapState
+import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.view.model.PlaceClusterItem
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -75,6 +76,7 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
             when (intent) {
                 is MapIntent.Move -> moveIntents.emit(intent)
                 is MapIntent.MapClick -> handleMapClick(intent.item)
+                is MapIntent.ToggleFilter -> handleToggleFilter(intent.category)
             }
         }
     }
@@ -161,6 +163,17 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
                 selectedClusterItem = item
             )
         }
+    }
+
+    private fun handleToggleFilter(category: PlaceCategory) {
+        val updatedCategories = if (_state.value.selectedCategories.contains(category)) {
+            _state.value.selectedCategories - category
+        } else {
+            _state.value.selectedCategories + category
+        }
+        _state.value = _state.value.copy(
+            selectedCategories = updatedCategories
+        )
     }
 
     private fun handleClearMarkers() {

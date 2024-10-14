@@ -16,6 +16,7 @@
 
 package com.aarokoinsaari.accessibilitymap.intent
 
+import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.view.model.PlaceClusterItem
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -28,4 +29,5 @@ sealed class MapIntent {
     ) : MapIntent()
 
     data class MapClick(val item: PlaceClusterItem?) : MapIntent()
+    data class ToggleFilter(val category: PlaceCategory) : MapIntent()
 }

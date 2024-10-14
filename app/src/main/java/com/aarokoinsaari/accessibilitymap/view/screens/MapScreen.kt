@@ -20,6 +20,7 @@ import android.Manifest
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,13 +29,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,9 +60,11 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -212,6 +224,15 @@ fun MapScreen(
             )
         }
 
+        FilterChipRow(
+            selectedCategories = state.selectedCategories,
+            onIntent = onIntent,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent)
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+        )
+
         AnimatedVisibility(
             visible = showNotification,
             enter = fadeIn(),
@@ -278,6 +299,50 @@ fun MapScreen(
                         .padding(16.dp)
                 )
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun FilterChipRow(
+    selectedCategories: Set<PlaceCategory>,
+    onIntent: (MapIntent) -> Unit = { },
+    modifier: Modifier = Modifier
+) {
+    val categories = PlaceCategory.entries.toTypedArray()
+
+    LazyRow(
+        modifier = modifier
+    ) {
+        items(categories) { category ->
+            val isSelected = selectedCategories.contains(category)
+            val haptic = LocalHapticFeedback.current
+
+            FilterChip(
+                selected = isSelected,
+                onClick = {
+                    onIntent(MapIntent.ToggleFilter(category))
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove) // TODO
+                },
+                label = { Text(text = category.defaultName) },
+                leadingIcon = if (isSelected) {
+                    { Icon(Icons.Default.Check, contentDescription = null) }
+                } else {
+                    { Icon(Icons.Default.Add, contentDescription = null) }
+                },
+                colors = FilterChipDefaults.filterChipColors(
+                    // TODO: Use MaterialTheme
+                    containerColor = Color.White
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = false,
+                    selected = isSelected
+                ),
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .animateItem()
+            )
         }
     }
 }
