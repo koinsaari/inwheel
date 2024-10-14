@@ -85,9 +85,11 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
         currentBounds: LatLngBounds,
         expandedBounds: LatLngBounds
     ) {
+        _state.value = _state.value.copy(isLoading = true)
         placeRepository.getPlacesWithinBounds(currentBounds, expandedBounds)
             .distinctUntilChanged()
             .catch { e ->
+                _state.value = _state.value.copy(isLoading = false)
                 when (e) {
                     is UnknownHostException, is ConnectException -> {
                         _state.value = _state.value.copy(errorState = ErrorState.NoInternet)
@@ -113,16 +115,18 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
                 }
             }
             .collect { newPlaces ->
-                val currentClusterItems = _state.value.clusterItems
-                val combinedClusterItems =
-                    (currentClusterItems + newPlaces.map {
-                        PlaceClusterItem(it, 1f)
-                    }).distinctBy { it.placeData.id }
+                val allPlaces = (_state.value.markers + newPlaces).distinctBy { it.id }
+                val combinedClusterItems = (_state.value.clusterItems + newPlaces.map {
+                    PlaceClusterItem(it, 1f)
+                }).distinctBy { it.placeData.id }
 
                 _state.value = _state.value.copy(
+                    markers = allPlaces,
                     clusterItems = combinedClusterItems,
-                    isLoading = false
+                    isLoading = false,
+                    errorState = ErrorState.None
                 )
+                applyFilters()
             }
     }
 
@@ -174,6 +178,7 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
         _state.value = _state.value.copy(
             selectedCategories = updatedCategories
         )
+        applyFilters()
     }
 
     private fun handleClearMarkers() {
@@ -187,6 +192,19 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
             )
             Log.d("MapViewModel", "Clear markers action, current state: ${_state.value}")
         }
+    }
+
+    private fun applyFilters() {
+        val filteredMarkers = if (_state.value.selectedCategories.isEmpty()) {
+            _state.value.markers
+        } else {
+            _state.value.markers.filter { _state.value.selectedCategories.contains(it.category) }
+        }
+        _state.value = _state.value.copy(
+            clusterItems = filteredMarkers.map {
+                PlaceClusterItem(it, 1f)
+            }
+        )
     }
 
     private fun calculateExpandedBounds(bounds: LatLngBounds): LatLngBounds {
