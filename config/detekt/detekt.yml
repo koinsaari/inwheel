@@ -130,7 +130,7 @@ complexity:
     active: true
     threshold: 80
     ignoreAnnotated:
-      - "Composable"
+      - 'Composable'
   LongParameterList:
     active: true
     functionThreshold: 6
@@ -138,6 +138,8 @@ complexity:
     ignoreDefaultParameters: false
     ignoreDataClasses: true
     ignoreAnnotatedParameter: [ ]
+    ignoreAnnotated:
+      - 'Composable'
   MethodOverloading:
     active: false
     threshold: 6
@@ -177,7 +179,7 @@ complexity:
     ignoreDeprecated: false
     ignorePrivate: false
     ignoreOverridden: false
-    ignoreAnnotatedFunctions: [ "Preview", "Composable" ]
+    ignoreAnnotatedFunctions: [ 'Preview', 'Composable' ]
 
 coroutines:
   active: true
