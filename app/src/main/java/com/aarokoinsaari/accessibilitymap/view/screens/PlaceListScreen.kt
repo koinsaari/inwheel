@@ -16,22 +16,13 @@
 
 package com.aarokoinsaari.accessibilitymap.view.screens
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,12 +31,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.intent.PlaceListIntent
-import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.state.PlaceListState
+import com.aarokoinsaari.accessibilitymap.view.components.PlaceSearchBar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -64,62 +53,35 @@ fun PlaceListScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         Column(
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            SearchBar(
-                inputField = {
-                    SearchBarDefaults.InputField(
-                        query = state.searchQuery,
-                        onQueryChange = { text ->
-                            onIntent(PlaceListIntent.UpdateQuery(text))
-                        },
-                        onSearch = {
-                            expanded = false
-                            onIntent(PlaceListIntent.Search(state.searchQuery))
-                        },
-                        expanded = expanded,
-                        onExpandedChange = { expanded = it },
-                        placeholder = { Text(text = stringResource(R.string.search_placeholder)) },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                        trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) }
-                    )
+            PlaceSearchBar(
+                query = state.searchQuery,
+                onQueryChange = { text ->
+                    onIntent(PlaceListIntent.UpdateQuery(text))
+                },
+                onSearch = {
+                    expanded = false
+                    onIntent(PlaceListIntent.Search(state.searchQuery))
                 },
                 expanded = expanded,
-                onExpandedChange = { }
-            ) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clickable { expanded = false }
-                ) {
-                    items(state.filteredPlaces) { place ->
-                        PlaceListItem(
-                            place = place,
-                            onClick = {
-                                onIntent(PlaceListIntent.SelectPlace(place))
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
+                onExpandedChange = { expanded = it },
+                searchResults = state.filteredPlaces,
+                onPlaceSelected = { place ->
+                    onIntent(PlaceListIntent.SelectPlace(place))
+                    expanded = false
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
 
-@Composable
-fun PlaceListItem(place: Place, onClick: () -> Unit = { }) {
-    ListItem(
-        headlineContent = { Text(place.name) },
-        overlineContent = { Text(place.category.name) },
-        modifier = Modifier.clickable { onClick() }
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
-fun PlaceListScreen_Preview() {
+private fun PlaceListScreen_Preview() {
     MaterialTheme {
         PlaceListScreen(stateFlow = MutableStateFlow(PlaceListState()))
     }

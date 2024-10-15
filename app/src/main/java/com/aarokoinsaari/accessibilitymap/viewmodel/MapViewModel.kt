@@ -77,6 +77,9 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
                 is MapIntent.Move -> moveIntents.emit(intent)
                 is MapIntent.MapClick -> handleMapClick(intent.item)
                 is MapIntent.ToggleFilter -> handleToggleFilter(intent.category)
+                is MapIntent.Search -> TODO()
+                is MapIntent.SelectPlace -> TODO()
+                is MapIntent.UpdateQuery -> TODO()
             }
         }
     }

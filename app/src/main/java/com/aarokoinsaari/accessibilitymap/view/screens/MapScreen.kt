@@ -87,6 +87,7 @@ import com.aarokoinsaari.accessibilitymap.state.ErrorState
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.utils.getLastLocationSuspended
+import com.aarokoinsaari.accessibilitymap.view.components.PlaceSearchBar
 import com.aarokoinsaari.accessibilitymap.view.model.PlaceClusterItem
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -132,6 +133,7 @@ fun MapScreen(
 
     var showNotification by rememberSaveable { mutableStateOf(true) }
     var showError by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) } // Search list
 
     LaunchedEffect(locationPermissionState, cameraPositionState) {
         if (locationPermissionState.status.isGranted) {
@@ -181,11 +183,11 @@ fun MapScreen(
         }
     }
 
-    Box(Modifier.fillMaxSize()) {
+    Box {
         GoogleMap(
-            modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-            onMapClick = { onIntent(MapIntent.MapClick(null)) }
+            onMapClick = { onIntent(MapIntent.MapClick(null)) },
+            modifier = Modifier.fillMaxSize()
         ) {
             Clustering(
                 items = state.clusterItems,
@@ -224,14 +226,50 @@ fun MapScreen(
             )
         }
 
-        FilterChipRow(
-            selectedCategories = state.selectedCategories,
-            onIntent = onIntent,
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.Transparent)
-                .padding(horizontal = 8.dp, vertical = 4.dp)
-        )
+                .align(Alignment.TopCenter)
+        ) {
+            PlaceSearchBar(
+                query = state.searchQuery,
+                onQueryChange = { text ->
+                    onIntent(MapIntent.UpdateQuery(text))
+                },
+                onSearch = {
+                    expanded = false
+                    onIntent(MapIntent.Search(state.searchQuery))
+                },
+                expanded = expanded,
+                onExpandedChange = { expanded = it },
+                searchResults = state.filteredPlaces,
+                onPlaceSelected = { place ->
+                    onIntent(MapIntent.SelectPlace(place))
+                    expanded = false
+
+                    // Moves map to the selected place
+                    coroutineScope.launch {
+                        cameraPositionState.animate(
+                            update = CameraUpdateFactory.newLatLngZoom(
+                                LatLng(place.lat, place.lon),
+                                15f
+                            ),
+                            durationMs = 1000
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            FilterChipRow(
+                selectedCategories = state.selectedCategories,
+                onIntent = onIntent,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Transparent)
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+            )
+        }
 
         AnimatedVisibility(
             visible = showNotification,
@@ -239,13 +277,11 @@ fun MapScreen(
             exit = fadeOut()
         ) {
             Box(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
                 NotificationBar(
-                    message = stringResource(id = R.string.map_zoom_notification),
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = 64.dp)
+                    message = stringResource(id = R.string.map_zoom_notification)
                 )
             }
         }
@@ -259,10 +295,7 @@ fun MapScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 NotificationBar(
-                    message = errorMessage!!,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = 64.dp)
+                    message = errorMessage!!
                 )
             }
         }

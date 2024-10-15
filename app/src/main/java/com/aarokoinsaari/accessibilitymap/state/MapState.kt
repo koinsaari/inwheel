@@ -27,6 +27,8 @@ data class MapState(
     val clusterItems: List<PlaceClusterItem> = emptyList(),
     val selectedClusterItem: PlaceClusterItem? = null,
     val selectedCategories: Set<PlaceCategory> = emptySet(),
+    val searchQuery: String = "",
+    val filteredPlaces: List<Place> = emptyList(),
     val zoomLevel: Float? = 10f,
     val center: LatLng? = null,
     val currentBounds: LatLngBounds? = null,
@@ -46,6 +48,8 @@ data class MapState(
                 isLoading=$isLoading,
                 selectedClusterItem=$selectedClusterItem,
                 selectedCategories=$selectedCategories,
+                filteredPlaces=$filteredPlaces,
+                searchQuery=$searchQuery,
                 errorState=$errorState
             )
         """.trimIndent()
