@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.net.ConnectException
@@ -51,8 +52,10 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
     init {
         viewModelScope.launch {
             placeRepository.placesFlow.collect { places ->
-                val clusterItems = places.map { PlaceClusterItem(it, zIndex = null) }
-                _state.value = _state.value.copy(clusterItems = clusterItems)
+                _state.value = _state.value.copy(
+                    markers = places,
+                    clusterItems = places.map { PlaceClusterItem(it, zIndex = null) }
+                )
             }
         }
 
@@ -69,6 +72,18 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
                     fetchAndSetPlaces(currentBounds, expandedBounds)
                 }
         }
+
+        viewModelScope.launch {
+            _state
+                .map { it.searchQuery }
+                .debounce(DEBOUNCE_VALUE)
+                .distinctUntilChanged()
+                .collect { query ->
+                    if (query.isNotBlank()) {
+                        applySearchFilter(query)
+                    }
+                }
+        }
     }
 
     fun handleIntent(intent: MapIntent) {
@@ -77,9 +92,18 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
                 is MapIntent.Move -> moveIntents.emit(intent)
                 is MapIntent.MapClick -> handleMapClick(intent.item)
                 is MapIntent.ToggleFilter -> handleToggleFilter(intent.category)
-                is MapIntent.Search -> TODO()
-                is MapIntent.SelectPlace -> TODO()
-                is MapIntent.UpdateQuery -> TODO()
+                is MapIntent.Search -> applySearchFilter(intent.query)
+                is MapIntent.SelectPlace -> {
+                    _state.value = _state.value.copy(
+                        selectedClusterItem = PlaceClusterItem(intent.place, 1f)
+                    )
+                }
+
+                is MapIntent.UpdateQuery -> {
+                    _state.value = _state.value.copy(
+                        searchQuery = intent.query
+                    )
+                }
             }
         }
     }
@@ -208,6 +232,19 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
                 PlaceClusterItem(it, 1f)
             }
         )
+    }
+
+    private fun applySearchFilter(query: String) {
+        val allPlaces = _state.value.markers
+        val filtered = if (query.isBlank()) {
+            emptyList()
+        } else {
+            allPlaces.filter { place ->
+                place.name.contains(query, ignoreCase = true)
+            }
+        }
+        _state.value = _state.value.copy(filteredPlaces = filtered)
+        Log.d("MapViewModel", "Filtered places: ${_state.value.filteredPlaces}")
     }
 
     private fun calculateExpandedBounds(bounds: LatLngBounds): LatLngBounds {

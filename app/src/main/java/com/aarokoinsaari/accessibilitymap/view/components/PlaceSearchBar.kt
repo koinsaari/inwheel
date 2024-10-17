@@ -31,6 +31,7 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.model.Place
@@ -65,6 +66,7 @@ fun PlaceSearchBar(
         },
         expanded = expanded,
         onExpandedChange = onExpandedChange,
+        colors = SearchBarDefaults.colors(Color.White), // TODO: Use MaterialTheme
         modifier = modifier
     ) {
         LazyColumn(

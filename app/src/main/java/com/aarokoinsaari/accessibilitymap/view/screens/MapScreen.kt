@@ -251,7 +251,7 @@ fun MapScreen(
                         cameraPositionState.animate(
                             update = CameraUpdateFactory.newLatLngZoom(
                                 LatLng(place.lat, place.lon),
-                                15f
+                                20f
                             ),
                             durationMs = 1000
                         )
