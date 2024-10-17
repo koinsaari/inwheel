@@ -241,6 +241,7 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
         } else {
             allPlaces.filter { place ->
                 place.name.contains(query, ignoreCase = true)
+                place.name != place.category.defaultName // Excludes places without name (toilets, parking spots, etc)
             }
         }
         _state.value = _state.value.copy(filteredPlaces = filtered)
