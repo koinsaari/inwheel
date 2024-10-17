@@ -40,7 +40,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -362,7 +361,12 @@ fun FilterChipRow(
                 leadingIcon = if (isSelected) {
                     { Icon(Icons.Default.Check, contentDescription = null) }
                 } else {
-                    { Icon(Icons.Default.Add, contentDescription = null) }
+                    {
+                        Icon(
+                            painter = painterResource(id = category.iconResId),
+                            contentDescription = null
+                        )
+                    }
                 },
                 colors = FilterChipDefaults.filterChipColors(
                     // TODO: Use MaterialTheme
