@@ -19,7 +19,7 @@
     <string name="accessibility_status_no">No</string>
     <string name="accessibility_status_unknown">Unknown</string>
 
-    <string name="accessibility_wheelchair_label">Wheelchair: </string>
+    <string name="accessibility_wheelchair_label">Wheelchair accessible: </string>
     <string name="accessibility_toilet_label">Accessible toilet: </string>
     <string name="accessibility_elevator_label">Elevator: </string>
 
@@ -36,4 +36,15 @@
     <string name="map_error_timeout">Request timed out. Try again</string>
     <string name="map_error_api_failure">Unable to load places. Please try again</string>
     <string name="map_error_unknown">An error occurred. Please check your connection and try again</string>
+
+    <string name="place_details_text">details:</string>
+    <string name="content_desc_back_arrow">Back</string>
+    <string name="content_desc_favourite">Add to favourites</string>
+    <string name="content_desc_options">Options</string>
+    <string name="accessible_entrance">Accessible entrance:</string>
+    <string name="accessible_toilet">Accessible toilet:</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="unknown">Unknown</string>
+    <string name="limited">limited</string>
 </resources>
