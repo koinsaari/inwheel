@@ -4,6 +4,7 @@
 /app/debug
 local.defaults.properties
 secrets.properties
+/assets/icons
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,android,androidstudio,kotlin,java,gradle
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,android,androidstudio,kotlin,java,gradle
