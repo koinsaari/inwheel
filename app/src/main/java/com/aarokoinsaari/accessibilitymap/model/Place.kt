@@ -30,8 +30,22 @@ data class Place(
     val lat: Double,
     val lon: Double,
     val tags: Map<String, String>?,
-    val accessibility: AccessibilityInfo
-)
+    val accessibility: AccessibilityInfo?
+) {
+    /**
+     * Note: This function temporarily handles the determination of the general accessibility status
+     * by parsing the "wheelchair" tag from the Overpass API. Only this tag is used to determine
+     * the accessibility of a place if there are no other information. Until a better solution is
+     * implemented, we use this to determine the general accessibility.
+     **/
+    fun determineAccessibilityStatus(): AccessibilityStatus =
+        when (tags?.get("wheelchair")?.lowercase()) {
+            "yes", "designated" -> AccessibilityStatus.FULLY_ACCESSIBLE
+            "limited" -> AccessibilityStatus.LIMITED_ACCESSIBILITY
+            "no" -> AccessibilityStatus.NOT_ACCESSIBLE
+            else -> AccessibilityStatus.UNKNOWN
+        }
+}
 
 @Entity(tableName = "places_fts")
 @Fts4(contentEntity = Place::class)

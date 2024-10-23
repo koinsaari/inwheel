@@ -75,13 +75,16 @@ import androidx.compose.ui.unit.dp
 import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityInfo
+import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.FULLY_ACCESSIBLE
+import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.LIMITED_ACCESSIBILITY
+import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.NOT_ACCESSIBLE
+import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.UNKNOWN
+import com.aarokoinsaari.accessibilitymap.model.EntranceInfo
+import com.aarokoinsaari.accessibilitymap.model.FloorInfo
+import com.aarokoinsaari.accessibilitymap.model.ParkingInfo
 import com.aarokoinsaari.accessibilitymap.model.Place
-import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus
-import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.FULLY_ACCESSIBLE
-import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.LIMITED_ACCESSIBILITY
-import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.NOT_ACCESSIBLE
-import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.PARTIALLY_ACCESSIBLE
-import com.aarokoinsaari.accessibilitymap.model.WheelchairAccessStatus.UNKNOWN
+import com.aarokoinsaari.accessibilitymap.model.RestroomInfo
 import com.aarokoinsaari.accessibilitymap.state.ErrorState
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory
@@ -215,7 +218,8 @@ fun MapScreen(
                         modifier = Modifier
                             .size(24.dp)
                             .background(
-                                color = item.placeData.accessibility.wheelchairAccess
+                                color = item.placeData
+                                    .determineAccessibilityStatus()
                                     .getAccessibilityColor(),
                                 shape = CircleShape
                             )
@@ -405,12 +409,14 @@ fun MarkerInfoWindow(item: PlaceClusterItem, modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         InfoWindowAccessibilityImage(
-            status = item.placeData.accessibility.wheelchairAccess,
+            status = item.placeData.determineAccessibilityStatus(),
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .size(96.dp)
                 .background(
-                    color = item.placeData.accessibility.wheelchairAccess.getAccessibilityColor(),
+                    color = item.placeData
+                        .determineAccessibilityStatus()
+                        .getAccessibilityColor(),
                     shape = CircleShape
                 )
         )
@@ -430,20 +436,22 @@ fun MarkerInfoWindow(item: PlaceClusterItem, modifier: Modifier = Modifier) {
         InfoWindowAccessibilityInfo(
             infoLabel = stringResource(id = R.string.accessibility_wheelchair_label),
             status = stringResource(
-                id = item.placeData.accessibility.wheelchairAccess
-                    .getWheelchairAccessibilityStatusStringRes()
+                id = item.placeData
+                    .determineAccessibilityStatus()
+                    .getAccessibilityStatusStringRes()
             )
         )
         InfoWindowAccessibilityInfo(
             infoLabel = stringResource(id = R.string.accessibility_elevator_label),
             status = stringResource(
-                id = item.placeData.accessibility.hasElevator.getAccessibilityStatusStringRes()
+                id = item.placeData.accessibility?.floorInfo?.hasElevator
+                    .getAccessibilityStatusStringRes()
             )
         )
         InfoWindowAccessibilityInfo(
             infoLabel = stringResource(id = R.string.accessibility_toilet_label),
             status = stringResource(
-                id = item.placeData.accessibility.hasAccessibleToilet
+                id = item.placeData.accessibility?.restroomInfo?.determineAccessibilityStatus()
                     .getAccessibilityStatusStringRes()
             )
         )
@@ -452,7 +460,7 @@ fun MarkerInfoWindow(item: PlaceClusterItem, modifier: Modifier = Modifier) {
 
 @Composable
 fun InfoWindowAccessibilityImage(
-    status: WheelchairAccessStatus?,
+    status: AccessibilityStatus?,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -462,7 +470,7 @@ fun InfoWindowAccessibilityImage(
         Image(
             painter = painterResource(
                 id = if (status != NOT_ACCESSIBLE) {
-                    R.drawable.ic_accessible
+                    R.drawable.ic_accessible_general
                 } else {
                     R.drawable.ic_not_accessible
                 }
@@ -529,20 +537,18 @@ private fun moveCameraToUserLocation(
     }
 }
 
-private fun WheelchairAccessStatus.getWheelchairAccessibilityStatusStringRes(): Int =
+private fun AccessibilityStatus?.getAccessibilityStatusStringRes(): Int =
     when (this) {
         FULLY_ACCESSIBLE -> R.string.wheelchair_access_fully_accessible
-        PARTIALLY_ACCESSIBLE -> R.string.wheelchair_access_partially_accessible
         LIMITED_ACCESSIBILITY -> R.string.wheelchair_access_limited_accessibility
         NOT_ACCESSIBLE -> R.string.wheelchair_access_not_accessible
-        UNKNOWN -> R.string.wheelchair_access_unknown
+        else -> R.string.wheelchair_access_unknown
     }
 
-private fun WheelchairAccessStatus.getAccessibilityColor(): Color =
+private fun AccessibilityStatus.getAccessibilityColor(): Color =
     when (this) { // TODO: Change to MaterialTheme
         FULLY_ACCESSIBLE -> Color.Green
-        PARTIALLY_ACCESSIBLE -> Color.Yellow
-        LIMITED_ACCESSIBILITY -> Color.Yellow // TODO: Change to orange
+        LIMITED_ACCESSIBILITY -> Color.Yellow
         NOT_ACCESSIBLE -> Color.Red
         UNKNOWN -> Color.Gray
     }
@@ -577,10 +583,30 @@ private fun MapInfoPopup_Preview() {
                     lon = 144.962,
                     tags = mapOf("category" to "cafe"),
                     accessibility = AccessibilityInfo(
-                        wheelchairAccess = FULLY_ACCESSIBLE,
-                        hasAccessibleToilet = true,
-                        hasElevator = false,
-                        additionalInfo = "Located on the ground floor"
+                        entranceInfo = EntranceInfo(
+                            hasRamp = true,
+                            notTooSteepEntrance = true,
+                            stepCount = 0,
+                            isDoorWide = true,
+                            hasAutomaticDoor = true
+                        ),
+                        restroomInfo = RestroomInfo(
+                            hasGrabRails = true,
+                            isDoorWideEnough = true,
+                            isLargeEnough = true,
+                            euroKey = true
+                        ),
+                        parkingInfo = ParkingInfo(
+                            hasAccessibleSpots = true,
+                            spotCount = 3,
+                            parkingType = ParkingInfo.ParkingType.SURFACE,
+                            hasSmoothSurface = true,
+                            hasElevator = false
+                        ),
+                        floorInfo = FloorInfo(
+                            level = 0,
+                            hasElevator = false
+                        )
                     )
                 ),
                 zIndex = 1f
