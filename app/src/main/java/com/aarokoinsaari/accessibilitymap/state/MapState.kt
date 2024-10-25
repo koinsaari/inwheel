@@ -26,6 +26,7 @@ data class MapState(
     val markers: List<Place> = emptyList(),
     val clusterItems: List<PlaceClusterItem> = emptyList(),
     val selectedClusterItem: PlaceClusterItem? = null,
+    val selectedPlace: Place? = null,
     val selectedCategories: Set<PlaceCategory> = emptySet(),
     val searchQuery: String = "",
     val filteredPlaces: List<Place> = emptyList(),

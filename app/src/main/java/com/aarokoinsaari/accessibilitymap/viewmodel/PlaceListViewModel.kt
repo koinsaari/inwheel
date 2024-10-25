@@ -25,6 +25,7 @@ import com.aarokoinsaari.accessibilitymap.state.PlaceListState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -33,7 +34,7 @@ import kotlinx.coroutines.launch
 @OptIn(FlowPreview::class)
 class PlaceListViewModel(private val repository: PlaceRepository) : ViewModel() {
     private val _state = MutableStateFlow(PlaceListState())
-    val state: StateFlow<PlaceListState> = _state
+    val state: StateFlow<PlaceListState> = _state.asStateFlow()
 
     init {
         viewModelScope.launch {

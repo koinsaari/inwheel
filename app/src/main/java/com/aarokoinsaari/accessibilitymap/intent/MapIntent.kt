@@ -32,6 +32,7 @@ sealed class MapIntent {
     data class MapClick(val item: PlaceClusterItem?) : MapIntent()
     data class UpdateQuery(val query: String) : MapIntent()
     data class Search(val query: String) : MapIntent()
+    data class SelectPlaceMarker(val place: Place) : MapIntent()
     data class SelectPlace(val place: Place) : MapIntent()
     data class ToggleFilter(val category: PlaceCategory) : MapIntent()
 }

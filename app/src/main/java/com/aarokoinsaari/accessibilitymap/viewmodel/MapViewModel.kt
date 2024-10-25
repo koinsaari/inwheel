@@ -31,6 +31,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -47,7 +48,7 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
     private val moveIntents = MutableSharedFlow<MapIntent.Move>(extraBufferCapacity = 64)
     private val apiCallFlow =
         MutableSharedFlow<Pair<LatLngBounds, LatLngBounds>>(extraBufferCapacity = 64)
-    val state: StateFlow<MapState> = _state
+    val state: StateFlow<MapState> = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -93,7 +94,7 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
                 is MapIntent.MapClick -> handleMapClick(intent.item)
                 is MapIntent.ToggleFilter -> handleToggleFilter(intent.category)
                 is MapIntent.Search -> applySearchFilter(intent.query)
-                is MapIntent.SelectPlace -> {
+                is MapIntent.SelectPlaceMarker -> {
                     _state.value = _state.value.copy(
                         selectedClusterItem = PlaceClusterItem(intent.place, 1f)
                     )
@@ -102,6 +103,12 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
                 is MapIntent.UpdateQuery -> {
                     _state.value = _state.value.copy(
                         searchQuery = intent.query
+                    )
+                }
+
+                is MapIntent.SelectPlace -> {
+                    _state.value = _state.value.copy(
+                        selectedPlace = intent.place
                     )
                 }
             }

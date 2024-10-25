@@ -23,6 +23,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +47,7 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -247,7 +249,7 @@ fun MapScreen(
                 onExpandedChange = { expanded = it },
                 searchResults = state.filteredPlaces,
                 onPlaceSelected = { place ->
-                    onIntent(MapIntent.SelectPlace(place))
+                    onIntent(MapIntent.SelectPlaceMarker(place))
                     expanded = false
 
                     // Moves map to the selected place
@@ -318,6 +320,7 @@ fun MapScreen(
 
                 MarkerInfoWindow(
                     item = selectedItem,
+                    onClick = { onIntent(MapIntent.SelectPlace(selectedItem.placeData)) },
                     modifier = Modifier
                         .onGloballyPositioned { coordinates ->
                             popupSize = coordinates.size
@@ -333,6 +336,7 @@ fun MapScreen(
                             shape = RoundedCornerShape(16.dp)
                         )
                         .padding(16.dp)
+                        .clickable { onIntent(MapIntent.SelectPlace(selectedItem.placeData)) }
                 )
             }
         }
@@ -402,7 +406,11 @@ fun MapPlaceMarker(category: PlaceCategory, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MarkerInfoWindow(item: PlaceClusterItem, modifier: Modifier = Modifier) {
+fun MarkerInfoWindow(
+    item: PlaceClusterItem,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = { }
+) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start,
@@ -455,6 +463,14 @@ fun MarkerInfoWindow(item: PlaceClusterItem, modifier: Modifier = Modifier) {
                     .getAccessibilityStatusStringRes()
             )
         )
+        Spacer(Modifier.height(16.dp))
+        TextButton(
+            onClick = onClick,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Text(text = stringResource(R.string.info_window_view_details))
+        }
     }
 }
 
