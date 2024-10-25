@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.view.navigation
 
 import androidx.annotation.DrawableRes
 import com.aarokoinsaari.accessibilitymap.R
 
-enum class NavigationScreen(val route: String, @DrawableRes val iconResId: Int) {
+enum class NavigationScreen(val route: String, @DrawableRes val iconResId: Int?) {
     Map("map", R.drawable.ic_map),
-    Places("places", R.drawable.ic_places_list)
+    PlaceList("places", R.drawable.ic_places_list),
+    PlaceDetails("place_details", null)
 }

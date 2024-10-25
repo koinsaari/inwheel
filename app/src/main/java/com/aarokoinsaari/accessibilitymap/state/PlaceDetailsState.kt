@@ -18,4 +18,4 @@ package com.aarokoinsaari.accessibilitymap.state
 
 import com.aarokoinsaari.accessibilitymap.model.Place
 
-data class PlaceDetailState(val place: Place)
+data class PlaceDetailsState(val place: Place? = null)

@@ -47,4 +47,8 @@
     <string name="no">No</string>
     <string name="unknown">Unknown</string>
     <string name="limited">limited</string>
+    <string name="info_window_view_details">View details</string>
+    <string name="content_desc_navigation_map">Navigate to map</string>
+    <string name="content_desc_navigation_place_list">Navigate to place list</string>
+    <string name="content_desc_navigation_default">Navigate to other view</string>
 </resources>

@@ -50,14 +50,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aarokoinsaari.accessibilitymap.R
-import com.aarokoinsaari.accessibilitymap.intent.PlaceDetailIntent
+import com.aarokoinsaari.accessibilitymap.intent.PlaceDetailsIntent
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityInfo
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.FULLY_ACCESSIBLE
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.LIMITED_ACCESSIBILITY
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.NOT_ACCESSIBLE
-import com.aarokoinsaari.accessibilitymap.state.PlaceDetailState
+import com.aarokoinsaari.accessibilitymap.state.PlaceDetailsState
 import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -67,41 +67,46 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
-fun PlaceDetailScreen(
-    stateFlow: StateFlow<PlaceDetailState>,
-    onIntent: (PlaceDetailIntent) -> Unit = { }
+fun PlaceDetailsScreen(
+    stateFlow: StateFlow<PlaceDetailsState>,
+    onIntent: (PlaceDetailsIntent) -> Unit = { }
 ) {
     val state by stateFlow.collectAsState()
     val place = state.place
 
-    Surface(
-        color = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-    ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier.fillMaxSize()
+    if (place != null) {
+        Surface(
+            color = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
         ) {
-            PlaceTopAppBar(
-                place = place,
-                modifier = Modifier.fillMaxWidth()
-            )
-            MapCard(
-                place = place,
-                onClick = { onIntent(PlaceDetailIntent.MapClick(place)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .padding(8.dp)
-            )
-            PlaceBasicDetailsVertical(
-                place = place,
-                modifier = Modifier.fillMaxWidth()
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                PlaceTopAppBar(
+                    place = place,
+                    onIntent = onIntent,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                MapCard(
+                    place = place,
+                    onClick = { onIntent(PlaceDetailsIntent.MapClick(place)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .padding(8.dp)
+                )
+                PlaceBasicDetailsVertical(
+                    place = place,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
+    } else {
+        TODO()
     }
 }
 
@@ -131,22 +136,6 @@ fun PlaceBasicDetailsVertical(place: Place, modifier: Modifier = Modifier) {
     }
 }
 
-private fun AccessibilityStatus?.getAccessibilityStatusStringRes(): Int =
-    when (this) {
-        FULLY_ACCESSIBLE -> R.string.wheelchair_access_fully_accessible
-        LIMITED_ACCESSIBILITY -> R.string.wheelchair_access_limited_accessibility
-        NOT_ACCESSIBLE -> R.string.wheelchair_access_not_accessible
-        else -> R.string.wheelchair_access_unknown
-    }
-
-private fun AccessibilityStatus?.getSimpleAccessibilityStatusStringRes(): Int =
-    when (this) {
-        FULLY_ACCESSIBLE -> R.string.yes
-        LIMITED_ACCESSIBILITY -> R.string.limited
-        NOT_ACCESSIBLE -> R.string.no
-        else -> R.string.unknown
-    }
-
 @Composable
 fun AccessibilityDetailItem(
     @DrawableRes iconResId: Int,
@@ -160,7 +149,7 @@ fun AccessibilityDetailItem(
     ) {
         Icon(
             painter = painterResource(id = iconResId),
-            contentDescription = TODO()
+            contentDescription = null // TODO
         )
         Text(
             text = stringResource(id = descriptionResId),
@@ -177,8 +166,8 @@ fun AccessibilityDetailItem(
 @Composable
 fun PlaceTopAppBar(
     place: Place,
-    onIntent: (PlaceDetailIntent) -> Unit = { },
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onIntent: (PlaceDetailsIntent) -> Unit = { }
 ) {
     TopAppBar(
         title = {
@@ -188,7 +177,7 @@ fun PlaceTopAppBar(
             )
         },
         navigationIcon = {
-            IconButton(onClick = { onIntent(PlaceDetailIntent.BackClick(place)) }) {
+            IconButton(onClick = { onIntent(PlaceDetailsIntent.BackClick) }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(id = R.string.content_desc_back_arrow)
@@ -196,13 +185,13 @@ fun PlaceTopAppBar(
             }
         },
         actions = {
-            IconButton(onClick = { onIntent(PlaceDetailIntent.FavouriteClick(place)) }) {
+            IconButton(onClick = { onIntent(PlaceDetailsIntent.FavouriteClick(place)) }) {
                 Icon(
                     imageVector = Icons.Default.FavoriteBorder,
                     contentDescription = stringResource(id = R.string.content_desc_favourite)
                 )
             }
-            IconButton(onClick = { onIntent(PlaceDetailIntent.OptionsClick(place)) }) {
+            IconButton(onClick = { onIntent(PlaceDetailsIntent.OptionsClick(place)) }) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = stringResource(id = R.string.content_desc_options)
@@ -216,7 +205,7 @@ fun PlaceTopAppBar(
 @Composable
 fun MapCard(
     place: Place,
-    onClick: (PlaceDetailIntent) -> Unit = { },
+    onClick: (PlaceDetailsIntent) -> Unit = { },
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -235,6 +224,22 @@ fun MapCard(
     }
 }
 
+private fun AccessibilityStatus?.getAccessibilityStatusStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.wheelchair_access_fully_accessible
+        LIMITED_ACCESSIBILITY -> R.string.wheelchair_access_limited_accessibility
+        NOT_ACCESSIBLE -> R.string.wheelchair_access_not_accessible
+        else -> R.string.wheelchair_access_unknown
+    }
+
+private fun AccessibilityStatus?.getSimpleAccessibilityStatusStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.yes
+        LIMITED_ACCESSIBILITY -> R.string.limited
+        NOT_ACCESSIBLE -> R.string.no
+        else -> R.string.unknown
+    }
+
 @Preview(showBackground = true)
 @Composable
 private fun PlaceDetailScreen_Preview() {
@@ -247,10 +252,10 @@ private fun PlaceDetailScreen_Preview() {
         tags = emptyMap(),
         accessibility = AccessibilityInfo()
     )
-    val sampleState = PlaceDetailState(place = samplePlace)
+    val sampleState = PlaceDetailsState(place = samplePlace)
     val stateFlow = MutableStateFlow(sampleState)
 
-    PlaceDetailScreen(stateFlow = stateFlow)
+    PlaceDetailsScreen(stateFlow = stateFlow)
 }
 
 @Preview(showBackground = true)

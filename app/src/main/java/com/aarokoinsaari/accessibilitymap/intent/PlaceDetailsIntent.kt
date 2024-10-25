@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.intent
 
-sealed class MainIntent {
-    data object NavigateToMap : MainIntent()
-    data object NavigateToPlaces : MainIntent()
+import com.aarokoinsaari.accessibilitymap.model.Place
+
+sealed class PlaceDetailsIntent {
+    data class MapClick(val place: Place) : PlaceDetailsIntent()
+    data class FavouriteClick(val place: Place) : PlaceDetailsIntent()
+    data class OptionsClick(val place: Place) : PlaceDetailsIntent()
+    data object BackClick : PlaceDetailsIntent()
 }

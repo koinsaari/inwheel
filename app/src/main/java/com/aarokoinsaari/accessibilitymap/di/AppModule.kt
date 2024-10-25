@@ -20,10 +20,11 @@ import androidx.room.Room
 import com.aarokoinsaari.accessibilitymap.database.AppDatabase
 import com.aarokoinsaari.accessibilitymap.database.PlacesDao
 import com.aarokoinsaari.accessibilitymap.database.PlacesFtsDao
+import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.network.OverpassApiService
 import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
-import com.aarokoinsaari.accessibilitymap.viewmodel.MainViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
+import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceDetailsViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceListViewModel
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
@@ -56,6 +57,12 @@ val appModule = module {
             "app_database"
         ).fallbackToDestructiveMigration().build()
     }
+//    single {
+//        Room.inMemoryDatabaseBuilder(
+//            androidContext(),
+//            AppDatabase::class.java,
+//        ).fallbackToDestructiveMigration().build()
+//    }
     single<PlacesDao> {
         get<AppDatabase>().placesDao()
     }
@@ -66,12 +73,12 @@ val appModule = module {
         get<AppDatabase>().placesFtsDao()
     }
     viewModel {
-        MainViewModel()
-    }
-    viewModel {
         MapViewModel(get())
     }
     viewModel {
         PlaceListViewModel(get())
+    }
+    viewModel { (place: Place) ->
+        PlaceDetailsViewModel(place)
     }
 }

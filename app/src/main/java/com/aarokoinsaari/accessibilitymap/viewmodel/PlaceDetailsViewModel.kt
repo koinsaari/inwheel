@@ -13,30 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.aarokoinsaari.accessibilitymap.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.aarokoinsaari.accessibilitymap.intent.MainIntent
-import com.aarokoinsaari.accessibilitymap.state.MainState
-import com.aarokoinsaari.accessibilitymap.view.navigation.NavigationScreen
+import com.aarokoinsaari.accessibilitymap.intent.PlaceDetailsIntent
+import com.aarokoinsaari.accessibilitymap.model.Place
+import com.aarokoinsaari.accessibilitymap.state.PlaceDetailsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.asStateFlow
 
-class MainViewModel : ViewModel() {
-    private val _state = MutableStateFlow(MainState())
-    val state: StateFlow<MainState> = _state
+class PlaceDetailsViewModel(private val place: Place) : ViewModel() {
+    private val _state = MutableStateFlow(PlaceDetailsState(place))
+    val state: StateFlow<PlaceDetailsState> = _state.asStateFlow()
 
-    fun handleIntent(intent: MainIntent) {
-        viewModelScope.launch {
-            when (intent) {
-                MainIntent.NavigateToMap -> _state.value =
-                    _state.value.copy(currentScreen = NavigationScreen.Map)
-
-                MainIntent.NavigateToPlaces -> _state.value =
-                    _state.value.copy(currentScreen = NavigationScreen.Places)
-            }
+    fun handleIntent(intent: PlaceDetailsIntent) {
+        when (intent) {
+            is PlaceDetailsIntent.BackClick -> Unit // Handled in NavHost
+            is PlaceDetailsIntent.FavouriteClick -> TODO()
+            is PlaceDetailsIntent.MapClick -> TODO()
+            is PlaceDetailsIntent.OptionsClick -> TODO()
         }
     }
 }
