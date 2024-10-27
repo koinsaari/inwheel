@@ -41,8 +41,8 @@
     <string name="content_desc_back_arrow">Back</string>
     <string name="content_desc_favourite">Add to favourites</string>
     <string name="content_desc_options">Options</string>
-    <string name="accessible_entrance">Accessible entrance:</string>
-    <string name="accessible_toilet">Accessible toilet:</string>
+    <string name="place_details_basic_details_entrance">Entrance:</string>
+    <string name="place_details_basic_details_toilet">Toilet:</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="unknown">Unknown</string>
@@ -51,4 +51,7 @@
     <string name="content_desc_navigation_map">Navigate to map</string>
     <string name="content_desc_navigation_place_list">Navigate to place list</string>
     <string name="content_desc_navigation_default">Navigate to other view</string>
+    <string name="place_details_basic_details_headline">Accessibility</string>
+    <string name="place_details_basic_details_parking">Parking:</string>
+    <string name="place_details_basic_details_floor">On floor:</string>
 </resources>
