@@ -55,7 +55,12 @@ data class AccessibilityInfo(
     }
 }
 
-// TODO: Write better code and remove suppressed warnings below
+/**
+ * TODO:
+ * - get rid of suppressed warnings, write better code
+ * - improve the evaluations in general. These should be tested after with some unit tests because
+ *   there are so many different cases
+ */
 
 data class EntranceInfo(
     val hasRamp: Boolean? = null,
@@ -71,6 +76,9 @@ data class EntranceInfo(
         when {
             isDoorWide == false ->
                 AccessibilityStatus.NOT_ACCESSIBLE
+
+            stepCount == 0 && isDoorWide == true ->
+                AccessibilityStatus.FULLY_ACCESSIBLE
 
             isDoorWide == null ->
                 AccessibilityStatus.UNKNOWN

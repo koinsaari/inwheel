@@ -334,6 +334,7 @@ private fun PlaceBasicDetailsVertical_Preview() {
     val accessibilityInfo = AccessibilityInfo(
         entranceInfo = EntranceInfo(
             stepCount = 0,
+            isDoorWide = true
         ),
         restroomInfo = RestroomInfo(
             hasGrabRails = true
