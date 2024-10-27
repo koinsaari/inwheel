@@ -24,15 +24,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class PlaceDetailsViewModel(private val place: Place) : ViewModel() {
+class PlaceDetailsViewModel(place: Place) : ViewModel() {
     private val _state = MutableStateFlow(PlaceDetailsState(place))
     val state: StateFlow<PlaceDetailsState> = _state.asStateFlow()
 
     fun handleIntent(intent: PlaceDetailsIntent) {
         when (intent) {
-            is PlaceDetailsIntent.BackClick -> Unit // Handled in NavHost
+            // First two handled by NavHost
+            is PlaceDetailsIntent.BackClick -> Unit
+            is PlaceDetailsIntent.MapClick -> Unit
             is PlaceDetailsIntent.FavouriteClick -> TODO()
-            is PlaceDetailsIntent.MapClick -> TODO()
             is PlaceDetailsIntent.OptionsClick -> TODO()
         }
     }

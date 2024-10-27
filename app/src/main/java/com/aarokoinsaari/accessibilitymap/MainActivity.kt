@@ -107,7 +107,8 @@ class MainActivity : ComponentActivity() {
                                     stateFlow = viewModel.state,
                                     onIntent = { intent ->
                                         when (intent) {
-                                            is PlaceDetailsIntent.BackClick -> {
+                                            is PlaceDetailsIntent.BackClick,
+                                            is PlaceDetailsIntent.MapClick -> {
                                                 navController.popBackStack()
                                             }
 
