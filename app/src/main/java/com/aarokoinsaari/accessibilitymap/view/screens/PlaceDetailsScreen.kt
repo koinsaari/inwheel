@@ -18,14 +18,15 @@ package com.aarokoinsaari.accessibilitymap.view.screens
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -40,6 +41,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,17 +54,24 @@ import androidx.compose.ui.unit.dp
 import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.intent.PlaceDetailsIntent
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityInfo
-import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.FULLY_ACCESSIBLE
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.LIMITED_ACCESSIBILITY
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.NOT_ACCESSIBLE
+import com.aarokoinsaari.accessibilitymap.model.EntranceInfo
+import com.aarokoinsaari.accessibilitymap.model.FloorInfo
+import com.aarokoinsaari.accessibilitymap.model.ParkingInfo
+import com.aarokoinsaari.accessibilitymap.model.Place
+import com.aarokoinsaari.accessibilitymap.model.RestroomInfo
 import com.aarokoinsaari.accessibilitymap.state.PlaceDetailsState
 import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory
+import com.aarokoinsaari.accessibilitymap.view.theme.AccessibilityMapTheme
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -78,9 +87,7 @@ fun PlaceDetailsScreen(
         Surface(
             color = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp)
+            modifier = Modifier.fillMaxSize()
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -99,10 +106,21 @@ fun PlaceDetailsScreen(
                         .height(200.dp)
                         .padding(8.dp)
                 )
-                PlaceBasicDetailsVertical(
-                    place = place,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Column {
+                    Text(
+                        text = stringResource(id = R.string.place_details_basic_details_headline),
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(8.dp)
+                    )
+                    PlaceBasicDetailsVertical(
+                        place = place,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 70.dp) // TODO: Make more adaptive
+                    )
+                }
             }
         }
     } else {
@@ -112,25 +130,67 @@ fun PlaceDetailsScreen(
 
 @Composable
 fun PlaceBasicDetailsVertical(place: Place, modifier: Modifier = Modifier) {
-    Row(modifier = modifier) {
-        Column {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 4.dp)
+        ) {
             // Entrance
             AccessibilityDetailItem(
                 iconResId = R.drawable.ic_accessibility_entrance,
-                descriptionResId = R.string.accessible_entrance,
+                descriptionResId = R.string.place_details_basic_details_entrance,
                 statusText = stringResource(
                     id = place.accessibility?.entranceInfo?.determineAccessibilityStatus()
-                        .getAccessibilityStatusStringRes()
-                )
+                        .getSimpleAccessibilityStatusStringRes()
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
             )
             // Toilet
             AccessibilityDetailItem(
                 iconResId = R.drawable.ic_wc,
-                descriptionResId = R.string.accessible_toilet,
+                descriptionResId = R.string.place_details_basic_details_toilet,
                 statusText = stringResource(
                     id = place.accessibility?.restroomInfo?.determineAccessibilityStatus()
                         .getSimpleAccessibilityStatusStringRes()
-                )
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            )
+        }
+        VerticalDivider(Modifier.fillMaxHeight())
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 4.dp)
+        ) {
+            // Parking
+            AccessibilityDetailItem(
+                iconResId = R.drawable.ic_parking_area,
+                descriptionResId = R.string.place_details_basic_details_parking,
+                statusText = stringResource(
+                    id = place.accessibility?.entranceInfo?.determineAccessibilityStatus()
+                        .getSimpleAccessibilityStatusStringRes()
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            )
+            // Floor
+            AccessibilityDetailItem(
+                iconResId = R.drawable.ic_stack,
+                descriptionResId = R.string.place_details_basic_details_floor,
+                statusText = place.accessibility?.floorInfo?.level?.toString()
+                    ?: stringResource(id = R.string.unknown),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
             )
         }
     }
@@ -145,6 +205,7 @@ fun AccessibilityDetailItem(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier
     ) {
         Icon(
@@ -205,25 +266,34 @@ fun PlaceTopAppBar(
 @Composable
 fun MapCard(
     place: Place,
-    onClick: (PlaceDetailsIntent) -> Unit = { },
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (PlaceDetailsIntent) -> Unit = { }
 ) {
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         modifier = modifier
     ) {
-        Box(Modifier.clickable { onClick }) {
+        Box {
             GoogleMap(
                 cameraPositionState = rememberCameraPositionState {
                     position = CameraPosition.fromLatLngZoom(
                         LatLng(place.lat, place.lon), 15f
                     )
-                }
-            )
+                },
+                onMapClick = { onClick(PlaceDetailsIntent.MapClick(place)) }
+            ) {
+                // TODO: Change to the custom MapPlaceMarker as in MapScreen for consistency
+                Marker(
+                    state = rememberMarkerState(position = LatLng(place.lat, place.lon)),
+                    title = place.name,
+                    snippet = place.category.defaultName
+                )
+            }
         }
     }
 }
 
+@Suppress("UnusedPrivateMember")
 private fun AccessibilityStatus?.getAccessibilityStatusStringRes(): Int =
     when (this) {
         FULLY_ACCESSIBLE -> R.string.wheelchair_access_fully_accessible
@@ -256,6 +326,41 @@ private fun PlaceDetailScreen_Preview() {
     val stateFlow = MutableStateFlow(sampleState)
 
     PlaceDetailsScreen(stateFlow = stateFlow)
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PlaceBasicDetailsVertical_Preview() {
+    val accessibilityInfo = AccessibilityInfo(
+        entranceInfo = EntranceInfo(
+            stepCount = 0,
+        ),
+        restroomInfo = RestroomInfo(
+            hasGrabRails = true
+        ),
+        parkingInfo = ParkingInfo(
+            hasAccessibleSpots = true,
+            spotCount = 3
+        ),
+        floorInfo = FloorInfo(
+            level = 0,
+            hasElevator = true
+        )
+    )
+    AccessibilityMapTheme {
+        PlaceBasicDetailsVertical(
+            place = Place(
+                id = 1,
+                name = "Cafe",
+                category = PlaceCategory.CAFE,
+                lat = 0.0,
+                lon = 0.0,
+                tags = emptyMap(),
+                accessibility = accessibilityInfo
+            ),
+            modifier = Modifier
+        )
+    }
 }
 
 @Preview(showBackground = true)
