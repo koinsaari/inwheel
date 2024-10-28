@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng
 data class PlaceListState(
     val searchQuery: String = "",
     val places: List<Place> = emptyList(),
+    val isExpanded: Boolean = true, // On view change list stays expanded
     val filteredPlaces: List<Place> = emptyList(),
     val selectedPlace: Place? = null,
     val userLocation: LatLng? = null,
