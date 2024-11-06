@@ -74,6 +74,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityInfo
@@ -204,8 +205,12 @@ fun MapScreen(
                 onClusterItemClick = { clusterItem ->
                     onIntent(MapIntent.MapClick(clusterItem))
                     coroutineScope.launch {
+                        val adjustedPosition = LatLng(
+                            clusterItem.position.latitude + 0.003,
+                            clusterItem.position.longitude
+                        )
                         cameraPositionState.animate(
-                            update = CameraUpdateFactory.newLatLng(clusterItem.position),
+                            update = CameraUpdateFactory.newLatLng(adjustedPosition),
                             durationMs = 200
                         )
                     }
@@ -229,80 +234,6 @@ fun MapScreen(
                     )
                 }
             )
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.TopCenter)
-        ) {
-            PlaceSearchBar(
-                query = state.searchQuery,
-                onQueryChange = { text ->
-                    onIntent(MapIntent.UpdateQuery(text))
-                },
-                onSearch = {
-                    expanded = false
-                    onIntent(MapIntent.Search(state.searchQuery))
-                },
-                expanded = expanded,
-                onExpandedChange = { expanded = it },
-                searchResults = state.filteredPlaces,
-                onPlaceSelected = { place ->
-                    onIntent(MapIntent.SelectPlaceMarker(place))
-                    expanded = false
-
-                    // Moves map to the selected place
-                    coroutineScope.launch {
-                        cameraPositionState.animate(
-                            update = CameraUpdateFactory.newLatLngZoom(
-                                LatLng(place.lat, place.lon),
-                                20f
-                            ),
-                            durationMs = 1000
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            FilterChipRow(
-                selectedCategories = state.selectedCategories,
-                onIntent = onIntent,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Transparent)
-                    .padding(horizontal = 12.dp, vertical = 4.dp)
-            )
-        }
-
-        AnimatedVisibility(
-            visible = showNotification,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                NotificationBar(
-                    message = stringResource(id = R.string.map_zoom_notification)
-                )
-            }
-        }
-
-        AnimatedVisibility(
-            visible = showError && errorMessage != null,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                NotificationBar(
-                    message = errorMessage!!
-                )
-            }
         }
 
         // Since ClusterItem info windows currently cannot be customized,
@@ -337,6 +268,83 @@ fun MapScreen(
                         )
                         .padding(16.dp)
                         .clickable { onIntent(MapIntent.SelectPlace(selectedItem.placeData)) }
+                )
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.TopCenter)
+        ) {
+            PlaceSearchBar(
+                query = state.searchQuery,
+                onQueryChange = { text ->
+                    onIntent(MapIntent.UpdateQuery(text))
+                },
+                onSearch = {
+                    expanded = false
+                    onIntent(MapIntent.Search(state.searchQuery))
+                },
+                expanded = expanded,
+                onExpandedChange = { expanded = it },
+                searchResults = state.filteredPlaces,
+                onPlaceSelected = { place ->
+                    onIntent(MapIntent.SelectPlaceMarker(place))
+                    expanded = false
+
+                    // Moves map to the selected place
+                    coroutineScope.launch {
+                        cameraPositionState.animate(
+                            update = CameraUpdateFactory.newLatLngZoom(
+                                LatLng(place.lat, place.lon),
+                                20f
+                            ),
+                            durationMs = 1000
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .zIndex(1f)
+            )
+
+            FilterChipRow(
+                selectedCategories = state.selectedCategories,
+                onIntent = onIntent,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Transparent)
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+                    .zIndex(1f)
+            )
+        }
+
+        AnimatedVisibility(
+            visible = showNotification,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                NotificationBar(
+                    message = stringResource(id = R.string.map_zoom_notification)
+                )
+            }
+        }
+
+        AnimatedVisibility(
+            visible = showError && errorMessage != null,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                NotificationBar(
+                    message = errorMessage!!
                 )
             }
         }
@@ -555,10 +563,10 @@ private fun moveCameraToUserLocation(
 
 private fun AccessibilityStatus?.getAccessibilityStatusStringRes(): Int =
     when (this) {
-        FULLY_ACCESSIBLE -> R.string.wheelchair_access_fully_accessible
-        LIMITED_ACCESSIBILITY -> R.string.wheelchair_access_limited_accessibility
-        NOT_ACCESSIBLE -> R.string.wheelchair_access_not_accessible
-        else -> R.string.wheelchair_access_unknown
+        FULLY_ACCESSIBLE -> R.string.accessibility_status_yes
+        LIMITED_ACCESSIBILITY -> R.string.accessibility_status_limited
+        NOT_ACCESSIBLE -> R.string.no
+        else -> R.string.accessibility_status_unknown
     }
 
 private fun AccessibilityStatus.getAccessibilityColor(): Color =
