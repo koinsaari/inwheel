@@ -18,6 +18,7 @@ package com.aarokoinsaari.accessibilitymap.view.screens
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -69,6 +70,7 @@ import com.aarokoinsaari.accessibilitymap.view.theme.AccessibilityMapTheme
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
@@ -280,7 +282,8 @@ fun MapCard(
                         LatLng(place.lat, place.lon), 15f
                     )
                 },
-                onMapClick = { onClick(PlaceDetailsIntent.MapClick(place)) }
+                onMapClick = { onClick(PlaceDetailsIntent.MapClick(place)) },
+                uiSettings = MapUiSettings(zoomControlsEnabled = false)
             ) {
                 // TODO: Change to the custom MapPlaceMarker as in MapScreen for consistency
                 Marker(

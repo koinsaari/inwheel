@@ -43,7 +43,10 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 @OptIn(FlowPreview::class)
-class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
+class MapViewModel(
+    private val placeRepository: PlaceRepository,
+    private val sharedPlaceViewModel: SharedPlaceViewModel
+) : ViewModel() {
     private val _state = MutableStateFlow(MapState())
     private val moveIntents = MutableSharedFlow<MapIntent.Move>(extraBufferCapacity = 64)
     private val apiCallFlow =
@@ -84,6 +87,21 @@ class MapViewModel(private val placeRepository: PlaceRepository) : ViewModel() {
                         applySearchFilter(query)
                     }
                 }
+        }
+        // Observes selectedPlace changes in SharedPlaceViewModel to update map state so that the
+        // map is zoomed to the selected place
+        viewModelScope.launch {
+            sharedPlaceViewModel.selectedPlace.collect { place ->
+                Log.d("MapViewModel", "SharedPlaceViewModel selected place: $place")
+                place?.let {
+                    _state.value = _state.value.copy(
+                        selectedPlace = place,
+                        selectedClusterItem = PlaceClusterItem(place, 1f),
+                        zoomLevel = 20f,
+                        center = LatLng(place.lat, place.lon)
+                    )
+                }
+            }
         }
     }
 

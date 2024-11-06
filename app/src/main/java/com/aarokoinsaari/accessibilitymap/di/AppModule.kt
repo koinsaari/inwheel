@@ -74,7 +74,7 @@ val appModule = module {
         get<AppDatabase>().placesFtsDao()
     }
     viewModel {
-        MapViewModel(get())
+        MapViewModel(get(), get())
     }
     viewModel {
         PlaceListViewModel(get())

@@ -17,6 +17,7 @@
 package com.aarokoinsaari.accessibilitymap
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -70,8 +71,11 @@ class MainActivity : ComponentActivity() {
                                 onIntent = { intent ->
                                     when (intent) {
                                         is MapIntent.SelectPlace -> {
+                                            Log.d("MainActivity", "Selected place: ${intent.place}")
                                             sharedPlaceViewModel.selectPlace(intent.place)
-                                            navController.navigate(NavigationScreen.PlaceDetails.route)
+                                            navController.navigate(
+                                                NavigationScreen.PlaceDetails.route
+                                            )
                                         }
 
                                         else -> viewModel.handleIntent(intent)
@@ -86,8 +90,11 @@ class MainActivity : ComponentActivity() {
                                 onIntent = { intent ->
                                     when (intent) {
                                         is PlaceListIntent.SelectPlace -> {
+                                            Log.d("MainActivity", "Selected place: ${intent.place}")
                                             sharedPlaceViewModel.selectPlace(intent.place)
-                                            navController.navigate(NavigationScreen.PlaceDetails.route)
+                                            navController.navigate(
+                                                NavigationScreen.PlaceDetails.route
+                                            )
                                         }
 
                                         else -> viewModel.handleIntent(intent)
@@ -109,7 +116,20 @@ class MainActivity : ComponentActivity() {
                                         when (intent) {
                                             is PlaceDetailsIntent.BackClick,
                                             is PlaceDetailsIntent.MapClick -> {
-                                                navController.popBackStack()
+                                                Log.d("MainActivity", "Intent: $intent")
+                                                val currentRoute =
+                                                    navController.previousBackStackEntry?.destination?.route
+                                                Log.d("MainActivity", "currentRoute: $currentRoute")
+                                                if (currentRoute == NavigationScreen.PlaceList.route) {
+                                                    navController.navigate(NavigationScreen.Map.route) {
+                                                        popUpTo(NavigationScreen.Map.route) {
+                                                            inclusive = false
+                                                        }
+                                                    }
+                                                } else {
+                                                    navController.popBackStack()
+                                                    Log.d("MainActivity", "popBackStack()")
+                                                }
                                             }
 
                                             else -> viewModel.handleIntent(intent)
