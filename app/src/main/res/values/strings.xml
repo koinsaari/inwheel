@@ -54,4 +54,5 @@
     <string name="place_details_basic_details_headline">Accessibility</string>
     <string name="place_details_basic_details_parking">Parking:</string>
     <string name="place_details_basic_details_floor">On floor:</string>
+    <string name="accessibility_status_limited">limited</string>
 </resources>
