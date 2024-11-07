@@ -20,11 +20,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
-import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
+import com.aarokoinsaari.accessibilitymap.data.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.state.ErrorState
 import com.aarokoinsaari.accessibilitymap.state.MapState
-import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory
-import com.aarokoinsaari.accessibilitymap.view.model.PlaceClusterItem
+import com.aarokoinsaari.accessibilitymap.model.PlaceCategory
+import com.aarokoinsaari.accessibilitymap.ui.models.PlaceClusterItem
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.FlowPreview

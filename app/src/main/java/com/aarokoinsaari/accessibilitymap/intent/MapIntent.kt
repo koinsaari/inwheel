@@ -17,8 +17,8 @@
 package com.aarokoinsaari.accessibilitymap.intent
 
 import com.aarokoinsaari.accessibilitymap.model.Place
-import com.aarokoinsaari.accessibilitymap.utils.PlaceCategory
-import com.aarokoinsaari.accessibilitymap.view.model.PlaceClusterItem
+import com.aarokoinsaari.accessibilitymap.model.PlaceCategory
+import com.aarokoinsaari.accessibilitymap.ui.models.PlaceClusterItem
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 

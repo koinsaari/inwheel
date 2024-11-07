@@ -20,7 +20,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aarokoinsaari.accessibilitymap.intent.PlaceListIntent
-import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
+import com.aarokoinsaari.accessibilitymap.data.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.state.PlaceListState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -17,12 +17,12 @@
 package com.aarokoinsaari.accessibilitymap.di
 
 import androidx.room.Room
-import com.aarokoinsaari.accessibilitymap.database.AppDatabase
-import com.aarokoinsaari.accessibilitymap.database.PlacesDao
-import com.aarokoinsaari.accessibilitymap.database.PlacesFtsDao
+import com.aarokoinsaari.accessibilitymap.data.local.AppDatabase
+import com.aarokoinsaari.accessibilitymap.data.local.PlacesDao
+import com.aarokoinsaari.accessibilitymap.data.local.PlacesFtsDao
+import com.aarokoinsaari.accessibilitymap.data.remote.OverpassApiService
+import com.aarokoinsaari.accessibilitymap.data.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.model.Place
-import com.aarokoinsaari.accessibilitymap.network.OverpassApiService
-import com.aarokoinsaari.accessibilitymap.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceDetailsViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceListViewModel
