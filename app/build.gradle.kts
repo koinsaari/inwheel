@@ -110,6 +110,11 @@ detekt {
     buildUponDefaultConfig = true
 }
 
+licenseReport {
+    outputDir = "$projectDir"
+    renderers = arrayOf(com.github.jk1.license.render.InventoryMarkdownReportRenderer("NOTICE.md"))
+}
+
 tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
     jvmTarget = "17"
 }

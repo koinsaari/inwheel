@@ -46,6 +46,7 @@ import com.aarokoinsaari.accessibilitymap.viewmodel.SharedPlaceViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+@Suppress("LongMethod")
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
