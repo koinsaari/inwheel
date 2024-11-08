@@ -22,22 +22,25 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.model.PlaceFts
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PlacesDao {
-    @Query(
-        """
-        SELECT * FROM places 
-        WHERE lat BETWEEN :southLat AND :northLat 
-        AND lon BETWEEN :westLon AND :eastLon
-    """
-    )
-    suspend fun getPlacesFromBounds(
+    @Query("SELECT * FROM places WHERE lat BETWEEN :southLat AND :northLat AND lon BETWEEN :westLon AND :eastLon")
+    suspend fun getPlacesWithinBounds(
         southLat: Double,
         northLat: Double,
         westLon: Double,
         eastLon: Double
     ): List<Place>
+
+    @Query("SELECT * FROM places WHERE lat BETWEEN :southLat AND :northLat AND lon BETWEEN :westLon AND :eastLon")
+    fun getPlacesFlowWithinBounds(
+        southLat: Double,
+        northLat: Double,
+        westLon: Double,
+        eastLon: Double
+    ): Flow<List<Place>>
 
     @Query("SELECT * FROM places")
     suspend fun getAllPlaces(): List<Place>

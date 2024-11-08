@@ -20,6 +20,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Fts4
 import androidx.room.PrimaryKey
+import com.aarokoinsaari.accessibilitymap.ui.models.PlaceClusterItem
 
 @Entity(tableName = "places")
 data class Place(
@@ -45,6 +46,12 @@ data class Place(
             else -> AccessibilityStatus.UNKNOWN
         }
 }
+
+fun Place.toClusterItem(zIndex: Float? = null): PlaceClusterItem =
+    PlaceClusterItem(
+        place = this,
+        zIndex = zIndex
+    )
 
 @Entity(tableName = "places_fts")
 @Fts4(contentEntity = Place::class)

@@ -19,64 +19,37 @@ package com.aarokoinsaari.accessibilitymap.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.data.repository.PlaceRepository
-import com.aarokoinsaari.accessibilitymap.state.ErrorState
-import com.aarokoinsaari.accessibilitymap.state.MapState
+import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.model.PlaceCategory
+import com.aarokoinsaari.accessibilitymap.model.toClusterItem
+import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.aarokoinsaari.accessibilitymap.ui.models.PlaceClusterItem
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.net.ConnectException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 
 @OptIn(FlowPreview::class)
 class MapViewModel(
-    private val placeRepository: PlaceRepository,
+    private val repository: PlaceRepository,
     private val sharedPlaceViewModel: SharedPlaceViewModel
 ) : ViewModel() {
     private val _state = MutableStateFlow(MapState())
-    private val moveIntents = MutableSharedFlow<MapIntent.Move>(extraBufferCapacity = 64)
-    private val apiCallFlow =
-        MutableSharedFlow<Pair<LatLngBounds, LatLngBounds>>(extraBufferCapacity = 64)
     val state: StateFlow<MapState> = _state.asStateFlow()
 
+    private var placesJob: Job? = null
+
     init {
-        viewModelScope.launch {
-            placeRepository.placesFlow.collect { places ->
-                _state.value = _state.value.copy(
-                    markers = places,
-                    clusterItems = places.map { PlaceClusterItem(it, zIndex = null) }
-                )
-            }
-        }
-
-        viewModelScope.launch {
-            moveIntents.collect { intent ->
-                handleMove(intent)
-            }
-        }
-
-        viewModelScope.launch {
-            apiCallFlow
-                .debounce(DEBOUNCE_VALUE)
-                .collect { (currentBounds, expandedBounds) ->
-                    fetchAndSetPlaces(currentBounds, expandedBounds)
-                }
-        }
-
+        // Handle search query changes
         viewModelScope.launch {
             _state
                 .map { it.searchQuery }
@@ -88,18 +61,21 @@ class MapViewModel(
                     }
                 }
         }
+
         // Observes selectedPlace changes in SharedPlaceViewModel to update map state so that the
         // map is zoomed to the selected place
         viewModelScope.launch {
             sharedPlaceViewModel.selectedPlace.collect { place ->
                 Log.d("MapViewModel", "SharedPlaceViewModel selected place: $place")
                 place?.let {
-                    _state.value = _state.value.copy(
-                        selectedPlace = place,
-                        selectedClusterItem = PlaceClusterItem(place, 1f),
-                        zoomLevel = 20f,
-                        center = LatLng(place.lat, place.lon)
-                    )
+                    _state.update {
+                        it.copy(
+                            selectedPlace = place,
+                            selectedMarker = PlaceClusterItem(place, 1f),
+                            zoomLevel = 20f,
+                            center = LatLng(place.lat, place.lon)
+                        )
+                    }
                 }
             }
         }
@@ -108,140 +84,100 @@ class MapViewModel(
     fun handleIntent(intent: MapIntent) {
         viewModelScope.launch {
             when (intent) {
-                is MapIntent.Move -> moveIntents.emit(intent)
+                is MapIntent.Move -> handleMove(intent)
                 is MapIntent.MapClick -> handleMapClick(intent.item)
                 is MapIntent.ToggleFilter -> handleToggleFilter(intent.category)
                 is MapIntent.Search -> applySearchFilter(intent.query)
                 is MapIntent.SelectPlaceMarker -> {
-                    _state.value = _state.value.copy(
-                        selectedClusterItem = PlaceClusterItem(intent.place, 1f)
-                    )
+                    _state.update { it.copy(selectedMarker = PlaceClusterItem(intent.place, 1f)) }
                 }
 
                 is MapIntent.UpdateQuery -> {
-                    _state.value = _state.value.copy(
-                        searchQuery = intent.query
-                    )
+                    _state.update { it.copy(searchQuery = intent.query) }
                 }
 
                 is MapIntent.SelectPlace -> {
-                    _state.value = _state.value.copy(
-                        selectedPlace = intent.place
-                    )
+                    _state.update { it.copy(selectedPlace = intent.place) }
                 }
             }
         }
     }
 
-    private suspend fun fetchAndSetPlaces(
-        currentBounds: LatLngBounds,
-        expandedBounds: LatLngBounds
-    ) {
-        _state.value = _state.value.copy(isLoading = true)
-        placeRepository.getPlacesWithinBounds(currentBounds, expandedBounds)
-            .distinctUntilChanged()
-            .catch { e ->
-                _state.value = _state.value.copy(isLoading = false)
-                when (e) {
-                    is UnknownHostException, is ConnectException -> {
-                        _state.value = _state.value.copy(errorState = ErrorState.NoInternet)
-                    }
-
-                    is SocketTimeoutException -> {
-                        _state.value = _state.value.copy(errorState = ErrorState.Timeout)
-                    }
-
-                    is HttpException -> {
-                        _state.value = _state.value.copy(
-                            errorState = ErrorState.ApiError(
-                                e.code(),
-                                e.message()
-                            )
-                        )
-                    }
-
-                    else -> {
-                        _state.value = _state.value.copy(errorState = ErrorState.Unknown(e))
-                        Log.e("MapViewModel", "Unknown fetching places", e)
-                    }
-                }
-            }
-            .collect { newPlaces ->
-                val allPlaces = (_state.value.markers + newPlaces).distinctBy { it.id }
-                val combinedClusterItems = (_state.value.clusterItems + newPlaces.map {
-                    PlaceClusterItem(it, 1f)
-                }).distinctBy { it.placeData.id }
-
-                _state.value = _state.value.copy(
-                    markers = allPlaces,
-                    clusterItems = combinedClusterItems,
-                    isLoading = false,
-                    errorState = ErrorState.None
-                )
-                applyFilters()
-            }
-    }
-
-    private fun handleMove(intent: MapIntent.Move) {
+    private suspend fun handleMove(intent: MapIntent.Move) {
         Log.d("MapViewModel", "Update view intent: $intent")
-        _state.value = _state.value.copy(
-            zoomLevel = intent.zoomLevel,
-            center = intent.center,
-            currentBounds = intent.bounds
-        )
+        _state.update {
+            it.copy(
+                zoomLevel = intent.zoomLevel,
+                center = intent.center,
+                currentBounds = intent.bounds
+            )
+        }
 
         if (intent.zoomLevel < ZOOM_THRESHOLD) {
             handleClearMarkers()
             return
         }
 
-        val currentState = _state.value
-        if (currentState.snapshotBounds == null ||
-            centerIsOutOfBounds(intent.center, currentState.snapshotBounds)
+        if (_state.value.snapshotBounds == null ||
+            centerIsOutOfBounds(intent.center, _state.value.snapshotBounds!!)
         ) {
             val expandedBounds = calculateExpandedBounds(intent.bounds)
-            _state.value = _state.value.copy(
-                currentBounds = intent.bounds,
-                snapshotBounds = expandedBounds
-            )
-            apiCallFlow.tryEmit(intent.bounds to expandedBounds)
+            _state.update { it.copy(snapshotBounds = expandedBounds, isLoading = true) }
+            observePlacesWithinBounds(expandedBounds)
+            // Fetch cached places and trigger api fetch if needed
+            val cachedPlaces = repository.getPlaces(expandedBounds, intent.bounds)
+            if (cachedPlaces.isNotEmpty()) {
+                _state.update {
+                    it.copy(
+                        markers = cachedPlaces.map { it.toClusterItem() },
+                        isLoading = false
+                    )
+                }
+            }
         }
         Log.d("MapViewModel", "MapState after move: ${_state.value}")
     }
 
-    private fun handleMapClick(item: PlaceClusterItem?) {
-        if (item == _state.value.selectedClusterItem) {
-            _state.value = _state.value.copy(
-                selectedClusterItem = null
-            )
-        } else {
-            _state.value = _state.value.copy(
-                selectedClusterItem = item
-            )
+    private fun observePlacesWithinBounds(bounds: LatLngBounds) {
+        placesJob?.cancel() // Cancel any previous job to avoid multiple collectors
+        placesJob = viewModelScope.launch {
+            repository.observePlacesWithinBounds(bounds) // TODO: Here maybe some error handling
+                .collect { places ->
+                    _state.update {
+                        it.copy(
+                            markers = places.map { it.toClusterItem() },
+                            isLoading = false
+                        )
+                    }
+                }
         }
     }
 
+    private fun handleMapClick(item: PlaceClusterItem?) =
+        _state.update { it.copy(selectedMarker = if (item == it.selectedMarker) null else item) }
+
     private fun handleToggleFilter(category: PlaceCategory) {
-        val updatedCategories = if (_state.value.selectedCategories.contains(category)) {
-            _state.value.selectedCategories - category
-        } else {
-            _state.value.selectedCategories + category
+        _state.update { currentState ->
+            val updatedCategories = if (currentState.selectedCategories.contains(category)) {
+                currentState.selectedCategories - category
+            } else {
+                currentState.selectedCategories + category
+            }
+            currentState.copy(selectedCategories = updatedCategories)
         }
-        _state.value = _state.value.copy(
-            selectedCategories = updatedCategories
-        )
         applyFilters()
     }
 
     private fun handleClearMarkers() {
-        if (_state.value.clusterItems.isNotEmpty()) {
-            _state.value = _state.value.copy(
-                markers = emptyList(),
-                clusterItems = emptyList(),
-                currentBounds = null,
-                snapshotBounds = null,
-                selectedClusterItem = null
-            )
+        if (_state.value.markers.isNotEmpty()) {
+            _state.update {
+                it.copy(
+                    markers = emptyList(),
+                    currentBounds = null,
+                    snapshotBounds = null,
+                    selectedMarker = null
+                )
+            }
             Log.d("MapViewModel", "Clear markers action, current state: ${_state.value}")
         }
     }
@@ -250,13 +186,11 @@ class MapViewModel(
         val filteredMarkers = if (_state.value.selectedCategories.isEmpty()) {
             _state.value.markers
         } else {
-            _state.value.markers.filter { _state.value.selectedCategories.contains(it.category) }
-        }
-        _state.value = _state.value.copy(
-            clusterItems = filteredMarkers.map {
-                PlaceClusterItem(it, 1f)
+            _state.value.markers.filter {
+                _state.value.selectedCategories.contains(it.placeData.category)
             }
-        )
+        }
+        _state.update { it.copy(markers = filteredMarkers) }
     }
 
     private fun applySearchFilter(query: String) {
@@ -265,11 +199,12 @@ class MapViewModel(
             emptyList()
         } else {
             allPlaces.filter { place ->
-                place.name.contains(query, ignoreCase = true)
-                place.name != place.category.defaultName // Excludes places without name (toilets, parking spots, etc)
+                // Excludes places without name (toilets, parking spots, etc)
+                place.placeData.name.contains(query, ignoreCase = true) &&
+                        place.placeData.name != place.placeData.category.defaultName
             }
         }
-        _state.value = _state.value.copy(filteredPlaces = filtered)
+        _state.update { it.copy(filteredPlaces = filtered.map { it.placeData }) }
         Log.d("MapViewModel", "Filtered places: ${_state.value.filteredPlaces}")
     }
 

@@ -23,10 +23,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 
 data class MapState(
-    val markers: List<Place> = emptyList(),
-    val clusterItems: List<PlaceClusterItem> = emptyList(),
-    val selectedClusterItem: PlaceClusterItem? = null,
-    val selectedPlace: Place? = null,
+    val markers: List<PlaceClusterItem> = emptyList(),
+    val selectedMarker: PlaceClusterItem? = null,
+    val selectedPlace: Place? = null, // Used for place details
     val selectedCategories: Set<PlaceCategory> = emptySet(),
     val searchQuery: String = "",
     val filteredPlaces: List<Place> = emptyList(),
@@ -41,13 +40,12 @@ data class MapState(
         """
             MapState(
                 markers=${markers.size},
-                clusterItems=${clusterItems.size},
                 zoomLevel=$zoomLevel,
                 center=$center,
                 currentBoundingBox=$currentBounds,
                 snapshotBoundingBox=$snapshotBounds,
                 isLoading=$isLoading,
-                selectedClusterItem=$selectedClusterItem,
+                selectedClusterItem=$selectedMarker,
                 selectedCategories=$selectedCategories,
                 filteredPlaces=$filteredPlaces,
                 searchQuery=$searchQuery,
