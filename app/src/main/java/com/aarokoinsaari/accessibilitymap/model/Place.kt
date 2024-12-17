@@ -29,8 +29,10 @@ data class Place(
     val category: PlaceCategory,
     val lat: Double,
     val lon: Double,
+    val address: String?,
     val tags: Map<String, String>?,
-    val accessibility: AccessibilityInfo?
+    val accessibility: AccessibilityInfo?,
+    val contactInfo: ContactInfo?
 ) {
     /**
      * Note: This function temporarily handles the determination of the general accessibility status
@@ -60,4 +62,10 @@ data class PlaceFts(
     @ColumnInfo(name = "rowid")
     val rowId: Long,
     val name: String
+)
+
+data class ContactInfo(
+    val email: String?,
+    val phone: String?,
+    val website: String?
 )

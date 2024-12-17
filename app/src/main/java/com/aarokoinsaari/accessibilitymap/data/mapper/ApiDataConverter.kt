@@ -25,6 +25,7 @@ import com.aarokoinsaari.accessibilitymap.model.ParkingInfo.ParkingType
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.model.RestroomInfo
 import com.aarokoinsaari.accessibilitymap.data.remote.ApiMapMarker
+import com.aarokoinsaari.accessibilitymap.model.ContactInfo
 import com.aarokoinsaari.accessibilitymap.model.PlaceCategory.Companion.mapApiTagToCategory
 import kotlin.text.lowercase
 
@@ -42,9 +43,18 @@ object ApiDataConverter {
             lat = apiMarker.lat,
             lon = apiMarker.lon,
             tags = tags,
-            accessibility = parseAccessibilityInfo(tags)
+            accessibility = parseAccessibilityInfo(tags),
+            address = tags["addr:street"],
+            contactInfo = parseContactInfo(tags)
         )
     }
+
+    private fun parseContactInfo(map: Map<String, String>): ContactInfo? =
+        ContactInfo(
+            email = map["contact:email"],
+            phone = map["contact:phone"],
+            website = map["contact:website"]
+        )
 
     private fun parseAccessibilityInfo(tags: Map<String, String>): AccessibilityInfo =
         AccessibilityInfo(

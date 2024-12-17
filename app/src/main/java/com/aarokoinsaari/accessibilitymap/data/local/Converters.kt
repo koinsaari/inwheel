@@ -18,6 +18,7 @@ package com.aarokoinsaari.accessibilitymap.data.local
 
 import androidx.room.TypeConverter
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityInfo
+import com.aarokoinsaari.accessibilitymap.model.ContactInfo
 import com.aarokoinsaari.accessibilitymap.model.PlaceCategory
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -57,4 +58,14 @@ class Converters {
     @TypeConverter
     fun placeCategoryToString(category: PlaceCategory?): String? =
         category?.amenityTag
+
+    @TypeConverter
+    fun fromStringToContactInfo(value: String?): ContactInfo? =
+        value?.let {
+            gson.fromJson(value, ContactInfo::class.java)
+        }
+
+    @TypeConverter
+    fun fromContactInfoToString(info: ContactInfo?): String? =
+        gson.toJson(info)
 }
