@@ -80,6 +80,7 @@ import com.aarokoinsaari.accessibilitymap.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityInfo
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.NOT_ACCESSIBLE
+import com.aarokoinsaari.accessibilitymap.model.ContactInfo
 import com.aarokoinsaari.accessibilitymap.model.EntranceInfo
 import com.aarokoinsaari.accessibilitymap.model.FloorInfo
 import com.aarokoinsaari.accessibilitymap.model.ParkingInfo
@@ -573,6 +574,38 @@ private fun ErrorState.getErrorStringRes(): Int? =
 @Preview(showBackground = true)
 @Composable
 private fun MapInfoPopup_Preview() {
+    val contactInfo = ContactInfo(
+        email = "example@mail.com",
+        phone = "+41123123123",
+        website = "https://www.example.com"
+    )
+    val accessibilityInfo = AccessibilityInfo(
+        entranceInfo = EntranceInfo(
+            hasRamp = true,
+            notTooSteepEntrance = true,
+            stepCount = 0,
+            isDoorWide = true,
+            hasAutomaticDoor = true
+        ),
+        restroomInfo = RestroomInfo(
+            hasGrabRails = true,
+            isDoorWideEnough = true,
+            isLargeEnough = true,
+            euroKey = true
+        ),
+        parkingInfo = ParkingInfo(
+            hasAccessibleSpots = true,
+            spotCount = 3,
+            parkingType = ParkingInfo.ParkingType.SURFACE,
+            hasSmoothSurface = true,
+            hasElevator = false
+        ),
+        floorInfo = FloorInfo(
+            level = 0,
+            hasElevator = false
+        )
+    )
+
     MaterialTheme {
         MarkerInfoWindow(
             PlaceClusterItem(
@@ -583,32 +616,9 @@ private fun MapInfoPopup_Preview() {
                     lat = -37.813,
                     lon = 144.962,
                     tags = mapOf("category" to "cafe"),
-                    accessibility = AccessibilityInfo(
-                        entranceInfo = EntranceInfo(
-                            hasRamp = true,
-                            notTooSteepEntrance = true,
-                            stepCount = 0,
-                            isDoorWide = true,
-                            hasAutomaticDoor = true
-                        ),
-                        restroomInfo = RestroomInfo(
-                            hasGrabRails = true,
-                            isDoorWideEnough = true,
-                            isLargeEnough = true,
-                            euroKey = true
-                        ),
-                        parkingInfo = ParkingInfo(
-                            hasAccessibleSpots = true,
-                            spotCount = 3,
-                            parkingType = ParkingInfo.ParkingType.SURFACE,
-                            hasSmoothSurface = true,
-                            hasElevator = false
-                        ),
-                        floorInfo = FloorInfo(
-                            level = 0,
-                            hasElevator = false
-                        )
-                    )
+                    accessibility = accessibilityInfo,
+                    address = "221B Baker Street",
+                    contactInfo = contactInfo
                 ),
                 zIndex = 1f
             )
