@@ -16,52 +16,63 @@
 
 package com.aarokoinsaari.accessibilitymap.ui.screens
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.intent.PlaceDetailsIntent
 import com.aarokoinsaari.accessibilitymap.model.AccessibilityInfo
+import com.aarokoinsaari.accessibilitymap.model.ContactInfo
+import com.aarokoinsaari.accessibilitymap.model.ElevatorInfo
 import com.aarokoinsaari.accessibilitymap.model.EntranceInfo
 import com.aarokoinsaari.accessibilitymap.model.FloorInfo
 import com.aarokoinsaari.accessibilitymap.model.ParkingInfo
+import com.aarokoinsaari.accessibilitymap.model.ParkingInfo.ParkingType
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.model.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.model.RestroomInfo
 import com.aarokoinsaari.accessibilitymap.state.PlaceDetailsState
-import com.aarokoinsaari.accessibilitymap.ui.extensions.getAccessibilityStatusShortStringRes
+import com.aarokoinsaari.accessibilitymap.ui.extensions.getAccessibilityStatusEmojiStringRes
 import com.aarokoinsaari.accessibilitymap.ui.theme.AccessibilityMapTheme
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -74,6 +85,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @Composable
+@Suppress("CyclomaticComplexMethod")
 fun PlaceDetailsScreen(
     stateFlow: StateFlow<PlaceDetailsState>,
     onIntent: (PlaceDetailsIntent) -> Unit = { }
@@ -87,137 +99,329 @@ fun PlaceDetailsScreen(
             contentColor = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.fillMaxSize()
         ) {
-            Column(
+            LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                PlaceTopAppBar(
-                    place = place,
-                    onIntent = onIntent,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                MapCard(
-                    place = place,
-                    onClick = { onIntent(PlaceDetailsIntent.MapClick(place)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .padding(8.dp)
-                )
-                Column {
-                    Text(
-                        text = stringResource(id = R.string.place_details_basic_details_headline),
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(8.dp)
-                    )
-                    PlaceBasicDetailsVertical(
+                item {
+                    PlaceTopAppBar(
                         place = place,
+                        onIntent = onIntent,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                item {
+                    MapCard(
+                        place = place,
+                        onClick = { onIntent(PlaceDetailsIntent.MapClick(place)) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 70.dp) // TODO: Make more adaptive
+                            .height(200.dp)
+                            .padding(8.dp)
                     )
+                }
+
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        val contactDetails = listOfNotNull(
+                            place.contactInfo?.phone?.let { it to Icons.Outlined.Phone },
+                            place.contactInfo?.email?.let { it to Icons.Outlined.Email },
+                            place.contactInfo?.website?.let { it to Icons.Outlined.Info }
+                        )
+
+                        contactDetails.forEach { (info, icon) ->
+                            PlaceBasicDetailsRow(
+                                info = info,
+                                icon = icon,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                            )
+                        }
+                        HorizontalDivider(Modifier.padding(8.dp))
+                        // Entrance
+                        ExpandableItem(
+                            title = stringResource(id = R.string.entrance),
+                            content = {
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    val fraction = 0.6f
+                                    // Step count
+                                    DetailRow(
+                                        title = stringResource(id = R.string.step_count),
+                                        content = place.accessibility?.entranceInfo?.stepCount?.toString()
+                                            ?: stringResource(id = R.string.emoji_question),
+                                        modifier = Modifier
+                                            .fillMaxWidth(fraction)
+                                            .padding(start = 16.dp, bottom = 6.dp)
+                                    )
+
+                                    // Ramp
+                                    DetailRow(
+                                        title = stringResource(id = R.string.ramp),
+                                        content = stringResource(
+                                            id = place.accessibility?.entranceInfo?.hasRamp
+                                                .getAccessibilityStatusEmojiStringRes()
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth(fraction)
+                                            .padding(start = 16.dp, bottom = 6.dp)
+                                    )
+
+                                    // Steepness
+                                    DetailRow(
+                                        title = stringResource(id = R.string.entrance_steepness),
+                                        content = stringResource(
+                                            id = place.accessibility?.entranceInfo?.notTooSteepEntrance
+                                                .getAccessibilityStatusEmojiStringRes()
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth(fraction)
+                                            .padding(start = 16.dp, bottom = 6.dp)
+                                    )
+
+                                    // Door width
+                                    DetailRow(
+                                        title = stringResource(id = R.string.door_width),
+                                        content = stringResource(
+                                            id = place.accessibility?.entranceInfo?.isDoorWide
+                                                .getAccessibilityStatusEmojiStringRes()
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth(fraction)
+                                            .padding(start = 16.dp, bottom = 6.dp)
+                                    )
+
+                                    // Automatic door
+                                    DetailRow(
+                                        title = stringResource(id = R.string.automatic_door),
+                                        content = stringResource(
+                                            id = place.accessibility?.entranceInfo?.hasAutomaticDoor
+                                                .getAccessibilityStatusEmojiStringRes()
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth(fraction)
+                                            .padding(start = 16.dp, bottom = 6.dp)
+                                    )
+
+                                    // Additional info
+                                    if (place.accessibility?.entranceInfo?.additionalInfo != null) {
+                                        Column(
+                                            horizontalAlignment = Alignment.Start,
+                                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(start = 16.dp, bottom = 6.dp)
+                                        ) {
+                                            Text(
+                                                text = stringResource(id = R.string.additional_info),
+                                                style = MaterialTheme.typography.bodyLarge
+                                            )
+                                            Text(
+                                                text = place.accessibility.entranceInfo.additionalInfo,
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                fontStyle = FontStyle.Italic
+                                            )
+                                        }
+                                    }
+                                }
+                                // TODO: Images
+                            },
+                            modifier = Modifier.padding(6.dp)
+                        )
+
+                        // Restrooms
+                        ExpandableItem(
+                            title = stringResource(id = R.string.restroom),
+                            content = {
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    val fraction = 0.6f
+                                    // Grab rails
+                                    DetailRow(
+                                        title = stringResource(id = R.string.grab_rails),
+                                        content = stringResource(
+                                            id = place.accessibility?.restroomInfo?.hasGrabRails
+                                                .getAccessibilityStatusEmojiStringRes()
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth(fraction)
+                                            .padding(start = 16.dp, bottom = 6.dp)
+                                    )
+
+                                    // Door width
+                                    DetailRow(
+                                        title = stringResource(id = R.string.door_width),
+                                        content = stringResource(
+                                            id = place.accessibility?.restroomInfo?.isDoorWideEnough
+                                                .getAccessibilityStatusEmojiStringRes()
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth(fraction)
+                                            .padding(start = 16.dp, bottom = 6.dp)
+                                    )
+
+                                    // WC Size
+                                    DetailRow(
+                                        title = stringResource(id = R.string.spacious_enough),
+                                        content = stringResource(
+                                            id = place.accessibility?.restroomInfo?.isLargeEnough
+                                                .getAccessibilityStatusEmojiStringRes()
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth(fraction)
+                                            .padding(start = 16.dp, bottom = 6.dp)
+                                    )
+
+                                    // Emergency alarm
+                                    DetailRow(
+                                        title = stringResource(id = R.string.emergency_alarm),
+                                        content = stringResource(
+                                            id = place.accessibility?.restroomInfo?.hasEmergencyAlarm
+                                                .getAccessibilityStatusEmojiStringRes()
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth(fraction)
+                                            .padding(start = 16.dp, bottom = 6.dp)
+                                    )
+
+                                    // Euro key
+                                    DetailRow(
+                                        title = stringResource(id = R.string.euro_key),
+                                        content = stringResource(
+                                            id = place.accessibility?.restroomInfo?.euroKey
+                                                .getAccessibilityStatusEmojiStringRes()
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth(fraction)
+                                            .padding(start = 16.dp, bottom = 6.dp)
+                                    )
+
+                                    // Additional info
+                                    if (place.accessibility?.restroomInfo?.additionalInfo != null) {
+                                        Column(
+                                            horizontalAlignment = Alignment.Start,
+                                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(start = 16.dp, bottom = 6.dp)
+                                        ) {
+                                            Text(
+                                                text = stringResource(id = R.string.additional_info),
+                                                style = MaterialTheme.typography.bodyLarge
+                                            )
+                                            Text(
+                                                text = place.accessibility.restroomInfo.additionalInfo,
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                fontStyle = FontStyle.Italic
+                                            )
+                                        }
+                                    }
+                                }
+                                // TODO: Images
+                            },
+                            modifier = Modifier.padding(6.dp)
+                        )
+                        // Parking
+                        ExpandableItem(
+                            title = stringResource(id = R.string.parking),
+                            content = {
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    val fraction = 0.6f
+                                    val spotCount = place.accessibility?.parkingInfo?.spotCount
+
+                                    // Accessible spots
+                                    DetailRow(
+                                        title = stringResource(id = R.string.accessible_parking_spots),
+                                        content = when {
+                                            spotCount != null && spotCount > 0 -> {
+                                                spotCount.toString()
+                                            }
+
+                                            place.accessibility?.parkingInfo?.hasAccessibleSpots != null -> {
+                                                stringResource(
+                                                    id = place.accessibility.parkingInfo.hasAccessibleSpots
+                                                        .getAccessibilityStatusEmojiStringRes()
+                                                )
+                                            }
+
+                                            else -> {
+                                                stringResource(id = R.string.emoji_question)
+                                            }
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth(fraction)
+                                            .padding(start = 16.dp, bottom = 6.dp)
+                                    )
+
+                                    // Smooth surface
+                                    DetailRow(
+                                        title = stringResource(id = R.string.smooth_surface),
+                                        content = stringResource(
+                                            id = place.accessibility?.parkingInfo?.hasSmoothSurface
+                                                .getAccessibilityStatusEmojiStringRes()
+                                        ),
+                                        modifier = Modifier
+                                            .fillMaxWidth(fraction)
+                                            .padding(start = 16.dp, bottom = 6.dp)
+                                    )
+
+                                    // TODO: Parking type
+
+                                    // Elevator if parking is in other than SURFACE
+                                    if (place.accessibility?.parkingInfo?.parkingType != ParkingType.SURFACE) {
+                                        DetailRow(
+                                            title = stringResource(id = R.string.parking_elevator),
+                                            content = stringResource(
+                                                id = place.accessibility?.parkingInfo?.hasElevator
+                                                    .getAccessibilityStatusEmojiStringRes()
+                                            ),
+                                            modifier = Modifier
+                                                .fillMaxWidth(fraction)
+                                                .padding(start = 16.dp, bottom = 6.dp)
+                                        )
+                                    }
+
+                                    // TODO: elevator info
+
+                                    if (place.accessibility?.parkingInfo?.additionalInfo != null) {
+                                        Column(
+                                            horizontalAlignment = Alignment.Start,
+                                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(start = 16.dp, bottom = 6.dp)
+                                        ) {
+                                            Text(
+                                                text = stringResource(id = R.string.additional_info),
+                                                style = MaterialTheme.typography.bodyLarge
+                                            )
+                                            Text(
+                                                text = place.accessibility.parkingInfo.additionalInfo,
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                fontStyle = FontStyle.Italic
+                                            )
+                                        }
+                                    }
+                                }
+                                // TODO: Images
+                            },
+                            modifier = Modifier.padding(6.dp)
+                        )
+                    }
                 }
             }
         }
     } else {
         TODO()
-    }
-}
-
-@Composable
-fun PlaceBasicDetailsVertical(place: Place, modifier: Modifier = Modifier) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = modifier
-    ) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 4.dp)
-        ) {
-            // Entrance
-            AccessibilityDetailItem(
-                iconResId = R.drawable.ic_accessibility_entrance,
-                descriptionResId = R.string.place_details_basic_details_entrance,
-                statusText = stringResource(
-                    id = place.accessibility?.entranceInfo?.determineAccessibilityStatus()
-                        .getAccessibilityStatusShortStringRes()
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            )
-            // Toilet
-            AccessibilityDetailItem(
-                iconResId = R.drawable.ic_wc,
-                descriptionResId = R.string.place_details_basic_details_toilet,
-                statusText = stringResource(
-                    id = place.accessibility?.restroomInfo?.determineAccessibilityStatus()
-                        .getAccessibilityStatusShortStringRes()
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            )
-        }
-        VerticalDivider(Modifier.fillMaxHeight())
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 4.dp)
-        ) {
-            // Parking
-            AccessibilityDetailItem(
-                iconResId = R.drawable.ic_parking_area,
-                descriptionResId = R.string.place_details_basic_details_parking,
-                statusText = stringResource(
-                    id = place.accessibility?.entranceInfo?.determineAccessibilityStatus()
-                        .getAccessibilityStatusShortStringRes()
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            )
-            // Floor
-            AccessibilityDetailItem(
-                iconResId = R.drawable.ic_stack,
-                descriptionResId = R.string.place_details_basic_details_floor,
-                statusText = place.accessibility?.floorInfo?.level?.toString()
-                    ?: stringResource(id = R.string.unknown),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun AccessibilityDetailItem(
-    @DrawableRes iconResId: Int,
-    @StringRes descriptionResId: Int,
-    statusText: String,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = modifier
-    ) {
-        Icon(
-            painter = painterResource(id = iconResId),
-            contentDescription = null // TODO
-        )
-        Text(
-            text = stringResource(id = descriptionResId),
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        Text(
-            text = statusText,
-            style = MaterialTheme.typography.bodyMedium,
-        )
     }
 }
 
@@ -230,10 +434,17 @@ fun PlaceTopAppBar(
 ) {
     TopAppBar(
         title = {
-            Text(
-                text = place.name,
-                style = MaterialTheme.typography.titleLarge
-            )
+            Column {
+                Text(
+                    text = place.name,
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Text(
+                    text = stringResource(id = place.category.nameResId),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            }
         },
         navigationIcon = {
             IconButton(onClick = { onIntent(PlaceDetailsIntent.BackClick) }) {
@@ -292,63 +503,145 @@ fun MapCard(
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-private fun PlaceDetailScreen_Preview() {
-    val samplePlace = Place(
-        id = 1,
-        name = "Sample Place",
-        category = PlaceCategory.CAFE,
-        lat = 46.462,
-        lon = 6.841,
-        tags = emptyMap(),
-        accessibility = AccessibilityInfo()
-    )
-    val sampleState = PlaceDetailsState(place = samplePlace)
-    val stateFlow = MutableStateFlow(sampleState)
-
-    PlaceDetailsScreen(stateFlow = stateFlow)
+fun PlaceBasicDetailsRow(
+    info: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.padding(end = 8.dp)
+        )
+        Text(
+            text = info,
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
 }
 
-@Preview(showBackground = true)
 @Composable
-private fun PlaceBasicDetailsVertical_Preview() {
-    val accessibilityInfo = AccessibilityInfo(
-        entranceInfo = EntranceInfo(
-            stepCount = 0,
-            isDoorWide = true
-        ),
-        restroomInfo = RestroomInfo(
-            hasGrabRails = true
-        ),
-        parkingInfo = ParkingInfo(
-            hasAccessibleSpots = true,
-            spotCount = 3
-        ),
-        floorInfo = FloorInfo(
-            level = 0,
-            hasElevator = true
-        )
-    )
-    AccessibilityMapTheme {
-        PlaceBasicDetailsVertical(
-            place = Place(
-                id = 1,
-                name = "Cafe",
-                category = PlaceCategory.CAFE,
-                lat = 0.0,
-                lon = 0.0,
-                tags = emptyMap(),
-                accessibility = accessibilityInfo
-            ),
+fun ExpandableItem(
+    title: String,
+    initiallyExpanded: Boolean = false,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    var isExpanded by remember { mutableStateOf(initiallyExpanded) }
+
+    Column(
+        horizontalAlignment = Alignment.Start,
+        modifier = modifier
+    ) {
+        Row(
             modifier = Modifier
+                .fillMaxWidth()
+                .clickable { isExpanded = !isExpanded }
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.weight(1f)
+            )
+            Icon(
+                imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = null
+            )
+        }
+
+        AnimatedVisibility(visible = isExpanded) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun DetailRow(
+    title: String,
+    content: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+            text = content,
+            style = MaterialTheme.typography.bodyLarge
         )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun MapCard_Preview() {
+private fun PlaceDetailScreen_Preview() {
+    val contactInfo = ContactInfo(
+        email = "example@mail.com",
+        phone = "+41123123123",
+        website = "https://www.example.com"
+    )
+
+    val entranceInfo = EntranceInfo(
+        hasRamp = true,
+        notTooSteepEntrance = true,
+        stepCount = 0,
+        isDoorWide = true,
+        hasAutomaticDoor = false,
+        additionalInfo = "Main entrance has a smooth surface."
+    )
+
+    val restroomInfo = RestroomInfo(
+        hasGrabRails = true,
+        isDoorWideEnough = true,
+        isLargeEnough = true,
+        hasEmergencyAlarm = false,
+        euroKey = false,
+        additionalInfo = "Accessible restroom on the first floor."
+    )
+
+    val parkingInfo = ParkingInfo(
+        hasAccessibleSpots = true,
+        spotCount = 3,
+        parkingType = ParkingType.SURFACE,
+        hasSmoothSurface = true,
+        hasElevator = false,
+        additionalInfo = "Parking spots near the entrance."
+    )
+
+    val floorInfo = FloorInfo(
+        level = 0,
+        hasElevator = true,
+        elevatorInfo = ElevatorInfo(
+            isAvailable = true,
+            isSpaciousEnough = true,
+            hasBrailleButtons = true,
+            hasAudioAnnouncements = true,
+            additionalInfo = "Elevator has braille and audio guidance."
+        ),
+        additionalInfo = "Ground level accessible without stairs."
+    )
+
+    val accessibilityInfo = AccessibilityInfo(
+        entranceInfo = entranceInfo,
+        restroomInfo = restroomInfo,
+        parkingInfo = parkingInfo,
+        floorInfo = floorInfo,
+        additionalInfo = "Very accessible."
+    )
+
     val samplePlace = Place(
         id = 1,
         name = "Sample Place",
@@ -356,15 +649,17 @@ private fun MapCard_Preview() {
         lat = 46.462,
         lon = 6.841,
         tags = emptyMap(),
-        accessibility = AccessibilityInfo()
+        accessibility = accessibilityInfo,
+        address = "221B Baker Street",
+        contactInfo = contactInfo
     )
-    MapCard(
-        place = samplePlace,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp)
-            .padding(8.dp)
-    )
+
+    val sampleState = PlaceDetailsState(place = samplePlace)
+    val stateFlow = MutableStateFlow(sampleState)
+
+    AccessibilityMapTheme {
+        PlaceDetailsScreen(stateFlow = stateFlow)
+    }
 }
 
 @Preview(showBackground = true)
@@ -377,7 +672,11 @@ private fun PlaceTopAppBar_Preview() {
         lat = 46.462,
         lon = 6.841,
         tags = emptyMap(),
-        accessibility = AccessibilityInfo()
+        accessibility = AccessibilityInfo(),
+        address = null,
+        contactInfo = null
     )
-    PlaceTopAppBar(samplePlace)
+    AccessibilityMapTheme {
+        PlaceTopAppBar(samplePlace)
+    }
 }

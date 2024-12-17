@@ -38,3 +38,10 @@ fun Boolean?.getAccessibilityStatusBoolean(): Int =
         false -> R.string.accessibility_status_no
         null -> R.string.accessibility_status_unknown
     }
+
+fun Boolean?.getAccessibilityStatusEmojiStringRes(): Int =
+    when (this) {
+        true -> R.string.emoji_checkmark
+        false -> R.string.emoji_cross
+        null -> R.string.emoji_question
+    }
