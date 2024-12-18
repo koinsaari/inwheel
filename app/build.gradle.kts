@@ -4,18 +4,18 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.ksp)
     alias(libs.plugins.secrets.gradle.plugin)
-    id("io.gitlab.arturbosch.detekt").version("1.23.6")
-    id("com.github.jk1.dependency-license-report").version("2.8")
+    id("io.gitlab.arturbosch.detekt").version("1.23.7")
+    id("com.github.jk1.dependency-license-report").version("2.9")
 }
 
 android {
     namespace = "com.aarokoinsaari.accessibilitymap"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.aarokoinsaari.accessibilitymap"
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 5
         versionName = "0.0.5d"
 
@@ -105,7 +105,7 @@ secrets {
 }
 
 detekt {
-    toolVersion = "1.23.6"
+    toolVersion = "1.23.7"
     buildUponDefaultConfig = true
 }
 
