@@ -75,4 +75,11 @@
     <string name="accessible_parking_spots">Accessible spots:</string>
     <string name="smooth_surface">Smooth surface:</string>
     <string name="parking_elevator">Elevator in parking place:</string>
+    <string name="miscellaneous">Miscellaneous</string>
+    <string name="located_on_floor">Located on floor:</string>
+    <string name="elevator_to_floor">Elevator to the floor:</string>
+    <string name="elevator_spacious">Spacious:</string>
+    <string name="elevator_braille_buttons">Braille buttons:</string>
+    <string name="elevator_audio_announcements">Audio announcements:</string>
+    <string name="title_elevator">Elevator</string>
 </resources>

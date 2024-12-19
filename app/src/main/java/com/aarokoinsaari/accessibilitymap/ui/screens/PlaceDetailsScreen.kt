@@ -330,6 +330,7 @@ fun PlaceDetailsScreen(
                                 },
                                 modifier = Modifier.padding(6.dp)
                             )
+
                             // Parking
                             ExpandableItem(
                                 title = stringResource(id = R.string.parking),
@@ -392,8 +393,6 @@ fun PlaceDetailsScreen(
                                             )
                                         }
 
-                                        // TODO: elevator info
-
                                         if (place.accessibility?.parkingInfo?.additionalInfo != null) {
                                             Column(
                                                 horizontalAlignment = Alignment.Start,
@@ -415,6 +414,116 @@ fun PlaceDetailsScreen(
                                         }
                                     }
                                     // TODO: Images
+                                },
+                                modifier = Modifier.padding(6.dp)
+                            )
+
+                            // Miscellaneous
+                            ExpandableItem(
+                                title = stringResource(id = R.string.miscellaneous),
+                                content = {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        val fraction = 0.6f
+                                        val level = place.accessibility?.floorInfo?.level
+
+                                        // Level
+                                        DetailRow(
+                                            title = stringResource(id = R.string.located_on_floor),
+                                            content = if (level == null) {
+                                                stringResource(id = R.string.emoji_question)
+                                            } else {
+                                                level.toString()
+                                            },
+                                            modifier = Modifier
+                                                .fillMaxWidth(fraction)
+                                                .padding(start = 16.dp, bottom = 6.dp)
+                                        )
+
+                                        // Elevator to the floor
+                                        DetailRow(
+                                            title = stringResource(id = R.string.elevator_to_floor),
+                                            content = stringResource(
+                                                id = place.accessibility?.floorInfo?.hasElevator
+                                                    .getAccessibilityStatusEmojiStringRes()
+                                            ),
+                                            modifier = Modifier
+                                                .fillMaxWidth(fraction)
+                                                .padding(start = 16.dp, bottom = 6.dp)
+                                        )
+
+                                        if (level != null && level > 0) {
+                                            HorizontalDivider(Modifier.padding(horizontal = 8.dp))
+
+                                            Text(
+                                                text = stringResource(id = R.string.title_elevator),
+                                                style = MaterialTheme.typography.titleLarge,
+                                                color = MaterialTheme.colorScheme.onSurface.copy(
+                                                    alpha = 0.6f
+                                                ),
+                                                modifier = Modifier.padding(start = 16.dp)
+                                            )
+
+                                            // Elevator spacious enough
+                                            DetailRow(
+                                                title = stringResource(id = R.string.elevator_spacious),
+                                                content = stringResource(
+                                                    id = place.accessibility.floorInfo.elevatorInfo?.isSpaciousEnough
+                                                        .getAccessibilityStatusEmojiStringRes()
+                                                ),
+                                                modifier = Modifier
+                                                    .fillMaxWidth(fraction)
+                                                    .padding(start = 16.dp, bottom = 6.dp)
+                                            )
+
+                                            // Elevator has braille buttons
+                                            DetailRow(
+                                                title = stringResource(id = R.string.elevator_braille_buttons),
+                                                content = stringResource(
+                                                    id = place.accessibility.floorInfo.elevatorInfo?.hasBrailleButtons
+                                                        .getAccessibilityStatusEmojiStringRes()
+                                                ),
+                                                modifier = Modifier
+                                                    .fillMaxWidth(fraction)
+                                                    .padding(start = 16.dp, bottom = 6.dp)
+                                            )
+
+                                            // Elevator has audio announcements
+                                            DetailRow(
+                                                title = stringResource(id = R.string.elevator_audio_announcements),
+                                                content = stringResource(
+                                                    id = place.accessibility.floorInfo.elevatorInfo
+                                                        ?.hasAudioAnnouncements
+                                                        .getAccessibilityStatusEmojiStringRes()
+                                                ),
+                                                modifier = Modifier
+                                                    .fillMaxWidth(fraction)
+                                                    .padding(start = 16.dp, bottom = 6.dp)
+                                            )
+                                        }
+
+                                        // Floor additional info
+                                        if (place.accessibility?.floorInfo?.additionalInfo != null) {
+                                            Column(
+                                                horizontalAlignment = Alignment.Start,
+                                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(start = 16.dp, bottom = 6.dp)
+                                            ) {
+                                                Text(
+                                                    text = stringResource(id = R.string.additional_info),
+                                                    style = MaterialTheme.typography.bodyLarge
+                                                )
+                                                Text(
+                                                    text = place.accessibility.floorInfo.additionalInfo,
+                                                    style = MaterialTheme.typography.bodyLarge,
+                                                    fontStyle = FontStyle.Italic
+                                                )
+                                            }
+                                        }
+                                    }
                                 },
                                 modifier = Modifier.padding(6.dp)
                             )
@@ -538,7 +647,7 @@ fun PlaceBasicDetailsRow(
 @Composable
 fun ExpandableItem(
     title: String,
-    initiallyExpanded: Boolean = false,
+    initiallyExpanded: Boolean = true,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
@@ -631,7 +740,7 @@ private fun PlaceDetailScreen_Preview() {
     )
 
     val floorInfo = FloorInfo(
-        level = 0,
+        level = 1,
         hasElevator = true,
         elevatorInfo = ElevatorInfo(
             isAvailable = true,
@@ -651,9 +760,9 @@ private fun PlaceDetailScreen_Preview() {
         additionalInfo = "Very accessible."
     )
 
-    val samplePlace = Place(
+    val place = Place(
         id = 1,
-        name = "Sample Place",
+        name = "Place",
         category = PlaceCategory.CAFE,
         lat = 46.462,
         lon = 6.841,
@@ -663,8 +772,7 @@ private fun PlaceDetailScreen_Preview() {
         contactInfo = contactInfo
     )
 
-    val sampleState = PlaceDetailsState(place = samplePlace)
-    val stateFlow = MutableStateFlow(sampleState)
+    val stateFlow = MutableStateFlow(PlaceDetailsState(place = place))
 
     AccessibilityMapTheme {
         PlaceDetailsScreen(stateFlow = stateFlow)
@@ -674,9 +782,9 @@ private fun PlaceDetailScreen_Preview() {
 @Preview(showBackground = true)
 @Composable
 private fun PlaceTopAppBar_Preview() {
-    val samplePlace = Place(
+    val place = Place(
         id = 1,
-        name = "Sample Place",
+        name = "Place",
         category = PlaceCategory.CAFE,
         lat = 46.462,
         lon = 6.841,
@@ -686,6 +794,6 @@ private fun PlaceTopAppBar_Preview() {
         contactInfo = null
     )
     AccessibilityMapTheme {
-        PlaceTopAppBar(samplePlace)
+        PlaceTopAppBar(place)
     }
 }
