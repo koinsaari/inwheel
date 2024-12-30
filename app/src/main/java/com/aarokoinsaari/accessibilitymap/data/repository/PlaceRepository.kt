@@ -28,7 +28,6 @@ import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -37,8 +36,7 @@ class PlaceRepository(
     private val placesDao: PlacesDao,
     private val placesFtsDao: PlacesFtsDao
 ) {
-    private val _placesFlow = MutableStateFlow<List<Place>>(emptyList())
-    val placesFlow: Flow<List<Place>> = _placesFlow
+    fun observeAllPlaces(): Flow<List<Place>> = placesDao.getAllPlacesFlow()
 
     fun observePlacesWithinBounds(bounds: LatLngBounds): Flow<List<Place>> =
         placesDao.getPlacesFlowWithinBounds(
@@ -77,12 +75,14 @@ class PlaceRepository(
                 Log.d("PlaceRepository", "Fetched ${newPlaces.size} places from API")
                 if (newPlaces.isNotEmpty()) {
                     placesDao.insertPlaces(newPlaces)
-                    placesFtsDao.insertPlaces(newPlaces.map {
-                        PlaceFts(
-                            rowId = it.id,
-                            name = it.name
-                        )
-                    })
+                    placesFtsDao.insertPlaces(
+                        newPlaces.map {
+                            PlaceFts(
+                                rowId = it.id,
+                                name = it.name
+                            )
+                        }
+                    )
                 }
             } catch (e: Exception) {
                 Log.e("PlaceRepository", "Error fetching places from API", e)

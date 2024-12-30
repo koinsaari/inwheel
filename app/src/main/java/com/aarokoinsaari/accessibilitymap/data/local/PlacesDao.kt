@@ -47,6 +47,9 @@ interface PlacesDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlaces(places: List<Place>)
+
+    @Query("SELECT * FROM places")
+    fun getAllPlacesFlow(): Flow<List<Place>>
 }
 
 @Dao

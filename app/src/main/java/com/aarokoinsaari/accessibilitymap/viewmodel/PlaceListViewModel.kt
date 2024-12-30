@@ -38,7 +38,7 @@ class PlaceListViewModel(private val repository: PlaceRepository) : ViewModel() 
 
     init {
         viewModelScope.launch {
-            repository.placesFlow.collect { places ->
+            repository.observeAllPlaces().collect { places ->
                 _state.value = _state.value.copy(places = places)
             }
         }
@@ -76,11 +76,14 @@ class PlaceListViewModel(private val repository: PlaceRepository) : ViewModel() 
 
     private fun applyFilter(query: String) {
         val allPlaces = _state.value.places
+        Log.d("PlaceListViewModel", "All places: $allPlaces")
         val filtered = if (query.isBlank()) {
             emptyList()
         } else {
             allPlaces.filter { place ->
-                place.name.contains(query, ignoreCase = true)
+                // Excludes places without name (toilets, parking spots, etc)
+                place.name.contains(query, ignoreCase = true) &&
+                        place.name != place.category.defaultName
             }
         }
         _state.value = _state.value.copy(filteredPlaces = filtered)
