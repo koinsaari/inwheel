@@ -71,7 +71,7 @@ class MapViewModel(
                     _state.update {
                         it.copy(
                             selectedPlace = place,
-                            selectedMarker = PlaceClusterItem(place, 1f),
+                            selectedClusterItem = PlaceClusterItem(place, 1f),
                             zoomLevel = 20f,
                             center = LatLng(place.lat, place.lon)
                         )
@@ -89,7 +89,14 @@ class MapViewModel(
                 is MapIntent.ToggleFilter -> handleToggleFilter(intent.category)
                 is MapIntent.Search -> applySearchFilter(intent.query)
                 is MapIntent.SelectPlaceMarker -> {
-                    _state.update { it.copy(selectedMarker = PlaceClusterItem(intent.place, 1f)) }
+                    _state.update {
+                        it.copy(
+                            selectedClusterItem = PlaceClusterItem(
+                                intent.place,
+                                1f
+                            )
+                        )
+                    }
                 }
 
                 is MapIntent.UpdateQuery -> {
@@ -129,7 +136,7 @@ class MapViewModel(
             if (cachedPlaces.isNotEmpty()) {
                 _state.update {
                     it.copy(
-                        markers = cachedPlaces.map { it.toClusterItem() },
+                        allClusterItems = cachedPlaces.map { it.toClusterItem() },
                         isLoading = false
                     )
                 }
@@ -144,38 +151,43 @@ class MapViewModel(
             repository.observePlacesWithinBounds(bounds) // TODO: Here maybe some error handling
                 .collect { places ->
                     _state.update {
+                        val clusterItems = places.map { it.toClusterItem() }
                         it.copy(
-                            markers = places.map { it.toClusterItem() },
+                            clusterItems = clusterItems,
+                            allClusterItems = clusterItems,
                             isLoading = false
                         )
                     }
+                    Log.d("MapViewModel", "MapState after observe: ${_state.value}")
                 }
         }
     }
 
     private fun handleMapClick(item: PlaceClusterItem?) =
-        _state.update { it.copy(selectedMarker = if (item == it.selectedMarker) null else item) }
+        _state.update { it.copy(selectedClusterItem = if (item == it.selectedClusterItem) null else item) }
 
     private fun handleToggleFilter(category: PlaceCategory) {
+        Log.d("MapViewModel", "Toggled category: $category")
         _state.update { currentState ->
             val updatedCategories = if (currentState.selectedCategories.contains(category)) {
                 currentState.selectedCategories - category
             } else {
                 currentState.selectedCategories + category
             }
+            Log.d("MapViewModel", "Updated categories: $updatedCategories")
             currentState.copy(selectedCategories = updatedCategories)
         }
         applyFilters()
     }
 
     private fun handleClearMarkers() {
-        if (_state.value.markers.isNotEmpty()) {
+        if (_state.value.clusterItems.isNotEmpty()) {
             _state.update {
                 it.copy(
-                    markers = emptyList(),
+                    clusterItems = emptyList(),
                     currentBounds = null,
                     snapshotBounds = null,
-                    selectedMarker = null
+                    selectedClusterItem = null
                 )
             }
             Log.d("MapViewModel", "Clear markers action, current state: ${_state.value}")
@@ -183,18 +195,21 @@ class MapViewModel(
     }
 
     private fun applyFilters() {
-        val filteredMarkers = if (_state.value.selectedCategories.isEmpty()) {
-            _state.value.markers
+        val selectedCategories = _state.value.selectedCategories
+        val allClusterItems = _state.value.allClusterItems
+        val filteredClusterItems = if (selectedCategories.isEmpty()) {
+            allClusterItems
         } else {
-            _state.value.markers.filter {
-                _state.value.selectedCategories.contains(it.placeData.category)
+            allClusterItems.filter {
+                selectedCategories.contains(it.placeData.category)
             }
         }
-        _state.update { it.copy(markers = filteredMarkers) }
+        _state.update { it.copy(clusterItems = filteredClusterItems) }
+        Log.d("MapViewModel", "Filtered markers: ${_state.value.clusterItems}")
     }
 
     private fun applySearchFilter(query: String) {
-        val allPlaces = _state.value.markers
+        val allPlaces = _state.value.clusterItems
         val filtered = if (query.isBlank()) {
             emptyList()
         } else {

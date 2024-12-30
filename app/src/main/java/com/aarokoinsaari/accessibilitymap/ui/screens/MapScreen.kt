@@ -196,7 +196,7 @@ fun MapScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             Clustering(
-                items = state.markers,
+                items = state.clusterItems,
                 onClusterClick = {
                     cameraPositionState.move(
                         CameraUpdateFactory.zoomIn()
@@ -241,7 +241,7 @@ fun MapScreen(
         // for now the only reasonable solution is to insert the custom info
         // window according to the selected cluster item. This should be changed
         // when the issue mentioned above is closed and Marker Composables can be used instead.
-        state.selectedMarker?.let { selectedItem ->
+        state.selectedClusterItem?.let { selectedItem ->
             val screenPosition =
                 cameraPositionState.projection?.toScreenLocation(selectedItem.position)
 
