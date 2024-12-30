@@ -91,8 +91,7 @@ import com.aarokoinsaari.accessibilitymap.state.ErrorState
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.aarokoinsaari.accessibilitymap.ui.components.PlaceSearchBar
 import com.aarokoinsaari.accessibilitymap.ui.extensions.getAccessibilityColor
-import com.aarokoinsaari.accessibilitymap.ui.extensions.getAccessibilityStatusBoolean
-import com.aarokoinsaari.accessibilitymap.ui.extensions.getAccessibilityStatusStringRes
+import com.aarokoinsaari.accessibilitymap.ui.extensions.getAccessibilityStatusEmojiStringRes
 import com.aarokoinsaari.accessibilitymap.ui.models.PlaceClusterItem
 import com.aarokoinsaari.accessibilitymap.utils.extensions.getLastLocationSuspended
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -451,25 +450,25 @@ fun MarkerInfoWindow(
             modifier = Modifier.padding(bottom = 16.dp)
         )
         InfoWindowAccessibilityInfo(
-            infoLabel = stringResource(id = R.string.accessibility_wheelchair_label),
+            infoLabel = stringResource(id = R.string.accessible_entrance),
             status = stringResource(
                 id = item.placeData
                     .determineAccessibilityStatus()
-                    .getAccessibilityStatusStringRes()
-            )
-        )
-        InfoWindowAccessibilityInfo(
-            infoLabel = stringResource(id = R.string.accessibility_elevator_label),
-            status = stringResource(
-                id = item.placeData.accessibility?.floorInfo?.hasElevator
-                    .getAccessibilityStatusBoolean()
+                    .getAccessibilityStatusEmojiStringRes()
             )
         )
         InfoWindowAccessibilityInfo(
             infoLabel = stringResource(id = R.string.accessibility_toilet_label),
             status = stringResource(
                 id = item.placeData.accessibility?.restroomInfo?.determineAccessibilityStatus()
-                    .getAccessibilityStatusStringRes()
+                    .getAccessibilityStatusEmojiStringRes()
+            )
+        )
+        InfoWindowAccessibilityInfo(
+            infoLabel = stringResource(id = R.string.accessibility_elevator_label),
+            status = stringResource(
+                id = item.placeData.accessibility?.floorInfo?.hasElevator
+                    .getAccessibilityStatusEmojiStringRes()
             )
         )
         Spacer(Modifier.height(16.dp))

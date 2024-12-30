@@ -45,3 +45,11 @@ fun Boolean?.getAccessibilityStatusEmojiStringRes(): Int =
         false -> R.string.emoji_cross
         null -> R.string.emoji_question
     }
+
+fun AccessibilityStatus?.getAccessibilityStatusEmojiStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.emoji_checkmark
+        LIMITED_ACCESSIBILITY -> R.string.emoji_warning
+        NOT_ACCESSIBLE -> R.string.emoji_cross
+        else -> R.string.emoji_question
+    }
