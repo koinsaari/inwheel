@@ -84,11 +84,11 @@ class MapViewModel(
     fun handleIntent(intent: MapIntent) {
         viewModelScope.launch {
             when (intent) {
-                is MapIntent.Move -> handleMove(intent)
-                is MapIntent.MapClick -> handleMapClick(intent.item)
+                is MapIntent.MoveMap -> handleMove(intent)
+                is MapIntent.ClickMap -> handleMapClick(intent.item)
                 is MapIntent.ToggleFilter -> handleToggleFilter(intent.category)
-                is MapIntent.Search -> applySearchFilter(intent.query)
-                is MapIntent.SelectPlaceMarker -> {
+                is MapIntent.SearchPlace -> applySearchFilter(intent.query)
+                is MapIntent.ClickClusterItem -> {
                     _state.update {
                         it.copy(
                             selectedClusterItem = PlaceClusterItem(
@@ -110,7 +110,7 @@ class MapViewModel(
         }
     }
 
-    private suspend fun handleMove(intent: MapIntent.Move) {
+    private suspend fun handleMove(intent: MapIntent.MoveMap) {
         Log.d("MapViewModel", "Update view intent: $intent")
         _state.update {
             it.copy(
@@ -243,7 +243,7 @@ class MapViewModel(
         !bounds.contains(center)
 
     companion object {
-        private const val ZOOM_THRESHOLD = 13
+        private const val ZOOM_THRESHOLD = 12
         private const val EXPAND_FACTOR = 3.0
         private const val DEBOUNCE_VALUE = 250L
     }

@@ -19,8 +19,8 @@ package com.aarokoinsaari.accessibilitymap.intent
 import com.aarokoinsaari.accessibilitymap.model.Place
 
 sealed class PlaceDetailsIntent {
-    data class MapClick(val place: Place) : PlaceDetailsIntent()
-    data class FavouriteClick(val place: Place) : PlaceDetailsIntent()
-    data class OptionsClick(val place: Place) : PlaceDetailsIntent()
-    data object BackClick : PlaceDetailsIntent()
+    data class ClickMap(val place: Place) : PlaceDetailsIntent()
+    data class ClickFavorite(val place: Place) : PlaceDetailsIntent()
+    data class ClickOptions(val place: Place) : PlaceDetailsIntent()
+    data object ClickBack : PlaceDetailsIntent()
 }

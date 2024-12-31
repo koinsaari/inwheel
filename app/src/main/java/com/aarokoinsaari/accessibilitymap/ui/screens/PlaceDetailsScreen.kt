@@ -115,7 +115,7 @@ fun PlaceDetailsScreen(
                     item {
                         MapCard(
                             place = place,
-                            onClick = { onIntent(PlaceDetailsIntent.MapClick(place)) },
+                            onClick = { onIntent(PlaceDetailsIntent.ClickMap(place)) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(200.dp)
@@ -560,7 +560,7 @@ fun PlaceTopAppBar(
             }
         },
         navigationIcon = {
-            IconButton(onClick = { onIntent(PlaceDetailsIntent.BackClick) }) {
+            IconButton(onClick = { onIntent(PlaceDetailsIntent.ClickBack) }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(id = R.string.content_desc_back_arrow)
@@ -568,13 +568,13 @@ fun PlaceTopAppBar(
             }
         },
         actions = {
-            IconButton(onClick = { onIntent(PlaceDetailsIntent.FavouriteClick(place)) }) {
+            IconButton(onClick = { onIntent(PlaceDetailsIntent.ClickFavorite(place)) }) {
                 Icon(
                     imageVector = Icons.Default.FavoriteBorder,
                     contentDescription = stringResource(id = R.string.content_desc_favourite)
                 )
             }
-            IconButton(onClick = { onIntent(PlaceDetailsIntent.OptionsClick(place)) }) {
+            IconButton(onClick = { onIntent(PlaceDetailsIntent.ClickOptions(place)) }) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = stringResource(id = R.string.content_desc_options)
@@ -607,7 +607,7 @@ fun MapCard(
                         LatLng(place.lat, place.lon), 15f
                     )
                 },
-                onMapClick = { onClick(PlaceDetailsIntent.MapClick(place)) },
+                onMapClick = { onClick(PlaceDetailsIntent.ClickMap(place)) },
                 uiSettings = MapUiSettings(zoomControlsEnabled = false)
             ) {
                 // TODO: Change to the custom MapPlaceMarker as in MapScreen for consistency

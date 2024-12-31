@@ -115,8 +115,8 @@ class MainActivity : ComponentActivity() {
                                     stateFlow = viewModel.state,
                                     onIntent = { intent ->
                                         when (intent) {
-                                            is PlaceDetailsIntent.BackClick,
-                                            is PlaceDetailsIntent.MapClick -> {
+                                            is PlaceDetailsIntent.ClickBack,
+                                            is PlaceDetailsIntent.ClickMap -> {
                                                 Log.d("MainActivity", "Intent: $intent")
                                                 val currentRoute =
                                                     navController.previousBackStackEntry?.destination?.route

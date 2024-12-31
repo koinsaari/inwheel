@@ -44,24 +44,6 @@ enum class PlaceCategory(
         R.string.category_toilets,
         "Toilets"
     ),
-    BUS_STATION(
-        "bus_station",
-        R.drawable.ic_bus_station,
-        R.string.category_bus_station,
-        "Bus Station"
-    ),
-    TRAIN_STATION(
-        "train_station",
-        R.drawable.ic_train_station,
-        R.string.category_train_station,
-        "Train Station"
-    ),
-    SUBWAY_STATION(
-        "subway_station",
-        R.drawable.ic_subway_station,
-        R.string.category_subway_station,
-        "Subway Station"
-    ),
     PARKING(
         "parking",
         R.drawable.ic_parking_area,

@@ -31,10 +31,10 @@ class PlaceDetailsViewModel(place: Place) : ViewModel() {
     fun handleIntent(intent: PlaceDetailsIntent) {
         when (intent) {
             // First two handled by NavHost
-            is PlaceDetailsIntent.BackClick -> Unit
-            is PlaceDetailsIntent.MapClick -> Unit
-            is PlaceDetailsIntent.FavouriteClick -> TODO()
-            is PlaceDetailsIntent.OptionsClick -> TODO()
+            is PlaceDetailsIntent.ClickBack -> Unit
+            is PlaceDetailsIntent.ClickMap -> Unit
+            is PlaceDetailsIntent.ClickFavorite -> TODO()
+            is PlaceDetailsIntent.ClickOptions -> TODO()
         }
     }
 }

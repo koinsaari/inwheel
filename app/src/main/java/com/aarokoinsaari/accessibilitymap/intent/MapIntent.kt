@@ -23,16 +23,16 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 
 sealed class MapIntent {
-    data class Move(
+    data class MoveMap(
         val center: LatLng,
         val zoomLevel: Float,
         val bounds: LatLngBounds
     ) : MapIntent()
 
-    data class MapClick(val item: PlaceClusterItem?) : MapIntent()
+    data class ClickMap(val item: PlaceClusterItem?) : MapIntent()
     data class UpdateQuery(val query: String) : MapIntent()
-    data class Search(val query: String) : MapIntent()
-    data class SelectPlaceMarker(val place: Place) : MapIntent()
+    data class SearchPlace(val query: String) : MapIntent()
+    data class ClickClusterItem(val place: Place) : MapIntent()
     data class SelectPlace(val place: Place) : MapIntent()
     data class ToggleFilter(val category: PlaceCategory) : MapIntent()
 }

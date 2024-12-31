@@ -150,7 +150,7 @@ fun MapScreen(
             .distinctUntilChanged()
             .collect { position ->
                 onIntent(
-                    MapIntent.Move(
+                    MapIntent.MoveMap(
                         center = LatLng(position.target.latitude, position.target.longitude),
                         zoomLevel = position.zoom,
                         bounds = cameraPositionState.projection?.visibleRegion?.latLngBounds
@@ -191,7 +191,7 @@ fun MapScreen(
     Box {
         GoogleMap(
             cameraPositionState = cameraPositionState,
-            onMapClick = { onIntent(MapIntent.MapClick(null)) },
+            onMapClick = { onIntent(MapIntent.ClickMap(null)) },
             modifier = Modifier.fillMaxSize()
         ) {
             Clustering(
@@ -203,7 +203,7 @@ fun MapScreen(
                     false
                 },
                 onClusterItemClick = { clusterItem ->
-                    onIntent(MapIntent.MapClick(clusterItem))
+                    onIntent(MapIntent.ClickMap(clusterItem))
                     coroutineScope.launch {
                         val adjustedPosition = LatLng(
                             clusterItem.position.latitude + 0.003,
@@ -284,13 +284,13 @@ fun MapScreen(
                 },
                 onSearch = {
                     expanded = false
-                    onIntent(MapIntent.Search(state.searchQuery))
+                    onIntent(MapIntent.SearchPlace(state.searchQuery))
                 },
                 expanded = expanded,
                 onExpandedChange = { expanded = it },
                 searchResults = state.filteredPlaces,
                 onPlaceSelected = { place ->
-                    onIntent(MapIntent.SelectPlaceMarker(place))
+                    onIntent(MapIntent.ClickClusterItem(place))
                     expanded = false
 
                     // Moves map to the selected place
