@@ -109,7 +109,8 @@ object ApiDataConverter {
         val isDoorWideEnough = tags["entrance:width"]
             ?.toMetersOrNull()
             ?.let { it >= 0.9 }
-        val isDoorAutomatic = tags["automatic_door"]?.parseAccessibility()
+        val isDoorAutomatic = tags["automatic_door"]?.isAutomaticDoor()
+            ?: tags["entrance:automatic_door"]?.isAutomaticDoor()
 
         if (isDoorWideEnough == null && isDoorAutomatic == null) {
             return null
@@ -214,4 +215,11 @@ object ApiDataConverter {
     private fun String.parseAccessibility(): Boolean =
         this.trim().lowercase() == "yes" || this.lowercase() == "wheelchair" ||
                 this.toIntOrNull()?.let { it > 0 } == true
+
+    private fun String.isAutomaticDoor(): Boolean? =
+        when (this.trim().lowercase()) {
+            "yes", "button", "motion", "continuous", "slowdown_button" -> true
+            "no" -> false
+            else -> null
+        }
 }
