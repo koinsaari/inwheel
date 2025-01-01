@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.aarokoinsaari.accessibilitymap.model
+package com.aarokoinsaari.accessibilitymap.model.accessibility
 
 /**
  * This enum represents the accessibility level of a place (or a feature of it), mostly from a

@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.aarokoinsaari.accessibilitymap.model
+package com.aarokoinsaari.accessibilitymap.model.accessibility
 
 data class AccessibilityInfo(
     val entranceInfo: EntranceInfo? = null,
     val restroomInfo: RestroomInfo? = null,
     val parkingInfo: ParkingInfo? = null,
-    val floorInfo: FloorInfo? = null,
+    val miscInfo: MiscellaneousInfo? = null,
     val additionalInfo: String? = null
 ) {
     /**
      * This determines the general accessibility of a place. Note that the entrance has the most
      * weight evaluating the accessibility because if a person in a wheelchair can't even enter
      * the place, the rest of the details (like restrooms or elevators) don't really matter.
-     * See more details about determining the accessibility status in AccessibilityStatus class.
+     * See more details about determining the accessibility status in [AccessibilityStatus].
      */
     fun determineGeneralAccessibilityStatus(): AccessibilityStatus {
         val entranceStatus = entranceInfo?.determineAccessibilityStatus()
@@ -36,7 +36,7 @@ data class AccessibilityInfo(
 
         val statuses = listOf(
             restroomInfo?.determineAccessibilityStatus(),
-            floorInfo?.determineAccessibilityStatus(),
+            miscInfo?.determineAccessibilityStatus(),
             parkingInfo?.determineAccessibilityStatus()
         )
 
@@ -53,54 +53,6 @@ data class AccessibilityInfo(
             else -> AccessibilityStatus.FULLY_ACCESSIBLE
         }
     }
-}
-
-/**
- * TODO:
- * - get rid of suppressed warnings, write better code
- * - improve the evaluations in general. These should be tested after with some unit tests because
- *   there are so many different cases
- */
-
-data class EntranceInfo(
-    val hasRamp: Boolean? = null,
-    val notTooSteepEntrance: Boolean? = null,
-    val stepCount: Int? = null,
-    val isDoorWide: Boolean? = null, // Over 90 cm which is based on ADA recommendations (36 inches)
-    val hasAutomaticDoor: Boolean? = null,
-    val additionalInfo: String? = null
-) {
-    // TODO: what if automatic door?
-    @Suppress("CyclomaticComplexMethod")
-    fun determineAccessibilityStatus(): AccessibilityStatus =
-        when {
-            isDoorWide == false ->
-                AccessibilityStatus.NOT_ACCESSIBLE
-
-            stepCount == 0 && isDoorWide == true ->
-                AccessibilityStatus.FULLY_ACCESSIBLE
-
-            isDoorWide == null ->
-                AccessibilityStatus.UNKNOWN
-
-            (stepCount == null || hasRamp == null) && isDoorWide == true ->
-                AccessibilityStatus.UNKNOWN
-
-            hasRamp == true && isDoorWide == true ->
-                AccessibilityStatus.FULLY_ACCESSIBLE
-
-            hasRamp == false && stepCount != null && stepCount > 1 ->
-                AccessibilityStatus.NOT_ACCESSIBLE
-
-            hasRamp == false && stepCount in 0..1 && isDoorWide == true ->
-                AccessibilityStatus.LIMITED_ACCESSIBILITY
-
-            hasRamp == false && stepCount == 0 &&
-                    notTooSteepEntrance == true &&
-                    isDoorWide == true -> AccessibilityStatus.FULLY_ACCESSIBLE
-
-            else -> AccessibilityStatus.UNKNOWN
-        }
 }
 
 data class RestroomInfo(
@@ -174,7 +126,7 @@ data class ParkingInfo(
         }
 }
 
-data class FloorInfo(
+data class MiscellaneousInfo(
     val level: Int? = null,
     val hasElevator: Boolean? = null,
     val elevatorInfo: ElevatorInfo? = null,

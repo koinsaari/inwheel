@@ -82,6 +82,13 @@
     <string name="elevator_spacious">Spacious:</string>
     <string name="elevator_braille_buttons">Braille buttons:</string>
     <string name="elevator_audio_announcements">Audio announcements:</string>
-    <string name="title_elevator">Elevator</string>
+    <string name="title_elevator">Elevator info:</string>
     <string name="accessible_entrance">"Accessible entrance: "</string>
+    <string name="has_ramp">"Ramp: "</string>
+    <string name="ramp_steepness">"Ramp not too steep: "</string>
+    <string name="has_elevator">"Elevator: "</string>
+    <string name="content_desc_phone">Phone number</string>
+    <string name="content_desc_email">Email address</string>
+    <string name="content_desc_website">Website</string>
+    <string name="no_information_for_section">No information available for this section ☹️.</string>
 </resources>

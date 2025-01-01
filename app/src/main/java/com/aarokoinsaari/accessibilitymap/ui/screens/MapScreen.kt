@@ -77,16 +77,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
-import com.aarokoinsaari.accessibilitymap.model.AccessibilityInfo
-import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus
-import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.NOT_ACCESSIBLE
 import com.aarokoinsaari.accessibilitymap.model.ContactInfo
-import com.aarokoinsaari.accessibilitymap.model.EntranceInfo
-import com.aarokoinsaari.accessibilitymap.model.FloorInfo
-import com.aarokoinsaari.accessibilitymap.model.ParkingInfo
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.model.PlaceCategory
-import com.aarokoinsaari.accessibilitymap.model.RestroomInfo
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityInfo
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus.NOT_ACCESSIBLE
+import com.aarokoinsaari.accessibilitymap.model.accessibility.ElevatorInfo
+import com.aarokoinsaari.accessibilitymap.model.accessibility.EntranceDoor
+import com.aarokoinsaari.accessibilitymap.model.accessibility.EntranceInfo
+import com.aarokoinsaari.accessibilitymap.model.accessibility.EntranceSteps
+import com.aarokoinsaari.accessibilitymap.model.accessibility.MiscellaneousInfo
+import com.aarokoinsaari.accessibilitymap.model.accessibility.ParkingInfo
+import com.aarokoinsaari.accessibilitymap.model.accessibility.ParkingInfo.ParkingType
+import com.aarokoinsaari.accessibilitymap.model.accessibility.RampSteepness
+import com.aarokoinsaari.accessibilitymap.model.accessibility.RestroomInfo
 import com.aarokoinsaari.accessibilitymap.state.ErrorState
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.aarokoinsaari.accessibilitymap.ui.components.PlaceSearchBar
@@ -467,7 +472,7 @@ fun MarkerInfoWindow(
         InfoWindowAccessibilityInfo(
             infoLabel = stringResource(id = R.string.accessibility_elevator_label),
             status = stringResource(
-                id = item.placeData.accessibility?.floorInfo?.hasElevator
+                id = item.placeData.accessibility?.miscInfo?.hasElevator
                     .getAccessibilityStatusEmojiStringRes()
             )
         )
@@ -578,31 +583,62 @@ private fun MapInfoPopup_Preview() {
         phone = "+41123123123",
         website = "https://www.example.com"
     )
+    val entranceSteps = EntranceSteps(
+        hasStairs = true,
+        stepCount = 1,
+        hasRamp = true,
+        rampSteepness = RampSteepness.MEDIUM,
+        hasElevator = false
+    )
+
+    val entranceDoor = EntranceDoor(
+        isDoorWideEnough = true,
+        isDoorAutomatic = false
+    )
+
+    val entranceInfo = EntranceInfo(
+        stepsInfo = entranceSteps,
+        doorInfo = entranceDoor,
+        additionalInfo = "Main entrance has a moderately steep ramp and a non-automatic wide door."
+    )
+
+    val restroomInfo = RestroomInfo(
+        hasGrabRails = true,
+        isDoorWideEnough = true,
+        isLargeEnough = true,
+        hasEmergencyAlarm = false,
+        euroKey = false,
+        additionalInfo = "Accessible restroom on the first floor."
+    )
+
+    val parkingInfo = ParkingInfo(
+        hasAccessibleSpots = true,
+        spotCount = 3,
+        parkingType = ParkingType.SURFACE,
+        hasSmoothSurface = true,
+        hasElevator = false,
+        additionalInfo = "Parking spots near the entrance."
+    )
+
+    val miscInfo = MiscellaneousInfo(
+        level = 1,
+        hasElevator = true,
+        elevatorInfo = ElevatorInfo(
+            isAvailable = true,
+            isSpaciousEnough = true,
+            hasBrailleButtons = true,
+            hasAudioAnnouncements = true,
+            additionalInfo = "Elevator has braille and audio guidance."
+        ),
+        additionalInfo = "Ground level accessible without stairs."
+    )
+
     val accessibilityInfo = AccessibilityInfo(
-        entranceInfo = EntranceInfo(
-            hasRamp = true,
-            notTooSteepEntrance = true,
-            stepCount = 0,
-            isDoorWide = true,
-            hasAutomaticDoor = true
-        ),
-        restroomInfo = RestroomInfo(
-            hasGrabRails = true,
-            isDoorWideEnough = true,
-            isLargeEnough = true,
-            euroKey = true
-        ),
-        parkingInfo = ParkingInfo(
-            hasAccessibleSpots = true,
-            spotCount = 3,
-            parkingType = ParkingInfo.ParkingType.SURFACE,
-            hasSmoothSurface = true,
-            hasElevator = false
-        ),
-        floorInfo = FloorInfo(
-            level = 0,
-            hasElevator = false
-        )
+        entranceInfo = entranceInfo,
+        restroomInfo = restroomInfo,
+        parkingInfo = parkingInfo,
+        miscInfo = miscInfo,
+        additionalInfo = "Very accessible."
     )
 
     MaterialTheme {

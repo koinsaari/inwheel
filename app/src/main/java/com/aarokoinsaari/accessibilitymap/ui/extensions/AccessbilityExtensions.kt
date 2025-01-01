@@ -18,11 +18,11 @@ package com.aarokoinsaari.accessibilitymap.ui.extensions
 
 import androidx.compose.ui.graphics.Color
 import com.aarokoinsaari.accessibilitymap.R
-import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus
-import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.FULLY_ACCESSIBLE
-import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.LIMITED_ACCESSIBILITY
-import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.NOT_ACCESSIBLE
-import com.aarokoinsaari.accessibilitymap.model.AccessibilityStatus.UNKNOWN
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus.FULLY_ACCESSIBLE
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus.LIMITED_ACCESSIBILITY
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus.NOT_ACCESSIBLE
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus.UNKNOWN
 
 fun AccessibilityStatus?.getAccessibilityStatusShortStringRes(): Int =
     when (this) {

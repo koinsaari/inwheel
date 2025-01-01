@@ -17,9 +17,9 @@
 package com.aarokoinsaari.accessibilitymap.data.local
 
 import androidx.room.TypeConverter
-import com.aarokoinsaari.accessibilitymap.model.AccessibilityInfo
 import com.aarokoinsaari.accessibilitymap.model.ContactInfo
 import com.aarokoinsaari.accessibilitymap.model.PlaceCategory
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityInfo
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 

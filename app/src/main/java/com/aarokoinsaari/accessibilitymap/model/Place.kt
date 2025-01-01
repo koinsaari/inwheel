@@ -20,6 +20,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Fts4
 import androidx.room.PrimaryKey
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityInfo
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.ui.models.PlaceClusterItem
 
 @Entity(tableName = "places")
