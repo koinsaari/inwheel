@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024-2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,23 +53,6 @@ data class AccessibilityInfo(
             else -> AccessibilityStatus.FULLY_ACCESSIBLE
         }
     }
-}
-
-data class RestroomInfo(
-    val hasGrabRails: Boolean? = null,
-    val isDoorWideEnough: Boolean? = null,
-    val isLargeEnough: Boolean? = null,
-    val hasEmergencyAlarm: Boolean? = null,
-    val euroKey: Boolean? = null,
-    val additionalInfo: String? = null
-) {
-    fun determineAccessibilityStatus(): AccessibilityStatus =
-        when {
-            isDoorWideEnough == null && hasGrabRails == null -> AccessibilityStatus.UNKNOWN
-            isDoorWideEnough == false || hasGrabRails == false -> AccessibilityStatus.NOT_ACCESSIBLE
-            isDoorWideEnough == true && hasGrabRails == true -> AccessibilityStatus.FULLY_ACCESSIBLE
-            else -> AccessibilityStatus.LIMITED_ACCESSIBILITY
-        }
 }
 
 data class ParkingInfo(

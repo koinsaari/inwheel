@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024-2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.aarokoinsaari.accessibilitymap.model.ContactInfo
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.model.PlaceCategory.Companion.mapApiTagToCategory
 import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityInfo
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.model.accessibility.ElevatorInfo
 import com.aarokoinsaari.accessibilitymap.model.accessibility.EntranceDoor
 import com.aarokoinsaari.accessibilitymap.model.accessibility.EntranceInfo
@@ -86,11 +87,11 @@ object ApiDataConverter {
     private fun parseEntranceSteps(tags: Map<String, String>): EntranceSteps? {
         val stepCount = tags["entrance:step_count"]?.trim()?.toIntOrNull()
         val hasStairs = stepCount?.let { it > 0 }
-        val hasRamp = (tags["ramp"]?.parseAccessibility() == true ||
+        val hasRamp = (tags["ramp"]?.toAccessibilityBoolean() == true ||
                 tags["ramp:wheelchair"]?.trim()?.lowercase() == "yes")
         val rampSteepness = null // TODO
-        val hasElevator = (tags["entrance:elevator"]?.parseAccessibility() == true ||
-                tags["wheelchair:elevator"]?.parseAccessibility() == true)
+        val hasElevator = (tags["entrance:elevator"]?.toAccessibilityBoolean() == true ||
+                tags["wheelchair:elevator"]?.toAccessibilityBoolean() == true)
 
         if (stepCount == null && !hasRamp && !hasElevator) {
             return null
@@ -124,12 +125,11 @@ object ApiDataConverter {
 
     private fun parseRestroomInfo(tags: Map<String, String>): RestroomInfo? =
         RestroomInfo(
-            hasGrabRails = tags["toilets:wheelchair:grab_rails"]?.parseAccessibility(),
-            isDoorWideEnough = tags["toilets:wheelchair:door_width"]?.toMetersOrNull()
-                ?.let { it >= 0.9 },
-            isLargeEnough = tags["toilets:wheelchair:turning_circle"]?.trim()?.lowercase() == "yes"
-                    || tags["wheelchair:turning_circle"]?.trim()?.lowercase() == "yes",
-            hasEmergencyAlarm = null, // Does not seem to be available in OSM
+            grabRails = tags["toilets:wheelchair:grab_rails"]?.toAccessibilityStatus(),
+            doorWidth = tags["toilets:wheelchair:door_width"]?.toMetersOrNull()
+                ?.let { it >= 0.85 },
+            roomSpaciousness = null, // TODO Not available in OSM
+            hasEmergencyAlarm = null, // TODO Does not seem to be available in OSM
             euroKey = tags["centralkey"]?.trim()?.lowercase() == "eurokey",
             additionalInfo = tags["toilets:description"]
         )
@@ -141,7 +141,7 @@ object ApiDataConverter {
 
         return ParkingInfo(
             spotCount = tags["capacity:disabled"]?.trim()?.toIntOrNull(),
-            hasAccessibleSpots = tags["capacity:disabled"]?.parseAccessibility() == true ||
+            hasAccessibleSpots = tags["capacity:disabled"]?.toAccessibilityBoolean() == true ||
                     tags["parking_space"]?.trim()?.lowercase() == "disabled",
             hasSmoothSurface = tags["surface"]?.trim()?.lowercase() in setOf(
                 "asphalt",
@@ -212,9 +212,18 @@ object ApiDataConverter {
             else -> null
         }
 
-    private fun String.parseAccessibility(): Boolean =
+    private fun String.toAccessibilityBoolean(): Boolean =
         this.trim().lowercase() == "yes" || this.lowercase() == "wheelchair" ||
                 this.toIntOrNull()?.let { it > 0 } == true
+
+    private fun String?.toAccessibilityStatus(): AccessibilityStatus = when {
+        this == null -> AccessibilityStatus.UNKNOWN
+        this.trim().lowercase() == "yes" -> AccessibilityStatus.FULLY_ACCESSIBLE
+        this.trim().lowercase() == "limited" -> AccessibilityStatus.LIMITED_ACCESSIBILITY
+        this.trim().lowercase() == "no" -> AccessibilityStatus.NOT_ACCESSIBLE
+        this.trim().lowercase() == "unknown" -> AccessibilityStatus.UNKNOWN
+        else -> AccessibilityStatus.UNKNOWN
+    }
 
     private fun String.isAutomaticDoor(): Boolean? =
         when (this.trim().lowercase()) {

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2025 Aaro Koinsaari
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.aarokoinsaari.accessibilitymap.model.accessibility
 
 /**
@@ -112,9 +128,9 @@ data class EntranceInfo(
 
 /**
  * Represents door-related accessibility details.
- * - `isDoorWideEnough`: Whether the door is at least 90 cm wide. This is typically considered the
+ * - `isDoorWideEnough` - Whether the door is at least 90 cm wide. This is typically considered the
  *                       minimum for wheelchair access for example in Europe.
- * - `isDoorAutomatic`: Whether the door is automatic, which can impact ease of access.
+ * - `isDoorAutomatic` - Whether the door is automatic, which can impact ease of access.
  */
 data class EntranceDoor(
     val isDoorWideEnough: Boolean? = null, // >= 90cm
@@ -123,12 +139,12 @@ data class EntranceDoor(
 
 /**
  * Represents step-related accessibility details.
- * - `hasStairs`: Indicates whether the entrance has stairs.
- * - `stepCount`: Number of steps at the entrance. More than one step is typically a significant
+ * - `hasStairs` - Indicates whether the entrance has stairs.
+ * - `stepCount` - Number of steps at the entrance. More than one step is typically a significant
  *                barrier and should lead directly to NOT_ACCESSIBLE status.
- * - `hasRamp`: Whether there is a ramp as an alternative to stairs.
- * - `rampSteepness`: Describes the steepness of the ramp, which affects accessibility. See [RampSteepness].
- * - `hasElevator`: Indicates whether there is an elevator at the entrance as an alternative to stairs.
+ * - `hasRamp` - Whether there is a ramp as an alternative to stairs.
+ * - `rampSteepness` - Describes the steepness of the ramp, which affects accessibility. See [RampSteepness].
+ * - `hasElevator` - Indicates whether there is an elevator at the entrance as an alternative to stairs.
  */
 data class EntranceSteps(
     val hasStairs: Boolean? = null,
@@ -142,20 +158,21 @@ data class EntranceSteps(
 /**
  * Represents the steepness of a ramp, defined by the slope ratio of rise (height) to run (length).
  * These ratios are used to determine the usability of ramps:
- * - `1:12` means that for every 12 units of horizontal length, the ramp rises by 1 unit.
+ * - `1:10` means that for every 10 units of horizontal length, the ramp rises by 1 unit.
  * - `1:20` means that for every 20 units of horizontal length, the ramp rises by 1 unit.
  *
- * See for more details: https://www.un.org/esa/socdev/enable/designm/AD2-10.htm.
- *
- * - `STEEP`: A steep ramp (max 1:12). This slope is too steep for most wheelchair users
+ * - `STEEP` - A steep ramp (> 1:10). This slope is too steep for most wheelchair users
  *            without assistance and should be considered NOT_ACCESSIBLE.
- * - `MEDIUM`: A moderately steep ramp (between 1:12 and 1:20). It is manageable for some users,
- *             but not ideal and should be considered LIMITED_ACCESSIBILITY.
- * - `SHALLOW`: A shallow ramp (>= 1:20). This slope is easy to navigate and meets accessibility
- *              standards, making it FULLY_ACCESSIBLE.
+ * - `MEDIUM` - A moderately steep ramp (<= 1:10 > 1:20). It is manageable for some users,
+ *             but not ideal and might require assistance. Should be considered LIMITED_ACCESSIBILITY.
+ * - `SHALLOW` - A shallow ramp (<= 1:20). This slope is easy to navigate and meets accessibility
+ *              standards, so it should be considered FULLY_ACCESSIBLE.
+ *
+ * **NOTE:** These values are based on the UN design manuals. See
+ * [here](https://www.un.org/esa/socdev/enable/designm/AD2-01.htm).
  */
 enum class RampSteepness {
-    STEEP, // 1:12
-    MEDIUM, // 1:12 - 1:20
-    SHALLOW // >= 1:20
+    STEEP,
+    MEDIUM,
+    SHALLOW
 }

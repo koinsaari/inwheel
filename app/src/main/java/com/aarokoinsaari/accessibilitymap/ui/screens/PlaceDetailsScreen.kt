@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024-2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,7 @@ import com.aarokoinsaari.accessibilitymap.model.ContactInfo
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.model.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityInfo
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.model.accessibility.ElevatorInfo
 import com.aarokoinsaari.accessibilitymap.model.accessibility.EntranceDoor
 import com.aarokoinsaari.accessibilitymap.model.accessibility.EntranceInfo
@@ -482,7 +483,7 @@ fun RestroomSection(
         DetailRow(
             title = stringResource(R.string.grab_rails),
             content = stringResource(
-                id = restroomInfo.hasGrabRails.getAccessibilityStatusEmojiStringRes()
+                id = restroomInfo.grabRails.getAccessibilityStatusEmojiStringRes()
             ),
             modifier = Modifier
                 .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
@@ -496,7 +497,7 @@ fun RestroomSection(
         DetailRow(
             title = stringResource(R.string.door_width),
             content = stringResource(
-                id = restroomInfo.isDoorWideEnough.getAccessibilityStatusEmojiStringRes()
+                id = restroomInfo.doorWidth.getAccessibilityStatusEmojiStringRes()
             ),
             modifier = Modifier
                 .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
@@ -510,7 +511,7 @@ fun RestroomSection(
         DetailRow(
             title = stringResource(R.string.spacious_enough),
             content = stringResource(
-                id = restroomInfo.isLargeEnough.getAccessibilityStatusEmojiStringRes()
+                id = restroomInfo.roomSpaciousness.getAccessibilityStatusEmojiStringRes()
             ),
             modifier = Modifier
                 .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
@@ -868,9 +869,9 @@ private fun PlaceDetailScreen_Preview() {
     )
 
     val restroomInfo = RestroomInfo(
-        hasGrabRails = true,
-        isDoorWideEnough = true,
-        isLargeEnough = true,
+        grabRails = AccessibilityStatus.LIMITED_ACCESSIBILITY,
+        doorWidth = true,
+        roomSpaciousness = AccessibilityStatus.FULLY_ACCESSIBLE,
         hasEmergencyAlarm = false,
         euroKey = false,
         additionalInfo = "Accessible restroom on the first floor."

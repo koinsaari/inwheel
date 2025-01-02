@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024-2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -603,9 +603,9 @@ private fun MapInfoPopup_Preview() {
     )
 
     val restroomInfo = RestroomInfo(
-        hasGrabRails = true,
-        isDoorWideEnough = true,
-        isLargeEnough = true,
+        grabRails = AccessibilityStatus.FULLY_ACCESSIBLE,
+        doorWidth = true,
+        roomSpaciousness = AccessibilityStatus.FULLY_ACCESSIBLE,
         hasEmergencyAlarm = false,
         euroKey = false,
         additionalInfo = "Accessible restroom on the first floor."
