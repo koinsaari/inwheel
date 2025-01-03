@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ data class AccessibilityInfo(
      * the place, the rest of the details (like restrooms or elevators) don't really matter.
      * See more details about determining the accessibility status in [AccessibilityStatus].
      */
-    fun determineGeneralAccessibilityStatus(): AccessibilityStatus {
+    fun determineAccessibilityStatus(): AccessibilityStatus {
         val entranceStatus = entranceInfo?.determineAccessibilityStatus()
             ?: AccessibilityStatus.UNKNOWN
         if (entranceStatus != AccessibilityStatus.FULLY_ACCESSIBLE) return entranceStatus

@@ -119,7 +119,7 @@ object OverpassDataMapper {
                 .parseOsmDoorWidthAccessibilityBoolean(),
             roomSpaciousness = null, // TODO Not available in OSM
             hasEmergencyAlarm = null, // TODO Does not seem to be available in OSM
-            euroKey = tags["centralkey"]?.trim()?.lowercase() == "eurokey",
+            euroKey = tags["centralkey"]?.trim()?.lowercase()?.let { it == "eurokey" },
             additionalInfo = tags["toilets:description"]
         )
 

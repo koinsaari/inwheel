@@ -91,4 +91,5 @@
     <string name="content_desc_email">Email address</string>
     <string name="content_desc_website">Website</string>
     <string name="no_information_for_section">No information available for this section ☹️.</string>
+    <string name="info_window_parking">"Parking: "</string>
 </resources>

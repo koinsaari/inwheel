@@ -456,22 +456,25 @@ fun MarkerInfoWindow(
         InfoWindowAccessibilityInfo(
             infoLabel = stringResource(id = R.string.accessible_entrance),
             status = stringResource(
-                id = item.placeData
-                    .determineAccessibilityStatus()
+                id = item.placeData.accessibility?.entranceInfo
+                    ?.determineAccessibilityStatus()
                     .getEmojiStringRes()
             )
         )
         InfoWindowAccessibilityInfo(
             infoLabel = stringResource(id = R.string.accessibility_toilet_label),
             status = stringResource(
-                id = item.placeData.accessibility?.restroomInfo?.determineAccessibilityStatus()
+                id = item.placeData.accessibility?.restroomInfo
+                    ?.determineAccessibilityStatus()
                     .getEmojiStringRes()
             )
         )
         InfoWindowAccessibilityInfo(
-            infoLabel = stringResource(id = R.string.accessibility_elevator_label),
+            infoLabel = stringResource(id = R.string.info_window_parking),
             status = stringResource(
-                id = item.placeData.accessibility?.miscInfo?.hasElevator.getEmojiStringRes()
+                id = item.placeData.accessibility?.parkingInfo
+                    ?.determineAccessibilityStatus()
+                    .getEmojiStringRes()
             )
         )
         Spacer(Modifier.height(16.dp))
