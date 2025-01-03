@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ package com.aarokoinsaari.accessibilitymap.data.repository
 import android.util.Log
 import com.aarokoinsaari.accessibilitymap.data.local.PlacesDao
 import com.aarokoinsaari.accessibilitymap.data.local.PlacesFtsDao
-import com.aarokoinsaari.accessibilitymap.data.mapper.ApiDataConverter
-import com.aarokoinsaari.accessibilitymap.data.remote.OverpassApiService
-import com.aarokoinsaari.accessibilitymap.data.remote.OverpassQueryBuilder
+import com.aarokoinsaari.accessibilitymap.data.mapper.overpass.OverpassDataMapper
+import com.aarokoinsaari.accessibilitymap.data.remote.overpass.OverpassApiService
+import com.aarokoinsaari.accessibilitymap.data.remote.overpass.OverpassQueryBuilder
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.model.PlaceFts
 import com.google.android.gms.maps.model.LatLngBounds
@@ -100,7 +100,7 @@ class PlaceRepository(
         Log.d("Repository", "Query: $query")
         val response = apiService.getMarkers(query)
         return response.elements.mapNotNull {
-            ApiDataConverter.convertMapMarkersToPlace(it)
+            OverpassDataMapper.convertElementToPlace(it)
         }
     }
 

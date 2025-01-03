@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatu
 import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus.NOT_ACCESSIBLE
 import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus.UNKNOWN
 
-fun AccessibilityStatus?.getAccessibilityStatusShortStringRes(): Int =
+internal fun AccessibilityStatus?.getStringRes(): Int =
     when (this) {
         FULLY_ACCESSIBLE -> R.string.yes
         LIMITED_ACCESSIBILITY -> R.string.limited
@@ -32,7 +32,7 @@ fun AccessibilityStatus?.getAccessibilityStatusShortStringRes(): Int =
         else -> R.string.unknown
     }
 
-fun AccessibilityStatus?.getAccessibilityStatusStringRes(): Int =
+internal fun AccessibilityStatus?.getFullStringRes(): Int =
     when (this) {
         FULLY_ACCESSIBLE -> R.string.wheelchair_access_fully_accessible
         LIMITED_ACCESSIBILITY -> R.string.wheelchair_access_limited_accessibility
@@ -40,7 +40,15 @@ fun AccessibilityStatus?.getAccessibilityStatusStringRes(): Int =
         else -> R.string.wheelchair_access_unknown
     }
 
-fun AccessibilityStatus.getAccessibilityColor(): Color =
+internal fun AccessibilityStatus?.getEmojiStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.emoji_checkmark
+        LIMITED_ACCESSIBILITY -> R.string.emoji_warning
+        NOT_ACCESSIBLE -> R.string.emoji_cross
+        else -> R.string.emoji_question
+    }
+
+internal fun AccessibilityStatus.getColor(): Color =
     when (this) { // TODO: Change to MaterialTheme
         FULLY_ACCESSIBLE -> Color.Green
         LIMITED_ACCESSIBILITY -> Color.Yellow
@@ -48,24 +56,16 @@ fun AccessibilityStatus.getAccessibilityColor(): Color =
         UNKNOWN -> Color.Gray
     }
 
-fun Boolean?.getAccessibilityStatusBoolean(): Int =
+internal fun Boolean?.getStringRes(): Int =
     when (this) {
         true -> R.string.accessibility_status_yes
         false -> R.string.accessibility_status_no
         null -> R.string.accessibility_status_unknown
     }
 
-fun Boolean?.getAccessibilityStatusEmojiStringRes(): Int =
+internal fun Boolean?.getEmojiStringRes(): Int =
     when (this) {
         true -> R.string.emoji_checkmark
         false -> R.string.emoji_cross
         null -> R.string.emoji_question
-    }
-
-fun AccessibilityStatus?.getAccessibilityStatusEmojiStringRes(): Int =
-    when (this) {
-        FULLY_ACCESSIBLE -> R.string.emoji_checkmark
-        LIMITED_ACCESSIBILITY -> R.string.emoji_warning
-        NOT_ACCESSIBLE -> R.string.emoji_cross
-        else -> R.string.emoji_question
     }

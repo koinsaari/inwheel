@@ -16,6 +16,9 @@
 
 package com.aarokoinsaari.accessibilitymap.model.accessibility
 
+import com.aarokoinsaari.accessibilitymap.utils.extensions.orUnknown
+import com.aarokoinsaari.accessibilitymap.utils.extensions.toAccessibilityStatus
+
 /**
  * Represents a restroom's accessibility details.
  *
@@ -37,7 +40,7 @@ package com.aarokoinsaari.accessibilitymap.model.accessibility
  *
  * Combined, these factors determine whether the restroom is fully or partially accessible,
  * inaccessible, or unknown due to missing information (we should prefer labelling as `UNKNOWN`
- * rather than risk mislabeling the whole rest room as `FULLY_ACCESSIBLE` or `NOT_ACCESSIBLE`).
+ * rather than risk mislabeling the whole restroom as `FULLY_ACCESSIBLE` or `NOT_ACCESSIBLE`).
  *
  * **NOTE:** These values are based on the UN design manuals. See
  *           [here](https://www.un.org/esa/socdev/enable/designm/AD2-10.htm).
@@ -63,46 +66,48 @@ data class RestroomInfo(
      * or (if everything is optimal) FULLY_ACCESSIBLE.
      */
     fun determineAccessibilityStatus(): AccessibilityStatus {
-        val doorStatus = checkDoorWidth()
-        if (doorStatus != AccessibilityStatus.FULLY_ACCESSIBLE) {
-            return doorStatus
-        }
+        val doorStatus = doorWidth.toAccessibilityStatus()
+        if (doorStatus != AccessibilityStatus.FULLY_ACCESSIBLE) return doorStatus
 
-        val roomStatus = checkRoomSpaciousness()
-        if (roomStatus != AccessibilityStatus.FULLY_ACCESSIBLE) {
-            return roomStatus
-        }
+        val roomStatus = roomSpaciousness.orUnknown()
+        if (roomSpaciousness != AccessibilityStatus.FULLY_ACCESSIBLE) return roomStatus
 
-        val detailsStatus = checkDetailedStatuses()
+        val detailsStatus = evaluateDetailedStatuses(
+            listOf(
+                grabRails,
+                sink,
+                toiletSeat,
+                hasEmergencyAlarm.toAccessibilityStatus()
+            )
+        )
         return detailsStatus
     }
 
-    private fun checkDoorWidth(): AccessibilityStatus = when (doorWidth) {
-        false -> AccessibilityStatus.NOT_ACCESSIBLE
-        null -> AccessibilityStatus.UNKNOWN
-        true -> AccessibilityStatus.FULLY_ACCESSIBLE
-    }
+    /**
+     * Evaluates the overall accessibility status of a restroom based on the statuses.
+     * If all statuses are `UNKNOWN`, it returns `UNKNOWN` to avoid misrepresentation. The toilet seat has
+     * higher priority: if it's `NOT_ACCESSIBLE`, the entire restroom is flagged as `NOT_ACCESSIBLE`.
+     * Otherwise, the restroom is `LIMITED_ACCESSIBILITY` if any feature is limited or inaccessible,
+     * and `FULLY_ACCESSIBLE` only if all features are fully accessible. The reason for flagging as
+     * `LIMITED_ACCESSIBILITY`, even if other features (excluding toilet seat) are inaccessible, is
+     * that we do not want to mark the entire restroom as `NOT_ACCESSIBLE` if it is missing some,
+     * not as critical features, which in this case are sink, emergency alarm and grab rails
+     * (although each important).
+     *
+     * @param statuses A list of feature statuses (`AccessibilityStatus?`).
+     * @param toiletSeat The accessibility status of the toilet seat.
+     * @return The combined restroom accessibility status.
+     */
+    private fun evaluateDetailedStatuses(statuses: List<AccessibilityStatus?>): AccessibilityStatus =
+        when {
+            statuses.all { it == AccessibilityStatus.UNKNOWN } -> AccessibilityStatus.UNKNOWN
+            toiletSeat == AccessibilityStatus.NOT_ACCESSIBLE -> AccessibilityStatus.NOT_ACCESSIBLE
+            statuses.any {
+                it == AccessibilityStatus.LIMITED_ACCESSIBILITY ||
+                        it == AccessibilityStatus.NOT_ACCESSIBLE ||
+                        it == AccessibilityStatus.UNKNOWN
+            } -> AccessibilityStatus.LIMITED_ACCESSIBILITY
 
-    private fun checkRoomSpaciousness(): AccessibilityStatus = when (roomSpaciousness) {
-        AccessibilityStatus.NOT_ACCESSIBLE -> AccessibilityStatus.NOT_ACCESSIBLE
-        AccessibilityStatus.LIMITED_ACCESSIBILITY -> AccessibilityStatus.LIMITED_ACCESSIBILITY
-        AccessibilityStatus.UNKNOWN -> AccessibilityStatus.UNKNOWN
-        AccessibilityStatus.FULLY_ACCESSIBLE -> AccessibilityStatus.FULLY_ACCESSIBLE
-        null -> AccessibilityStatus.UNKNOWN
-    }
-
-    private fun checkDetailedStatuses(): AccessibilityStatus {
-        val statuses = listOf(grabRails, sink, toiletSeat, hasEmergencyAlarm)
-
-        if (statuses.any { it == AccessibilityStatus.UNKNOWN }) {
-            return AccessibilityStatus.UNKNOWN
+            else -> AccessibilityStatus.FULLY_ACCESSIBLE
         }
-
-        if (statuses.any {
-                it == AccessibilityStatus.LIMITED_ACCESSIBILITY || it == AccessibilityStatus.NOT_ACCESSIBLE
-            }) {
-            return AccessibilityStatus.LIMITED_ACCESSIBILITY
-        }
-        return AccessibilityStatus.FULLY_ACCESSIBLE
-    }
 }

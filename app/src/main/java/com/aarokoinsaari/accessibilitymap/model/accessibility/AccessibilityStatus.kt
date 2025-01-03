@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,9 +55,9 @@ package com.aarokoinsaari.accessibilitymap.model.accessibility
  * users. For official regulations and detailed guidelines on accessibility, please refer to
  * official sources, like the ADA etc.
  */
-enum class AccessibilityStatus {
-    FULLY_ACCESSIBLE,
-    LIMITED_ACCESSIBILITY,
-    NOT_ACCESSIBLE,
-    UNKNOWN;
+enum class AccessibilityStatus(val severity: Int) {
+    FULLY_ACCESSIBLE(1),
+    LIMITED_ACCESSIBILITY(2),
+    NOT_ACCESSIBLE(3),
+    UNKNOWN(0);
 }

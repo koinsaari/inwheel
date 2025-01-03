@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import androidx.room.Room
 import com.aarokoinsaari.accessibilitymap.data.local.AppDatabase
 import com.aarokoinsaari.accessibilitymap.data.local.PlacesDao
 import com.aarokoinsaari.accessibilitymap.data.local.PlacesFtsDao
-import com.aarokoinsaari.accessibilitymap.data.remote.OverpassApiService
+import com.aarokoinsaari.accessibilitymap.data.remote.overpass.OverpassApiService
 import com.aarokoinsaari.accessibilitymap.data.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.aarokoinsaari.accessibilitymap.data.remote
 
-import retrofit2.http.GET
-import retrofit2.http.Query
+package com.aarokoinsaari.accessibilitymap.utils.extensions
 
-interface OverpassApiService {
-    @GET("interpreter")
-    suspend fun getMarkers(@Query("data") data: String): OverpassApiResponse
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus
+
+fun Boolean?.toAccessibilityStatus(): AccessibilityStatus = when (this) {
+    true -> AccessibilityStatus.FULLY_ACCESSIBLE
+    false -> AccessibilityStatus.NOT_ACCESSIBLE
+    null -> AccessibilityStatus.UNKNOWN
 }
+
+fun AccessibilityStatus?.orUnknown(): AccessibilityStatus = this ?: AccessibilityStatus.UNKNOWN

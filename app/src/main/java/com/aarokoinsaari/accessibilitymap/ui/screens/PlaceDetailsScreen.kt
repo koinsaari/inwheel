@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,11 +73,10 @@ import com.aarokoinsaari.accessibilitymap.model.accessibility.EntranceSteps
 import com.aarokoinsaari.accessibilitymap.model.accessibility.MiscellaneousInfo
 import com.aarokoinsaari.accessibilitymap.model.accessibility.ParkingInfo
 import com.aarokoinsaari.accessibilitymap.model.accessibility.ParkingInfo.ParkingType
-import com.aarokoinsaari.accessibilitymap.model.accessibility.RampSteepness
 import com.aarokoinsaari.accessibilitymap.model.accessibility.RestroomInfo
 import com.aarokoinsaari.accessibilitymap.state.PlaceDetailsState
-import com.aarokoinsaari.accessibilitymap.ui.extensions.getAccessibilityStatusEmojiStringRes
 import com.aarokoinsaari.accessibilitymap.ui.theme.AccessibilityMapTheme
+import com.aarokoinsaari.accessibilitymap.ui.extensions.getEmojiStringRes
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -397,7 +396,7 @@ fun EntranceSection(
         // Ramp
         DetailRow(
             title = stringResource(R.string.has_ramp),
-            content = stringResource(id = steps?.hasRamp.getAccessibilityStatusEmojiStringRes()),
+            content = stringResource(id = steps?.ramp.getEmojiStringRes()),
             modifier = Modifier
                 .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
                 .padding(
@@ -409,7 +408,7 @@ fun EntranceSection(
         // Elevator
         DetailRow(
             title = stringResource(R.string.has_elevator),
-            content = stringResource(id = steps?.hasElevator.getAccessibilityStatusEmojiStringRes()),
+            content = stringResource(id = steps?.elevator.getEmojiStringRes()),
             modifier = Modifier
                 .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
                 .padding(
@@ -422,7 +421,7 @@ fun EntranceSection(
         val door = entranceInfo.doorInfo
         DetailRow(
             title = stringResource(R.string.door_width),
-            content = stringResource(id = door?.isDoorWideEnough.getAccessibilityStatusEmojiStringRes()),
+            content = stringResource(id = door?.doorOpening.getEmojiStringRes()),
             modifier = Modifier
                 .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
                 .padding(
@@ -434,7 +433,7 @@ fun EntranceSection(
         // Automatic door
         DetailRow(
             title = stringResource(R.string.automatic_door),
-            content = stringResource(id = door?.isDoorAutomatic.getAccessibilityStatusEmojiStringRes()),
+            content = stringResource(id = door?.automaticDoor.getEmojiStringRes()),
             modifier = Modifier
                 .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
                 .padding(
@@ -483,7 +482,7 @@ fun RestroomSection(
         DetailRow(
             title = stringResource(R.string.grab_rails),
             content = stringResource(
-                id = restroomInfo.grabRails.getAccessibilityStatusEmojiStringRes()
+                id = restroomInfo.grabRails.getEmojiStringRes()
             ),
             modifier = Modifier
                 .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
@@ -497,7 +496,7 @@ fun RestroomSection(
         DetailRow(
             title = stringResource(R.string.door_width),
             content = stringResource(
-                id = restroomInfo.doorWidth.getAccessibilityStatusEmojiStringRes()
+                id = restroomInfo.doorWidth.getEmojiStringRes()
             ),
             modifier = Modifier
                 .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
@@ -511,7 +510,7 @@ fun RestroomSection(
         DetailRow(
             title = stringResource(R.string.spacious_enough),
             content = stringResource(
-                id = restroomInfo.roomSpaciousness.getAccessibilityStatusEmojiStringRes()
+                id = restroomInfo.roomSpaciousness.getEmojiStringRes()
             ),
             modifier = Modifier
                 .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
@@ -525,7 +524,7 @@ fun RestroomSection(
         DetailRow(
             title = stringResource(R.string.emergency_alarm),
             content = stringResource(
-                id = restroomInfo.hasEmergencyAlarm.getAccessibilityStatusEmojiStringRes()
+                id = restroomInfo.hasEmergencyAlarm.getEmojiStringRes()
             ),
             modifier = Modifier
                 .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
@@ -539,7 +538,7 @@ fun RestroomSection(
         DetailRow(
             title = stringResource(R.string.euro_key),
             content = stringResource(
-                id = restroomInfo.euroKey.getAccessibilityStatusEmojiStringRes()
+                id = restroomInfo.euroKey.getEmojiStringRes()
             ),
             modifier = Modifier
                 .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
@@ -592,7 +591,7 @@ fun ParkingSection(
                 spotCount != null && spotCount > 0 -> spotCount.toString()
                 parkingInfo.hasAccessibleSpots != null ->
                     stringResource(
-                        id = parkingInfo.hasAccessibleSpots.getAccessibilityStatusEmojiStringRes()
+                        id = parkingInfo.hasAccessibleSpots.getEmojiStringRes()
                     )
 
                 else -> stringResource(id = R.string.emoji_question)
@@ -609,7 +608,7 @@ fun ParkingSection(
         DetailRow(
             title = stringResource(R.string.smooth_surface),
             content = stringResource(
-                id = parkingInfo.hasSmoothSurface.getAccessibilityStatusEmojiStringRes()
+                id = parkingInfo.hasSmoothSurface.getEmojiStringRes()
             ),
             modifier = Modifier
                 .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
@@ -624,7 +623,7 @@ fun ParkingSection(
             DetailRow(
                 title = stringResource(R.string.parking_elevator),
                 content = stringResource(
-                    id = parkingInfo.hasElevator.getAccessibilityStatusEmojiStringRes()
+                    id = parkingInfo.hasElevator.getEmojiStringRes()
                 ),
                 modifier = Modifier
                     .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
@@ -716,7 +715,7 @@ fun MiscellaneousSection(
                 DetailRow(
                     title = stringResource(R.string.elevator_spacious),
                     content = stringResource(
-                        id = elevator.isSpaciousEnough.getAccessibilityStatusEmojiStringRes()
+                        id = elevator.isSpaciousEnough.getEmojiStringRes()
                     ),
                     modifier = Modifier
                         .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
@@ -730,7 +729,7 @@ fun MiscellaneousSection(
                 DetailRow(
                     title = stringResource(R.string.elevator_braille_buttons),
                     content = stringResource(
-                        id = elevator.hasBrailleButtons.getAccessibilityStatusEmojiStringRes()
+                        id = elevator.hasBrailleButtons.getEmojiStringRes()
                     ),
                     modifier = Modifier
                         .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
@@ -744,7 +743,7 @@ fun MiscellaneousSection(
                 DetailRow(
                     title = stringResource(R.string.elevator_audio_announcements),
                     content = stringResource(
-                        id = elevator.hasAudioAnnouncements.getAccessibilityStatusEmojiStringRes()
+                        id = elevator.hasAudioAnnouncements.getEmojiStringRes()
                     ),
                     modifier = Modifier
                         .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
@@ -760,7 +759,7 @@ fun MiscellaneousSection(
                 DetailRow(
                     title = stringResource(R.string.elevator_to_floor),
                     content = stringResource(
-                        id = miscInfo.hasElevator.getAccessibilityStatusEmojiStringRes()
+                        id = miscInfo.hasElevator.getEmojiStringRes()
                     ),
                     modifier = Modifier
                         .fillMaxWidth(ExpandableSectionDefaults.FRACTION)
@@ -852,14 +851,13 @@ private fun PlaceDetailScreen_Preview() {
     val entranceSteps = EntranceSteps(
         hasStairs = true,
         stepCount = 1,
-        hasRamp = true,
-        rampSteepness = RampSteepness.MEDIUM,
-        hasElevator = false
+        ramp = AccessibilityStatus.FULLY_ACCESSIBLE,
+        elevator = AccessibilityStatus.FULLY_ACCESSIBLE
     )
 
     val entranceDoor = EntranceDoor(
-        isDoorWideEnough = true,
-        isDoorAutomatic = false
+        doorOpening = AccessibilityStatus.FULLY_ACCESSIBLE,
+        automaticDoor = false
     )
 
     val entranceInfo = EntranceInfo(

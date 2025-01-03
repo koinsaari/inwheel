@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024-2025 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,13 +90,12 @@ import com.aarokoinsaari.accessibilitymap.model.accessibility.EntranceSteps
 import com.aarokoinsaari.accessibilitymap.model.accessibility.MiscellaneousInfo
 import com.aarokoinsaari.accessibilitymap.model.accessibility.ParkingInfo
 import com.aarokoinsaari.accessibilitymap.model.accessibility.ParkingInfo.ParkingType
-import com.aarokoinsaari.accessibilitymap.model.accessibility.RampSteepness
 import com.aarokoinsaari.accessibilitymap.model.accessibility.RestroomInfo
 import com.aarokoinsaari.accessibilitymap.state.ErrorState
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.aarokoinsaari.accessibilitymap.ui.components.PlaceSearchBar
-import com.aarokoinsaari.accessibilitymap.ui.extensions.getAccessibilityColor
-import com.aarokoinsaari.accessibilitymap.ui.extensions.getAccessibilityStatusEmojiStringRes
+import com.aarokoinsaari.accessibilitymap.ui.extensions.getColor
+import com.aarokoinsaari.accessibilitymap.ui.extensions.getEmojiStringRes
 import com.aarokoinsaari.accessibilitymap.ui.models.PlaceClusterItem
 import com.aarokoinsaari.accessibilitymap.utils.extensions.getLastLocationSuspended
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -232,7 +231,7 @@ fun MapScreen(
                             .background(
                                 color = item.placeData
                                     .determineAccessibilityStatus()
-                                    .getAccessibilityColor(),
+                                    .getColor(),
                                 shape = CircleShape
                             )
                             .padding(all = 6.dp),
@@ -437,7 +436,7 @@ fun MarkerInfoWindow(
                 .background(
                     color = item.placeData
                         .determineAccessibilityStatus()
-                        .getAccessibilityColor(),
+                        .getColor(),
                     shape = CircleShape
                 )
         )
@@ -459,21 +458,20 @@ fun MarkerInfoWindow(
             status = stringResource(
                 id = item.placeData
                     .determineAccessibilityStatus()
-                    .getAccessibilityStatusEmojiStringRes()
+                    .getEmojiStringRes()
             )
         )
         InfoWindowAccessibilityInfo(
             infoLabel = stringResource(id = R.string.accessibility_toilet_label),
             status = stringResource(
                 id = item.placeData.accessibility?.restroomInfo?.determineAccessibilityStatus()
-                    .getAccessibilityStatusEmojiStringRes()
+                    .getEmojiStringRes()
             )
         )
         InfoWindowAccessibilityInfo(
             infoLabel = stringResource(id = R.string.accessibility_elevator_label),
             status = stringResource(
-                id = item.placeData.accessibility?.miscInfo?.hasElevator
-                    .getAccessibilityStatusEmojiStringRes()
+                id = item.placeData.accessibility?.miscInfo?.hasElevator.getEmojiStringRes()
             )
         )
         Spacer(Modifier.height(16.dp))
@@ -586,14 +584,13 @@ private fun MapInfoPopup_Preview() {
     val entranceSteps = EntranceSteps(
         hasStairs = true,
         stepCount = 1,
-        hasRamp = true,
-        rampSteepness = RampSteepness.MEDIUM,
-        hasElevator = false
+        ramp = AccessibilityStatus.FULLY_ACCESSIBLE,
+        elevator = AccessibilityStatus.LIMITED_ACCESSIBILITY
     )
 
     val entranceDoor = EntranceDoor(
-        isDoorWideEnough = true,
-        isDoorAutomatic = false
+        doorOpening = AccessibilityStatus.FULLY_ACCESSIBLE,
+        automaticDoor = false
     )
 
     val entranceInfo = EntranceInfo(

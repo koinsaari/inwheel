@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ enum class PlaceCategory(
     );
 
     companion object {
-        fun mapApiTagToCategory(apiTag: String): PlaceCategory =
+        fun mapOverpassTagToCategory(apiTag: String): PlaceCategory =
             PlaceCategory.entries.find { it.amenityTag == apiTag.lowercase() } ?: DEFAULT
 
         // Used in data converter for Room
