@@ -1,0 +1,31 @@
+{
+  "accessibility_status": "FULLY_ACCESSIBLE",
+  "indoor_accessibility": "FULLY_ACCESSIBLE",
+  "entrance": {
+    "accessibility_status": "FULLY_ACCESSIBLE",
+    "steps": {
+      "step_count": 0,
+      "step_height": "FULLY_ACCESSIBLE",
+      "ramp": "FULLY_ACCESSIBLE",
+      "lift": "NOT_ACCESSIBLE"
+    },
+    "door": {
+      "width": "FULLY_ACCESSIBLE",
+      "type": "automatic"
+    },
+    "additional_info": "The entrance is located on the ground floor."
+  },
+  "restroom": {
+    "accessibility_status": "FULLY_ACCESSIBLE",
+    "door_width": "FULLY_ACCESSIBLE",
+    "room_manuever": "FULLY_ACCESSIBLE",
+    "grab_rails": "FULLY_ACCESSIBLE",
+    "sink": "FULLY_ACCESSIBLE",
+    "toilet_seat": "FULLY_ACCESSIBLE",
+    "emergency_alarm": "FULLY_ACCESSIBLE",
+    "accessible_via": "elevator",
+    "euro_key": true,
+    "additional_info": "Restroom is located on the ground floor."
+  },
+  "additional_info": "The place is wheelchair accessible."
+}

@@ -1,0 +1,10 @@
+{
+  "door_width": "FULLY_ACCESSIBLE",
+  "room_manuever": "FULLY_ACCESSIBLE",
+  "grab_rails": "FULLY_ACCESSIBLE",
+  "sink": "FULLY_ACCESSIBLE",
+  "toilet_seat": "FULLY_ACCESSIBLE",
+  "emergency_alarm": "FULLY_ACCESSIBLE",
+  "euro_key": true,
+  "additional_info": "Restroom is located on the ground floor."
+}
