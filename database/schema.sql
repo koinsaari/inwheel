@@ -8,7 +8,8 @@ CREATE TABLE public.places (
   lat DOUBLE PRECISION NOT NULL,
   lon DOUBLE PRECISION NOT NULL,
   geom GEOGRAPHY(Point, 4326),
-  accessibility JSONB,
+  accessibility_osm JSONB,
+  accessibility_user JSONB,
   last_osm_update TIMESTAMP WITH TIME ZONE,
   last_user_update TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now()

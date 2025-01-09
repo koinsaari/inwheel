@@ -26,11 +26,11 @@ def parse_yes_no(value: str) -> Optional[str]:
         return None
     val = value.strip().lower()
     if val in {"yes", "wheelchair", "designated"}:
-        return AccessibilityStatus.FULLY_ACCESSIBLE
+        return AccessibilityStatus.FULLY_ACCESSIBLE.value
     elif val == "limited":
-        return AccessibilityStatus.LIMITED_ACCESSIBILITY
+        return AccessibilityStatus.LIMITED_ACCESSIBILITY.value
     elif val == "no":
-        return AccessibilityStatus.NOT_ACCESSIBLE
+        return AccessibilityStatus.NOT_ACCESSIBLE.value
     return None
 
 
@@ -55,11 +55,11 @@ def parse_width(value: Optional[str]) -> Optional[str]:
     v = parse_meters(value)
     if v is not None:
         if v == 0:
-            return AccessibilityStatus.FULLY_ACCESSIBLE
+            return AccessibilityStatus.FULLY_ACCESSIBLE.value
         elif v <= 0.7:
-            return AccessibilityStatus.LIMITED_ACCESSIBILITY
+            return AccessibilityStatus.LIMITED_ACCESSIBILITY.value
         elif v > 0.7:
-            return AccessibilityStatus.NOT_ACCESSIBLE
+            return AccessibilityStatus.NOT_ACCESSIBLE.value
     return None
     
 
@@ -69,11 +69,14 @@ def parse_restroom_manuever(front: Optional[str], side: Optional[str]) -> Option
     
     front_val = parse_meters(front)
     side_val = parse_meters(side)
+
+    if front_val is None or side_val is None:
+        return None
     
     if front_val and side_val >= 1.5:
-        return AccessibilityStatus.FULLY_ACCESSIBLE
+        return AccessibilityStatus.FULLY_ACCESSIBLE.value
     else:
-        return AccessibilityStatus.NOT_ACCESSIBLE
+        return AccessibilityStatus.NOT_ACCESSIBLE.value
     
 
 def parse_general_accessibility_info(tags: Dict[str, str]) -> Dict[str, Optional[float]]:
@@ -114,9 +117,8 @@ def parse_general_accessibility_info(tags: Dict[str, str]) -> Dict[str, Optional
             "accessible_via": tags.get("toilets:wheelchair:accessible_via"),
             "additional_info": None
         }
-
     return {
-        "accessibility_status": None, # TODO
+        "accessibility_status": parse_yes_no(tags.get("wheelchair")),
         "indoor_accessibility": parse_yes_no(tags.get("wheelchair:turning_circle")),
         "entrance": {
             "steps": parse_entrance_steps(tags),
@@ -131,7 +133,7 @@ def parse_general_accessibility_info(tags: Dict[str, str]) -> Dict[str, Optional
 def parse_toilets_info(tags: Dict[str, str]) -> Dict[str, Optional[float]]:
     return {
         "door_width": parse_width(tags.get("door:width") or tags.get("entrance:width")),
-        "room_manuever": parse_restroom_manuever(tags.get("toilets:wheelchair:space_front") and tags.get("toilets:wheelchair:space_side")),
+        "room_manuever": parse_restroom_manuever(tags.get("toilets:wheelchair:space_front"), tags.get("toilets:wheelchair:space_side")),
         "grab_rails": parse_yes_no(tags.get("toilets:wheelchair:grab_rails")),
         "toilet_seat": None,
         "sink": None,
@@ -145,7 +147,7 @@ def parse_parking_info(tags: Dict[str, str]) -> Dict[str, Optional[float]]:
     return {
         "accessible_spot_count": tags.get("capacity:disabled") if tags.get("capacity:disabled") else None,
         "surface": tags.get("surface") or None,
-        "parking_type": tags.get("parking)"),
+        "parking_type": tags.get("parking_type"),
         "has_elevator": None,
         "additional_info": tags.get("description")
     }
