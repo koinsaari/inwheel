@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.secrets.gradle.plugin)
     id("io.gitlab.arturbosch.detekt").version("1.23.7")
     id("com.github.jk1.dependency-license-report").version("2.9")
+    kotlin("plugin.serialization").version("2.0.0")
 }
 
 android {
@@ -86,6 +87,9 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.accompanist.permissions)
     implementation(libs.play.services.location)
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.0.3"))
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation(libs.ktor.client.android)
     ksp(libs.androidx.room.compiler)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
