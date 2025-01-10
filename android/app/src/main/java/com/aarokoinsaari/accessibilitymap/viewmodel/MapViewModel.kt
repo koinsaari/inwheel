@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,8 +40,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
 class MapViewModel(
-    private val repository: PlaceRepository,
-    private val sharedPlaceViewModel: SharedPlaceViewModel
+    private val repository: PlaceRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(MapState())
     val state: StateFlow<MapState> = _state.asStateFlow()
@@ -60,24 +59,6 @@ class MapViewModel(
                         applySearchFilter(query)
                     }
                 }
-        }
-
-        // Observes selectedPlace changes in SharedPlaceViewModel to update map state so that the
-        // map is zoomed to the selected place
-        viewModelScope.launch {
-            sharedPlaceViewModel.selectedPlace.collect { place ->
-                Log.d("MapViewModel", "SharedPlaceViewModel selected place: $place")
-                place?.let {
-                    _state.update {
-                        it.copy(
-                            selectedPlace = place,
-                            selectedClusterItem = PlaceClusterItem(place, 1f),
-                            zoomLevel = 20f,
-                            center = LatLng(place.lat, place.lon)
-                        )
-                    }
-                }
-            }
         }
     }
 

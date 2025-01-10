@@ -25,8 +25,6 @@ import com.aarokoinsaari.accessibilitymap.data.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceDetailsViewModel
-import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceListViewModel
-import com.aarokoinsaari.accessibilitymap.viewmodel.SharedPlaceViewModel
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -74,15 +72,9 @@ val appModule = module {
         get<AppDatabase>().placesFtsDao()
     }
     viewModel {
-        MapViewModel(get(), get())
-    }
-    viewModel {
-        PlaceListViewModel(get())
+        MapViewModel(get())
     }
     viewModel { (place: Place) ->
         PlaceDetailsViewModel(place)
-    }
-    viewModel {
-        SharedPlaceViewModel()
     }
 }
