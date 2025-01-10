@@ -64,11 +64,15 @@ def parse_filtered_pbf() -> List[Place]:
     return handler.places
 
 
-def seed_places(places: List[Place]):
+def seed_places(places: List[Place], limit: int = None):
     conn = psycopg2.connect(DATABASE_URL)
     cur = conn.cursor()
-    for p in places:
+
+    places_to_seed = places[:limit] if limit else places
+
+    for p in places_to_seed:
         accessibility_json = Json(p.accessibility_osm)
+        contact_json = Json(p.contact)
         data_tuple = (
             p.osm_id,
             p.name,
@@ -77,28 +81,31 @@ def seed_places(places: List[Place]):
             p.lon,
             p.lon,  # longitude for MakePoint
             p.lat,  # latitude for MakePoint
+            contact_json,
             accessibility_json
         )
         try:
             cur.execute("""
-                INSERT INTO places (osm_id, name, category, lat, lon, geom, accessibility_osm, last_osm_update, created_at)
-                VALUES (%s, %s, %s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326)::GEOGRAPHY, %s, NOW(), NOW())
+                INSERT INTO places (osm_id, name, category, lat, lon, geom, contact, accessibility_osm, last_osm_update, created_at)
+                VALUES (%s, %s, %s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326)::GEOGRAPHY, %s, %s, NOW(), NOW())
                 ON CONFLICT (osm_id) DO UPDATE
                 SET name = EXCLUDED.name,
                     category = EXCLUDED.category,
                     lat = EXCLUDED.lat,
                     lon = EXCLUDED.lon,
                     geom = EXCLUDED.geom,
+                    contact = EXCLUDED.contact,
                     accessibility_osm = EXCLUDED.accessibility_osm,
                     last_osm_update = NOW()
             """, data_tuple)
-            print(f"Inserted/Updated place osm_id={p.osm_id}")
+
+            print(f"Inserting place osm_id={p.osm_id}, name={p.name}, category={p.category}")
         except Exception as e:
             print(f"Error inserting osm_id={p.osm_id}: {e}")
     conn.commit()
     cur.close()
     conn.close()
-    print("Seeding done.")
+    print(f"Seeding done. {len(places_to_seed)} places seeded.")
 
 
 def main():

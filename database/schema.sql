@@ -8,6 +8,7 @@ CREATE TABLE public.places (
   lat DOUBLE PRECISION NOT NULL,
   lon DOUBLE PRECISION NOT NULL,
   geom GEOGRAPHY(Point, 4326),
+  contact JSONB,
   accessibility_osm JSONB,
   accessibility_user JSONB,
   last_osm_update TIMESTAMP WITH TIME ZONE,
@@ -17,4 +18,6 @@ CREATE TABLE public.places (
 
 CREATE INDEX idx_places_geom ON places USING GIST (geom);
 CREATE INDEX idx_places_osm_id ON places (osm_id);
-CREATE INDEX idx_places_accessibility ON places USING GIN (accessibility);
+CREATE INDEX idx_places_contact ON places USING GIN (contact);
+CREATE INDEX idx_places_accessibility_osm ON places USING GIN (accessibility_osm);
+CREATE INDEX idx_places_accessibility_user ON places USING GIN (accessibility_user);
