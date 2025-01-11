@@ -17,7 +17,6 @@
 package com.aarokoinsaari.accessibilitymap.state
 
 import com.aarokoinsaari.accessibilitymap.model.Place
-import com.aarokoinsaari.accessibilitymap.model.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.ui.models.PlaceClusterItem
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -27,7 +26,7 @@ data class MapState(
     val allClusterItems: List<PlaceClusterItem> = emptyList(),
     val selectedClusterItem: PlaceClusterItem? = null,
     val selectedPlace: Place? = null, // Used for place details
-    val selectedCategories: Set<PlaceCategory> = emptySet(),
+    val selectedCategories: Set<String> = emptySet(),
     val searchQuery: String = "",
     val filteredPlaces: List<Place> = emptyList(),
     val zoomLevel: Float? = 10f,

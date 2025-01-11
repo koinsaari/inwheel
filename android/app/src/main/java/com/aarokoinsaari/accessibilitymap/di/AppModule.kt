@@ -20,35 +20,18 @@ import androidx.room.Room
 import com.aarokoinsaari.accessibilitymap.data.local.AppDatabase
 import com.aarokoinsaari.accessibilitymap.data.local.PlacesDao
 import com.aarokoinsaari.accessibilitymap.data.local.PlacesFtsDao
-import com.aarokoinsaari.accessibilitymap.data.remote.overpass.OverpassApiService
 import com.aarokoinsaari.accessibilitymap.data.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceDetailsViewModel
-import okhttp3.OkHttpClient
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
 
 @Suppress("MagicNumber")
 val appModule = module {
-    single {
-        val okHttpClient = OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
-            .build()
-
-        Retrofit.Builder()
-            .baseUrl("https://overpass-api.de/api/")
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(OverpassApiService::class.java)
-    }
     single {
         Room.databaseBuilder(
             androidContext(),
@@ -62,11 +45,20 @@ val appModule = module {
 //            AppDatabase::class.java,
 //        ).fallbackToDestructiveMigration().build()
 //    }
+
+    single {
+        createSupabaseClient(
+            supabaseUrl = "",
+            supabaseKey = ""
+        ) {
+            install(Postgrest)
+        }
+    }
     single<PlacesDao> {
         get<AppDatabase>().placesDao()
     }
     single {
-        PlaceRepository(get(), get(), get())
+        PlaceRepository(get(), get())
     }
     single<PlacesFtsDao> {
         get<AppDatabase>().placesFtsDao()

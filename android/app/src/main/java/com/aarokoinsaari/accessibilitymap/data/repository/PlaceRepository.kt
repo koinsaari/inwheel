@@ -19,9 +19,6 @@ package com.aarokoinsaari.accessibilitymap.data.repository
 import android.util.Log
 import com.aarokoinsaari.accessibilitymap.data.local.PlacesDao
 import com.aarokoinsaari.accessibilitymap.data.local.PlacesFtsDao
-import com.aarokoinsaari.accessibilitymap.data.mapper.overpass.OverpassDataMapper
-import com.aarokoinsaari.accessibilitymap.data.remote.overpass.OverpassApiService
-import com.aarokoinsaari.accessibilitymap.data.remote.overpass.OverpassQueryBuilder
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.model.PlaceFts
 import com.google.android.gms.maps.model.LatLngBounds
@@ -32,12 +29,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class PlaceRepository(
-    private val apiService: OverpassApiService,
     private val placesDao: PlacesDao,
     private val placesFtsDao: PlacesFtsDao
 ) {
-    fun observeAllPlaces(): Flow<List<Place>> = placesDao.getAllPlacesFlow()
-
     fun observePlacesWithinBounds(bounds: LatLngBounds): Flow<List<Place>> =
         placesDao.getPlacesFlowWithinBounds(
             southLat = bounds.southwest.latitude,
@@ -78,7 +72,7 @@ class PlaceRepository(
                     placesFtsDao.insertPlaces(
                         newPlaces.map {
                             PlaceFts(
-                                rowId = it.id,
+                                rowId = it.id.toLong(),
                                 name = it.name
                             )
                         }
@@ -96,12 +90,7 @@ class PlaceRepository(
                 "${bounds.southwest.longitude}," +
                 "${bounds.northeast.latitude}," +
                 "${bounds.northeast.longitude}"
-        val query = OverpassQueryBuilder.buildQuery(boundStr)
-        Log.d("Repository", "Query: $query")
-        val response = apiService.getMarkers(query)
-        return response.elements.mapNotNull {
-            OverpassDataMapper.convertElementToPlace(it)
-        }
+        TODO()
     }
 
     private fun dataCoversBounds(cachedPlaces: List<Place>, bounds: LatLngBounds): Boolean {

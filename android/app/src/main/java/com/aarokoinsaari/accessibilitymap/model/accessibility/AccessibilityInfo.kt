@@ -16,139 +16,212 @@
 
 package com.aarokoinsaari.accessibilitymap.model.accessibility
 
-data class AccessibilityInfo(
-    val entranceInfo: EntranceInfo? = null,
-    val restroomInfo: RestroomInfo? = null,
-    val parkingInfo: ParkingInfo? = null,
-    val miscInfo: MiscellaneousInfo? = null,
-    val additionalInfo: String? = null
-) {
-    /**
-     * This determines the general accessibility of a place. Note that the entrance has the most
-     * weight evaluating the accessibility because if a person in a wheelchair can't even enter
-     * the place, the rest of the details (like restrooms or elevators) don't really matter.
-     * See more details about determining the accessibility status in [AccessibilityStatus].
-     */
-    fun determineAccessibilityStatus(): AccessibilityStatus {
-        val entranceStatus = entranceInfo?.determineAccessibilityStatus()
-            ?: AccessibilityStatus.UNKNOWN
-        if (entranceStatus != AccessibilityStatus.FULLY_ACCESSIBLE) return entranceStatus
+import kotlinx.serialization.Serializable
 
-        val statuses = listOf(
-            restroomInfo?.determineAccessibilityStatus(),
-            miscInfo?.determineAccessibilityStatus(),
-            parkingInfo?.determineAccessibilityStatus()
+@Serializable
+sealed class AccessibilityInfo {
+
+    @Serializable
+    data class GeneralAccessibility(
+        val accessibilityStatus: AccessibilityStatus?,
+        val indoorAccessibility: AccessibilityStatus?,
+        val entrance: EntranceAccessibility?,
+        val restroom: RestroomAccessibility?,
+        val additionalInfo: String?
+    ) : AccessibilityInfo() {
+
+        @Serializable
+        data class EntranceAccessibility(
+            val accessibilityStatus: AccessibilityStatus?,
+            val steps: StepsAccessibility?,
+            val door: DoorAccessibility?,
+            val additionalInfo: String?
+        ) {
+            @Serializable
+            data class StepsAccessibility(
+                val stepCount: Int?,
+                val stepHeight: AccessibilityStatus?,
+                val ramp: AccessibilityStatus?,
+                val lift: AccessibilityStatus?
+            )
+
+            @Serializable
+            data class DoorAccessibility(
+                val doorWidth: AccessibilityStatus?,
+                val doorType: String?
+            )
+        }
+
+        @Serializable
+        data class RestroomAccessibility(
+            val accessibility: AccessibilityStatus?,
+            val doorWidth: AccessibilityStatus?,
+            val roomManeuver: AccessibilityStatus?,
+            val grabRails: AccessibilityStatus?,
+            val toiletSeat: AccessibilityStatus?,
+            val emergencyAlarm: AccessibilityStatus?,
+            val sink: AccessibilityStatus?,
+            val euroKey: Boolean?,
+            val accessibleVia: String?,
+            val additionalInfo: String?
         )
-
-        return when {
-            statuses.any {
-                it == AccessibilityStatus.NOT_ACCESSIBLE ||
-                        it == AccessibilityStatus.LIMITED_ACCESSIBILITY
-            } ->
-                AccessibilityStatus.LIMITED_ACCESSIBILITY
-
-            statuses.any { it == AccessibilityStatus.UNKNOWN } ->
-                AccessibilityStatus.UNKNOWN
-
-            else -> AccessibilityStatus.FULLY_ACCESSIBLE
-        }
-    }
-}
-
-data class ParkingInfo(
-    val hasAccessibleSpots: Boolean? = null,
-    val spotCount: Int? = null,
-    val parkingType: ParkingType? = null,
-    val hasSmoothSurface: Boolean? = null,
-    val hasElevator: Boolean? = null,
-    val elevatorInfo: ElevatorInfo? = null,
-    val additionalInfo: String? = null
-) {
-    enum class ParkingType {
-        SURFACE,
-        UNDERGROUND,
-        MULTI_STOREY,
-        ROOFTOP
     }
 
-    @Suppress("CyclomaticComplexMethod")
-    fun determineAccessibilityStatus(): AccessibilityStatus =
-        when {
-            (hasAccessibleSpots == null && spotCount == null) || hasSmoothSurface == null ->
-                AccessibilityStatus.UNKNOWN
+    @Serializable
+    data class ToiletAccessibility(
+        val accessibilityStatus: AccessibilityStatus?,
+        val doorWidth: AccessibilityStatus?,
+        val grabRails: AccessibilityStatus?,
+        val toiletSeat: AccessibilityStatus?,
+        val emergencyAlarm: AccessibilityStatus?,
+        val sink: AccessibilityStatus?,
+        val euroKey: Boolean?,
+        val additionalInfo: String?
+    ): AccessibilityInfo()
 
-            hasAccessibleSpots == false || spotCount == 0 -> AccessibilityStatus.NOT_ACCESSIBLE
-            hasSmoothSurface == false -> AccessibilityStatus.LIMITED_ACCESSIBILITY
-            parkingType != ParkingType.SURFACE -> {
-                when (hasElevator) {
-                    true -> {
-                        val elevatorStatus = elevatorInfo?.determineAccessibilityStatus()
-                        when (elevatorStatus) {
-                            AccessibilityStatus.FULLY_ACCESSIBLE ->
-                                AccessibilityStatus.FULLY_ACCESSIBLE
-
-                            AccessibilityStatus.LIMITED_ACCESSIBILITY ->
-                                AccessibilityStatus.LIMITED_ACCESSIBILITY
-
-                            AccessibilityStatus.NOT_ACCESSIBLE ->
-                                AccessibilityStatus.LIMITED_ACCESSIBILITY
-
-                            else -> AccessibilityStatus.UNKNOWN
-                        }
-                    }
-
-                    false -> AccessibilityStatus.NOT_ACCESSIBLE
-                    null -> AccessibilityStatus.UNKNOWN
-                }
-            }
-
-            hasAccessibleSpots == true || (spotCount != null && spotCount > 0) ->
-                AccessibilityStatus.FULLY_ACCESSIBLE
-
-            else -> AccessibilityStatus.UNKNOWN
-        }
+    @Serializable
+    data class ParkingAccessibility(
+        val accessibilityStatus: AccessibilityStatus?,
+        val accessibleSpotCount: Int?,
+        val surface: String?,
+        val parkingType: String?,
+        val hasElevator: Boolean?,
+        val additionalInfo: String?
+    ) : AccessibilityInfo()
 }
 
-data class MiscellaneousInfo(
-    val level: Int? = null,
-    val hasElevator: Boolean? = null,
-    val elevatorInfo: ElevatorInfo? = null,
-    val additionalInfo: String? = null
-) {
-    fun determineAccessibilityStatus(): AccessibilityStatus =
-        when {
-            level == 0 -> AccessibilityStatus.FULLY_ACCESSIBLE
-            level == null -> AccessibilityStatus.UNKNOWN
-            hasElevator == false -> AccessibilityStatus.NOT_ACCESSIBLE
-            hasElevator == true && elevatorInfo != null ->
-                elevatorInfo.determineAccessibilityStatus()
+val AccessibilityInfo?.accessibilityStatus: AccessibilityStatus?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.accessibilityStatus
+        is AccessibilityInfo.ToiletAccessibility -> this.accessibilityStatus
+        is AccessibilityInfo.ParkingAccessibility -> this.accessibilityStatus
+        else -> null
+    }
 
-            hasElevator == true && elevatorInfo == null -> AccessibilityStatus.UNKNOWN
-            else -> AccessibilityStatus.UNKNOWN
-        }
-}
+val AccessibilityInfo?.indoorAccessibility: AccessibilityStatus?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.indoorAccessibility
+        else -> null
+    }
 
-data class ElevatorInfo(
-    val isAvailable: Boolean? = null,
-    val isSpaciousEnough: Boolean? = null,
-    val hasBrailleButtons: Boolean? = null,
-    val hasAudioAnnouncements: Boolean? = null,
-    val additionalInfo: String? = null
-) {
-    fun determineAccessibilityStatus(): AccessibilityStatus =
-        when {
-            isAvailable == null -> AccessibilityStatus.UNKNOWN
-            isAvailable == false -> AccessibilityStatus.NOT_ACCESSIBLE
-            isSpaciousEnough == false -> AccessibilityStatus.LIMITED_ACCESSIBILITY
-            hasBrailleButtons == false || hasAudioAnnouncements == false ->
-                AccessibilityStatus.LIMITED_ACCESSIBILITY
+val AccessibilityInfo?.stepsCount: Int?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.entrance?.steps?.stepCount
+        else -> null
+    }
 
-            hasBrailleButtons == null || hasAudioAnnouncements == null ->
-                AccessibilityStatus.UNKNOWN
+val AccessibilityInfo?.stepHeight: AccessibilityStatus?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.entrance?.steps?.stepHeight
+        else -> null
+    }
 
-            isSpaciousEnough == true && hasBrailleButtons == true &&
-                    hasAudioAnnouncements == true -> AccessibilityStatus.FULLY_ACCESSIBLE
+val AccessibilityInfo?.ramp: AccessibilityStatus?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.entrance?.steps?.ramp
+        else -> null
+    }
 
-            else -> AccessibilityStatus.UNKNOWN
-        }
-}
+val AccessibilityInfo?.lift: AccessibilityStatus?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.entrance?.steps?.lift
+        else -> null
+    }
+
+val AccessibilityInfo?.doorWidth: AccessibilityStatus?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.entrance?.door?.doorWidth
+        else -> null
+    }
+
+val AccessibilityInfo?.doorType: String?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.entrance?.door?.doorType
+        else -> null
+    }
+
+val AccessibilityInfo?.restroomDoorWidth: AccessibilityStatus?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.restroom?.doorWidth
+        is AccessibilityInfo.ToiletAccessibility -> this.doorWidth
+        else -> null
+    }
+
+val AccessibilityInfo?.roomManeuver: AccessibilityStatus?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.restroom?.roomManeuver
+        else -> null
+    }
+
+val AccessibilityInfo?.grabRails: AccessibilityStatus?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.restroom?.grabRails
+        is AccessibilityInfo.ToiletAccessibility -> this.grabRails
+        else -> null
+    }
+
+val AccessibilityInfo?.toiletSeat: AccessibilityStatus?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.restroom?.toiletSeat
+        is AccessibilityInfo.ToiletAccessibility -> this.toiletSeat
+        else -> null
+    }
+
+val AccessibilityInfo?.emergencyAlarm: AccessibilityStatus?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.restroom?.emergencyAlarm
+        is AccessibilityInfo.ToiletAccessibility -> this.emergencyAlarm
+        else -> null
+    }
+
+val AccessibilityInfo?.sink: AccessibilityStatus?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.restroom?.sink
+        is AccessibilityInfo.ToiletAccessibility -> this.sink
+        else -> null
+    }
+
+val AccessibilityInfo?.euroKey: Boolean?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.restroom?.euroKey
+        is AccessibilityInfo.ToiletAccessibility -> this.euroKey
+        else -> null
+    }
+
+val AccessibilityInfo?.accessibleVia: String?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.restroom?.accessibleVia
+        else -> null
+    }
+
+val AccessibilityInfo?.parkingSpotCount: Int?
+    get() = when (this) {
+        is AccessibilityInfo.ParkingAccessibility -> this.accessibleSpotCount
+        else -> null
+    }
+
+val AccessibilityInfo?.parkingSurface: String?
+    get() = when (this) {
+        is AccessibilityInfo.ParkingAccessibility -> this.surface
+        else -> null
+    }
+
+val AccessibilityInfo?.parkingType: String?
+    get() = when (this) {
+        is AccessibilityInfo.ParkingAccessibility -> this.parkingType
+        else -> null
+    }
+
+val AccessibilityInfo?.parkingElevator: Boolean?
+    get() = when (this) {
+        is AccessibilityInfo.ParkingAccessibility -> this.hasElevator
+        else -> null
+    }
+
+val AccessibilityInfo?.additionalInfo: String?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.additionalInfo
+        is AccessibilityInfo.ToiletAccessibility -> this.additionalInfo
+        is AccessibilityInfo.ParkingAccessibility -> this.additionalInfo
+        else -> null
+    }

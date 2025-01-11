@@ -150,10 +150,10 @@ class MapViewModel(
     private fun handleToggleFilter(category: PlaceCategory) {
         Log.d("MapViewModel", "Toggled category: $category")
         _state.update { currentState ->
-            val updatedCategories = if (currentState.selectedCategories.contains(category)) {
-                currentState.selectedCategories - category
+            val updatedCategories = if (currentState.selectedCategories.contains(category.name.lowercase())) {
+                currentState.selectedCategories - category.name.lowercase()
             } else {
-                currentState.selectedCategories + category
+                currentState.selectedCategories + category.name.lowercase()
             }
             Log.d("MapViewModel", "Updated categories: $updatedCategories")
             currentState.copy(selectedCategories = updatedCategories)
@@ -182,7 +182,7 @@ class MapViewModel(
             allClusterItems
         } else {
             allClusterItems.filter {
-                selectedCategories.contains(it.placeData.category)
+                selectedCategories.contains(it.placeData.category.name.lowercase())
             }
         }
         _state.update { it.copy(clusterItems = filteredClusterItems) }
@@ -197,7 +197,7 @@ class MapViewModel(
             allPlaces.filter { place ->
                 // Excludes places without name (toilets, parking spots, etc)
                 place.placeData.name.contains(query, ignoreCase = true) &&
-                        place.placeData.name != place.placeData.category.defaultName
+                        place.placeData.name != place.placeData.category.name.lowercase()
             }
         }
         _state.update { it.copy(filteredPlaces = filtered.map { it.placeData }) }

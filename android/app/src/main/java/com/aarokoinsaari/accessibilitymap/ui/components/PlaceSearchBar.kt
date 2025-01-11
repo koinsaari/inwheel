@@ -91,7 +91,7 @@ fun PlaceSearchBar(
 fun PlaceListItem(place: Place, onClick: () -> Unit = { }) {
     ListItem(
         headlineContent = { Text(place.name) },
-        overlineContent = { Text(place.category.defaultName) },
+        overlineContent = { Text(place.category.toString()) },
         modifier = Modifier.clickable { onClick() }
     )
 }

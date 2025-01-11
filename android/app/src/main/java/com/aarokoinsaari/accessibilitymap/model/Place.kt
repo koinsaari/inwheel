@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,35 +21,25 @@ import androidx.room.Entity
 import androidx.room.Fts4
 import androidx.room.PrimaryKey
 import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityInfo
-import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.ui.models.PlaceClusterItem
 
 @Entity(tableName = "places")
 data class Place(
-    @PrimaryKey val id: Long,
+    @PrimaryKey val id: String,
     val name: String,
     val category: PlaceCategory,
     val lat: Double,
     val lon: Double,
+    val contact: ContactInfo,
+    val accessibility: AccessibilityInfo
+)
+
+data class ContactInfo(
+    val email: String?,
+    val phone: String?,
     val address: String?,
-    val tags: Map<String, String>?,
-    val accessibility: AccessibilityInfo?,
-    val contactInfo: ContactInfo?
-) {
-    /**
-     * Note: This function temporarily handles the determination of the general accessibility status
-     * by parsing the "wheelchair" tag from the Overpass API. Only this tag is used to determine
-     * the accessibility of a place if there are no other information. Until a better solution is
-     * implemented, we use this to determine the general accessibility.
-     **/
-    fun determineAccessibilityStatus(): AccessibilityStatus =
-        when (tags?.get("wheelchair")?.lowercase()) {
-            "yes", "designated" -> AccessibilityStatus.FULLY_ACCESSIBLE
-            "limited" -> AccessibilityStatus.LIMITED_ACCESSIBILITY
-            "no" -> AccessibilityStatus.NOT_ACCESSIBLE
-            else -> AccessibilityStatus.UNKNOWN
-        }
-}
+    val website: String?
+)
 
 fun Place.toClusterItem(zIndex: Float? = null): PlaceClusterItem =
     PlaceClusterItem(
@@ -64,10 +54,4 @@ data class PlaceFts(
     @ColumnInfo(name = "rowid")
     val rowId: Long,
     val name: String
-)
-
-data class ContactInfo(
-    val email: String?,
-    val phone: String?,
-    val website: String?
 )
