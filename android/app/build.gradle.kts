@@ -13,6 +13,10 @@ android {
     namespace = "com.aarokoinsaari.accessibilitymap"
     compileSdk = 35
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.aarokoinsaari.accessibilitymap"
         minSdk = 29
@@ -24,6 +28,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "SUPABASE_URL", "\"${project.findProperty("SUPABASE_URL")}\"")
+        buildConfigField("String", "SUPABASE_KEY", "\"${project.findProperty("SUPABASE_KEY")}\"")
     }
 
     buildTypes {
@@ -81,8 +88,6 @@ dependencies {
     implementation(libs.maps.compose.utils)
     implementation(libs.maps.compose.widgets)
     implementation(libs.android.maps.utils)
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.room.ktx)
     implementation(libs.accompanist.permissions)
