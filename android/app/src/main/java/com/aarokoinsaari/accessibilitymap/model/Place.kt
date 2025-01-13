@@ -22,6 +22,7 @@ import androidx.room.Fts4
 import androidx.room.PrimaryKey
 import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityInfo
 import com.aarokoinsaari.accessibilitymap.ui.models.PlaceClusterItem
+import kotlinx.serialization.Serializable
 
 @Entity(tableName = "places")
 data class Place(
@@ -34,11 +35,12 @@ data class Place(
     val accessibility: AccessibilityInfo
 )
 
+@Serializable
 data class ContactInfo(
-    val email: String?,
-    val phone: String?,
-    val address: String?,
-    val website: String?
+    val email: String? = null,
+    val phone: String? = null,
+    val address: String? = null,
+    val website: String? = null
 )
 
 fun Place.toClusterItem(zIndex: Float? = null): PlaceClusterItem =

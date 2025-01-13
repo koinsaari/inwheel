@@ -93,36 +93,56 @@ class MapViewModel(
 
     private suspend fun handleMove(intent: MapIntent.MoveMap) {
         Log.d("MapViewModel", "Update view intent: $intent")
-        _state.update {
-            it.copy(
-                zoomLevel = intent.zoomLevel,
-                center = intent.center,
-                currentBounds = intent.bounds
-            )
-        }
 
-        if (intent.zoomLevel < ZOOM_THRESHOLD) {
-            handleClearMarkers()
-            return
-        }
-
-        if (_state.value.snapshotBounds == null ||
-            centerIsOutOfBounds(intent.center, _state.value.snapshotBounds!!)
-        ) {
-            val expandedBounds = calculateExpandedBounds(intent.bounds)
-            _state.update { it.copy(snapshotBounds = expandedBounds, isLoading = true) }
-            observePlacesWithinBounds(expandedBounds)
-            // Fetch cached places and trigger api fetch if needed
-            val cachedPlaces = repository.getPlaces(expandedBounds, intent.bounds)
-            if (cachedPlaces.isNotEmpty()) {
-                _state.update {
-                    it.copy(
-                        allClusterItems = cachedPlaces.map { it.toClusterItem() },
-                        isLoading = false
-                    )
+        placesJob?.cancel()
+        placesJob = viewModelScope.launch {
+            repository.observePlacesWithinBounds(intent.bounds)
+                .collect { placesList ->
+                    val clusterItems = placesList.map { it.toClusterItem() }
+                    _state.update {
+                        it.copy(
+                            clusterItems = clusterItems,
+                            allClusterItems = clusterItems
+                        )
+                    }
                 }
-            }
         }
+
+        viewModelScope.launch {
+            repository.loadPlacesWithinBounds(intent.bounds, limit = 50)
+        }
+
+//        _state.update {
+//            it.copy(
+//                zoomLevel = intent.zoomLevel,
+//                center = intent.center,
+//                currentBounds = intent.bounds
+//            )
+//        }
+//
+//        if (intent.zoomLevel < ZOOM_THRESHOLD) {
+//            handleClearMarkers()
+//            return
+//        }
+//
+//        if (_state.value.snapshotBounds == null ||
+//            centerIsOutOfBounds(intent.center, _state.value.snapshotBounds!!)
+//        ) {
+//            val expandedBounds = calculateExpandedBounds(intent.bounds)
+//            _state.update { it.copy(snapshotBounds = expandedBounds, isLoading = true) }
+//            observePlacesWithinBounds(expandedBounds)
+//
+//            // Fetch cached places and trigger api fetch if needed
+//            val cachedPlaces = repository.getPlaces(expandedBounds, intent.bounds)
+//            if (cachedPlaces.isNotEmpty()) {
+//                _state.update {
+//                    it.copy(
+//                        allClusterItems = cachedPlaces.map { it.toClusterItem() },
+//                        isLoading = false
+//                    )
+//                }
+//            }
+//        }
         Log.d("MapViewModel", "MapState after move: ${_state.value}")
     }
 
