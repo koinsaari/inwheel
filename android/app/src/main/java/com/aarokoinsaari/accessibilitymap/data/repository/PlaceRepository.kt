@@ -18,103 +18,52 @@ package com.aarokoinsaari.accessibilitymap.data.repository
 
 import android.util.Log
 import com.aarokoinsaari.accessibilitymap.data.local.PlacesDao
-import com.aarokoinsaari.accessibilitymap.data.local.PlacesFtsDao
-import com.aarokoinsaari.accessibilitymap.data.mapper.overpass.OverpassDataMapper
-import com.aarokoinsaari.accessibilitymap.data.remote.overpass.OverpassApiService
-import com.aarokoinsaari.accessibilitymap.data.remote.overpass.OverpassQueryBuilder
+import com.aarokoinsaari.accessibilitymap.data.remote.supabase.SupabaseApiService
+import com.aarokoinsaari.accessibilitymap.data.remote.supabase.toDomain
 import com.aarokoinsaari.accessibilitymap.model.Place
-import com.aarokoinsaari.accessibilitymap.model.PlaceFts
 import com.google.android.gms.maps.model.LatLngBounds
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class PlaceRepository(
-    private val apiService: OverpassApiService,
-    private val placesDao: PlacesDao,
-    private val placesFtsDao: PlacesFtsDao
+    private val api: SupabaseApiService,
+    private val dao: PlacesDao,
+//    private val ftsDao: PlacesFtsDao,
 ) {
-    fun observeAllPlaces(): Flow<List<Place>> = placesDao.getAllPlacesFlow()
-
     fun observePlacesWithinBounds(bounds: LatLngBounds): Flow<List<Place>> =
-        placesDao.getPlacesFlowWithinBounds(
+        dao.getPlacesFlowWithinBounds(
             southLat = bounds.southwest.latitude,
             northLat = bounds.northeast.latitude,
             westLon = bounds.southwest.longitude,
             eastLon = bounds.northeast.longitude
         )
 
-    suspend fun getPlaces(
+    suspend fun fetchAndStorePlaces(
         bounds: LatLngBounds,
-        snapshotBounds: LatLngBounds
+        existingIds: Set<String> = emptySet(),
     ): List<Place> {
-        val cachedPlaces = withContext(Dispatchers.IO) {
-            placesDao.getPlacesWithinBounds(
-                southLat = snapshotBounds.southwest.latitude,
-                northLat = snapshotBounds.northeast.latitude,
-                westLon = snapshotBounds.southwest.longitude,
-                eastLon = snapshotBounds.northeast.longitude
-            )
+        delay(300)
+        val apiPlaces = api.fetchPlacesInBBox(
+            westLon = bounds.southwest.longitude,
+            southLat = bounds.southwest.latitude,
+            eastLon = bounds.northeast.longitude,
+            northLat = bounds.northeast.latitude,
+        ).map { it.toDomain() }
+        Log.d("PlaceRepository", "Loaded ${apiPlaces.size} places from API")
+
+        if (apiPlaces.isNotEmpty()) {
+            val newPlaces = apiPlaces
+                .filterNot { it.id in existingIds }
+                .distinctBy { it.id }
+            dao.insertPlaces(newPlaces)
+            Log.d("PlaceRepository", "Inserted ${newPlaces.size} new places into Room")
+
+//            val ftsPlaces = newPlaces
+//                .filterNot { it.category.name.lowercase() in setOf("toilets", "parking", "unknown") }
+//                .map { PlaceFts(rowId = it.id, name = it.name) }
+//            ftsDao.insertPlaces(ftsPlaces)
+//            Log.d("PlaceRepository", "Inserted ${ftsPlaces.size} places into FTS")
         }
-        Log.d("PlaceRepository", "Cached places: ${cachedPlaces.size}")
-
-        // Return the cached places immediately and check if need to fetch from API
-        if (!dataCoversBounds(cachedPlaces, bounds)) {
-            fetchPlacesFromApiAsync(bounds)
-        }
-        return cachedPlaces
-    }
-
-    @Suppress("TooGenericExceptionCaught")
-    private fun fetchPlacesFromApiAsync(bounds: LatLngBounds) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val newPlaces = fetchPlacesFromApi(bounds)
-                Log.d("PlaceRepository", "Fetched ${newPlaces.size} places from API")
-                if (newPlaces.isNotEmpty()) {
-                    placesDao.insertPlaces(newPlaces)
-                    placesFtsDao.insertPlaces(
-                        newPlaces.map {
-                            PlaceFts(
-                                rowId = it.id,
-                                name = it.name
-                            )
-                        }
-                    )
-                }
-            } catch (e: Exception) {
-                Log.e("PlaceRepository", "Error fetching places from API", e)
-                // TODO
-            }
-        }
-    }
-
-    private suspend fun fetchPlacesFromApi(bounds: LatLngBounds): List<Place> {
-        val boundStr = "${bounds.southwest.latitude}," +
-                "${bounds.southwest.longitude}," +
-                "${bounds.northeast.latitude}," +
-                "${bounds.northeast.longitude}"
-        val query = OverpassQueryBuilder.buildQuery(boundStr)
-        Log.d("Repository", "Query: $query")
-        val response = apiService.getMarkers(query)
-        return response.elements.mapNotNull {
-            OverpassDataMapper.convertElementToPlace(it)
-        }
-    }
-
-    private fun dataCoversBounds(cachedPlaces: List<Place>, bounds: LatLngBounds): Boolean {
-        if (cachedPlaces.isEmpty()) return false
-
-        val minLat = cachedPlaces.minOf { it.lat }
-        val maxLat = cachedPlaces.maxOf { it.lat }
-        val minLon = cachedPlaces.minOf { it.lon }
-        val maxLon = cachedPlaces.maxOf { it.lon }
-
-        return minLat <= bounds.southwest.latitude &&
-                maxLat >= bounds.northeast.latitude &&
-                minLon <= bounds.southwest.longitude &&
-                maxLon >= bounds.northeast.longitude
+        return apiPlaces
     }
 }

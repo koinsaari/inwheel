@@ -3,6 +3,8 @@ android/app/release/
 local.defaults.properties
 output-metadata.json
 secrets.properties
+*.pbf
+debug/
 
 # General
 .DS_Store
@@ -179,7 +181,6 @@ cover/
 *.pot
 
 # Django stuff:
-*.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal

@@ -6,11 +6,16 @@ plugins {
     alias(libs.plugins.secrets.gradle.plugin)
     id("io.gitlab.arturbosch.detekt").version("1.23.7")
     id("com.github.jk1.dependency-license-report").version("2.9")
+    kotlin("plugin.serialization").version("2.0.0")
 }
 
 android {
     namespace = "com.aarokoinsaari.accessibilitymap"
     compileSdk = 35
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.aarokoinsaari.accessibilitymap"
@@ -23,6 +28,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "SUPABASE_URL", "\"${project.findProperty("SUPABASE_URL")}\"")
+        buildConfigField("String", "SUPABASE_KEY", "\"${project.findProperty("SUPABASE_KEY")}\"")
     }
 
     buildTypes {
@@ -80,12 +88,13 @@ dependencies {
     implementation(libs.maps.compose.utils)
     implementation(libs.maps.compose.widgets)
     implementation(libs.android.maps.utils)
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.room.ktx)
     implementation(libs.accompanist.permissions)
     implementation(libs.play.services.location)
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.0.3"))
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation(libs.ktor.client.android)
     ksp(libs.androidx.room.compiler)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)

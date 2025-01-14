@@ -86,10 +86,14 @@
     <string name="accessible_entrance">"Accessible entrance: "</string>
     <string name="has_ramp">"Ramp: "</string>
     <string name="ramp_steepness">"Ramp not too steep: "</string>
-    <string name="has_elevator">"Elevator: "</string>
+    <string name="lift">"Elevator: "</string>
     <string name="content_desc_phone">Phone number</string>
     <string name="content_desc_email">Email address</string>
     <string name="content_desc_website">Website</string>
     <string name="no_information_for_section">No information available for this section ☹️.</string>
     <string name="info_window_parking">"Parking: "</string>
+    <string name="content_desc_address">Address</string>
+    <string name="door_type">Door type:</string>
+    <string name="parking_surface">"Parking surface: "</string>
+    <string name="parking_type">"Parking type: "</string>
 </resources>

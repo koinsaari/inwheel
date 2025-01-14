@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,56 +16,55 @@
 
 package com.aarokoinsaari.accessibilitymap.data.local
 
+
+import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
 import com.aarokoinsaari.accessibilitymap.model.ContactInfo
-import com.aarokoinsaari.accessibilitymap.model.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityInfo
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-/**
- * This class converts JSON strings to Maps and custom objects for Room
- * because Room cannot handle complex objects directly.
- */
+@ProvidedTypeConverter
 class Converters {
-    private val gson = Gson()
+
+    private val jsonFormat = Json {
+        encodeDefaults = true
+        ignoreUnknownKeys = true
+    }
+
+    // AccessibilityStatus
+    @TypeConverter
+    fun fromAccessibilityStatus(value: AccessibilityStatus?): String? = value?.name
 
     @TypeConverter
-    fun fromStringToMap(value: String?): Map<String, String>? =
-        value?.let {
-            val mapType = object : TypeToken<Map<String, String>>() {}.type
-            gson.fromJson(value, mapType)
-        }
+    fun toAccessibilityStatus(value: String?): AccessibilityStatus? =
+        if (value == null) null else AccessibilityStatus.valueOf(value)
+
+    // AccessibilityInfo
+    @TypeConverter
+    fun fromAccessibilityInfo(value: AccessibilityInfo?): String? {
+        if (value == null) return null
+        return jsonFormat.encodeToString(value)
+    }
 
     @TypeConverter
-    fun fromMapToString(map: Map<String, String>?): String? =
-        gson.toJson(map)
+    fun toAccessibilityInfo(value: String?): AccessibilityInfo? {
+        if (value == null) return null
+        return jsonFormat.decodeFromString(value)
+    }
+
+    // ContactInfo
+    @TypeConverter
+    fun fromContactInfo(info: ContactInfo?): String? {
+        if (info == null) return null
+        return jsonFormat.encodeToString(info)
+    }
 
     @TypeConverter
-    fun fromStringToAccessibilityInfo(value: String?): AccessibilityInfo? =
-        value?.let {
-            gson.fromJson(value, AccessibilityInfo::class.java)
-        }
+    fun toContactInfo(json: String?): ContactInfo? {
+        if (json == null) return null
+        return jsonFormat.decodeFromString(json)
+    }
 
-    @TypeConverter
-    fun fromAccessibilityInfoToString(info: AccessibilityInfo?): String? =
-        gson.toJson(info)
-
-    @TypeConverter
-    fun fromPlaceCategoryToString(value: String?): PlaceCategory? =
-        value?.let { PlaceCategory.fromAmenityTag(it) }
-
-    @TypeConverter
-    fun placeCategoryToString(category: PlaceCategory?): String? =
-        category?.amenityTag
-
-    @TypeConverter
-    fun fromStringToContactInfo(value: String?): ContactInfo? =
-        value?.let {
-            gson.fromJson(value, ContactInfo::class.java)
-        }
-
-    @TypeConverter
-    fun fromContactInfoToString(info: ContactInfo?): String? =
-        gson.toJson(info)
 }

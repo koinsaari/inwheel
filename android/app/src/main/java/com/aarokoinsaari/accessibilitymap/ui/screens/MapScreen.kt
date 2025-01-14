@@ -81,20 +81,17 @@ import com.aarokoinsaari.accessibilitymap.model.ContactInfo
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.model.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityInfo
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityInfo.GeneralAccessibility.EntranceAccessibility
 import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus.FULLY_ACCESSIBLE
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus.LIMITED_ACCESSIBILITY
 import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus.NOT_ACCESSIBLE
-import com.aarokoinsaari.accessibilitymap.model.accessibility.ElevatorInfo
-import com.aarokoinsaari.accessibilitymap.model.accessibility.EntranceDoor
-import com.aarokoinsaari.accessibilitymap.model.accessibility.EntranceInfo
-import com.aarokoinsaari.accessibilitymap.model.accessibility.EntranceSteps
-import com.aarokoinsaari.accessibilitymap.model.accessibility.MiscellaneousInfo
-import com.aarokoinsaari.accessibilitymap.model.accessibility.ParkingInfo
-import com.aarokoinsaari.accessibilitymap.model.accessibility.ParkingInfo.ParkingType
-import com.aarokoinsaari.accessibilitymap.model.accessibility.RestroomInfo
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus.UNKNOWN
+import com.aarokoinsaari.accessibilitymap.model.accessibility.accessibilityStatus
 import com.aarokoinsaari.accessibilitymap.state.ErrorState
 import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.aarokoinsaari.accessibilitymap.ui.components.PlaceSearchBar
-import com.aarokoinsaari.accessibilitymap.ui.extensions.getColor
+import com.aarokoinsaari.accessibilitymap.ui.extensions.getAccessibilityStatusColor
 import com.aarokoinsaari.accessibilitymap.ui.extensions.getEmojiStringRes
 import com.aarokoinsaari.accessibilitymap.ui.models.PlaceClusterItem
 import com.aarokoinsaari.accessibilitymap.utils.extensions.getLastLocationSuspended
@@ -121,7 +118,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MapScreen(
     stateFlow: StateFlow<MapState>,
-    onIntent: (MapIntent) -> Unit = { }
+    onIntent: (MapIntent) -> Unit = { },
 ) {
     val state by stateFlow.collectAsState()
     val context = LocalContext.current
@@ -229,9 +226,8 @@ fun MapScreen(
                         modifier = Modifier
                             .size(24.dp)
                             .background(
-                                color = item.placeData
-                                    .determineAccessibilityStatus()
-                                    .getColor(),
+                                color = item.placeData.accessibility.accessibilityStatus
+                                    .getAccessibilityStatusColor(),
                                 shape = CircleShape
                             )
                             .padding(all = 6.dp),
@@ -314,6 +310,7 @@ fun MapScreen(
             )
 
             FilterChipRow(
+                categories = PlaceCategory.entries,
                 selectedCategories = state.selectedCategories,
                 onIntent = onIntent,
                 modifier = Modifier
@@ -358,17 +355,14 @@ fun MapScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FilterChipRow(
-    selectedCategories: Set<PlaceCategory>,
+    categories: List<PlaceCategory>,
+    selectedCategories: Set<String>,
+    modifier: Modifier = Modifier,
     onIntent: (MapIntent) -> Unit = { },
-    modifier: Modifier = Modifier
 ) {
-    val categories = PlaceCategory.entries.toTypedArray()
-
-    LazyRow(
-        modifier = modifier
-    ) {
+    LazyRow(modifier = modifier) {
         items(categories) { category ->
-            val isSelected = selectedCategories.contains(category)
+            val isSelected = selectedCategories.contains(category.name.lowercase())
             val haptic = LocalHapticFeedback.current
 
             FilterChip(
@@ -377,7 +371,11 @@ fun FilterChipRow(
                     onIntent(MapIntent.ToggleFilter(category))
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove) // TODO
                 },
-                label = { Text(text = category.defaultName) },
+                label = {
+                    Text(
+                        text = stringResource(id = category.displayNameResId)
+                    )
+                },
                 leadingIcon = if (isSelected) {
                     { Icon(Icons.Default.Check, contentDescription = null) }
                 } else {
@@ -389,8 +387,7 @@ fun FilterChipRow(
                     }
                 },
                 colors = FilterChipDefaults.filterChipColors(
-                    // TODO: Use MaterialTheme
-                    containerColor = Color.White
+                    containerColor = Color.White // TODO: Use MaterialTheme
                 ),
                 border = FilterChipDefaults.filterChipBorder(
                     enabled = false,
@@ -421,7 +418,7 @@ fun MapPlaceMarker(category: PlaceCategory, modifier: Modifier = Modifier) {
 fun MarkerInfoWindow(
     item: PlaceClusterItem,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = { }
+    onClick: () -> Unit = { },
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
@@ -429,14 +426,13 @@ fun MarkerInfoWindow(
         modifier = modifier
     ) {
         InfoWindowAccessibilityImage(
-            status = item.placeData.determineAccessibilityStatus(),
+            status = item.placeData.accessibility.accessibilityStatus,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .size(96.dp)
                 .background(
-                    color = item.placeData
-                        .determineAccessibilityStatus()
-                        .getColor(),
+                    color = item.placeData.accessibility.accessibilityStatus
+                        .getAccessibilityStatusColor(),
                     shape = CircleShape
                 )
         )
@@ -449,31 +445,28 @@ fun MarkerInfoWindow(
             modifier = Modifier.widthIn(max = 200.dp)
         )
         Text(
-            text = stringResource(id = item.placeData.category.nameResId),
+            text = stringResource(id = item.placeData.category.displayNameResId),
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(bottom = 16.dp)
         )
         InfoWindowAccessibilityInfo(
             infoLabel = stringResource(id = R.string.accessible_entrance),
             status = stringResource(
-                id = item.placeData.accessibility?.entranceInfo
-                    ?.determineAccessibilityStatus()
+                id = item.placeData.accessibility.accessibilityStatus
                     .getEmojiStringRes()
             )
         )
         InfoWindowAccessibilityInfo(
             infoLabel = stringResource(id = R.string.accessibility_toilet_label),
             status = stringResource(
-                id = item.placeData.accessibility?.restroomInfo
-                    ?.determineAccessibilityStatus()
+                id = item.placeData.accessibility.accessibilityStatus
                     .getEmojiStringRes()
             )
         )
         InfoWindowAccessibilityInfo(
             infoLabel = stringResource(id = R.string.info_window_parking),
             status = stringResource(
-                id = item.placeData.accessibility?.parkingInfo
-                    ?.determineAccessibilityStatus()
+                id = item.placeData.accessibility.accessibilityStatus
                     .getEmojiStringRes()
             )
         )
@@ -491,7 +484,7 @@ fun MarkerInfoWindow(
 @Composable
 fun InfoWindowAccessibilityImage(
     status: AccessibilityStatus?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -515,7 +508,7 @@ fun InfoWindowAccessibilityImage(
 fun InfoWindowAccessibilityInfo(
     infoLabel: String,
     status: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -536,7 +529,7 @@ fun InfoWindowAccessibilityInfo(
 @Composable
 fun NotificationBar(
     message: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
@@ -558,7 +551,7 @@ fun NotificationBar(
 
 private fun moveCameraToUserLocation(
     fusedLocationProviderClient: FusedLocationProviderClient,
-    cameraPositionState: CameraPositionState
+    cameraPositionState: CameraPositionState,
 ) {
     val location = fusedLocationProviderClient.getLastLocationSuspended()
     location?.let {
@@ -581,80 +574,61 @@ private fun ErrorState.getErrorStringRes(): Int? =
 private fun MapInfoPopup_Preview() {
     val contactInfo = ContactInfo(
         email = "example@mail.com",
-        phone = "+41123123123",
-        website = "https://www.example.com"
-    )
-    val entranceSteps = EntranceSteps(
-        hasStairs = true,
-        stepCount = 1,
-        ramp = AccessibilityStatus.FULLY_ACCESSIBLE,
-        elevator = AccessibilityStatus.LIMITED_ACCESSIBILITY
+        phone = "+41 21 123 45 67",
+        website = "https://www.example.com",
+        address = "Grande Place 1, Vevey 1800"
     )
 
-    val entranceDoor = EntranceDoor(
-        doorOpening = AccessibilityStatus.FULLY_ACCESSIBLE,
-        automaticDoor = false
-    )
-
-    val entranceInfo = EntranceInfo(
-        stepsInfo = entranceSteps,
-        doorInfo = entranceDoor,
-        additionalInfo = "Main entrance has a moderately steep ramp and a non-automatic wide door."
-    )
-
-    val restroomInfo = RestroomInfo(
-        grabRails = AccessibilityStatus.FULLY_ACCESSIBLE,
-        doorWidth = true,
-        roomSpaciousness = AccessibilityStatus.FULLY_ACCESSIBLE,
-        hasEmergencyAlarm = false,
-        euroKey = false,
-        additionalInfo = "Accessible restroom on the first floor."
-    )
-
-    val parkingInfo = ParkingInfo(
-        hasAccessibleSpots = true,
-        spotCount = 3,
-        parkingType = ParkingType.SURFACE,
-        hasSmoothSurface = true,
-        hasElevator = false,
-        additionalInfo = "Parking spots near the entrance."
-    )
-
-    val miscInfo = MiscellaneousInfo(
-        level = 1,
-        hasElevator = true,
-        elevatorInfo = ElevatorInfo(
-            isAvailable = true,
-            isSpaciousEnough = true,
-            hasBrailleButtons = true,
-            hasAudioAnnouncements = true,
-            additionalInfo = "Elevator has braille and audio guidance."
+    val entranceAccessibility = EntranceAccessibility(
+        accessibilityStatus = FULLY_ACCESSIBLE,
+        steps = EntranceAccessibility.StepsAccessibility(
+            stepCount = 0,
+            stepHeight = null,
+            ramp = FULLY_ACCESSIBLE,
+            lift = UNKNOWN
         ),
-        additionalInfo = "Ground level accessible without stairs."
+        door = EntranceAccessibility.DoorAccessibility(
+            doorWidth = FULLY_ACCESSIBLE,
+            doorType = "Automatic"
+        ),
+        additionalInfo = "Entrance is fully accessible with automatic doors."
     )
 
-    val accessibilityInfo = AccessibilityInfo(
-        entranceInfo = entranceInfo,
-        restroomInfo = restroomInfo,
-        parkingInfo = parkingInfo,
-        miscInfo = miscInfo,
-        additionalInfo = "Very accessible."
+    val restroomAccessibility = AccessibilityInfo.GeneralAccessibility.RestroomAccessibility(
+        accessibility = NOT_ACCESSIBLE,
+        doorWidth = FULLY_ACCESSIBLE,
+        roomManeuver = NOT_ACCESSIBLE,
+        grabRails = LIMITED_ACCESSIBILITY,
+        toiletSeat = FULLY_ACCESSIBLE,
+        emergencyAlarm = NOT_ACCESSIBLE,
+        sink = FULLY_ACCESSIBLE,
+        euroKey = false,
+        accessibleVia = "Elevator",
+        additionalInfo = "Not accessible restroom on the ground floor."
+    )
+
+    val generalAccessibility = AccessibilityInfo.GeneralAccessibility(
+        accessibilityStatus = LIMITED_ACCESSIBILITY,
+        indoorAccessibility = FULLY_ACCESSIBLE,
+        entrance = entranceAccessibility,
+        restroom = restroomAccessibility,
+        additionalInfo = "This location is mostly accessible."
+    )
+
+    val place = Place(
+        id = "1",
+        name = "Example Cafe",
+        category = PlaceCategory.CAFE,
+        lat = 46.460071,
+        lon = 6.843391,
+        contact = contactInfo,
+        accessibility = generalAccessibility
     )
 
     MaterialTheme {
         MarkerInfoWindow(
             PlaceClusterItem(
-                place = Place(
-                    id = 1L,
-                    name = "Example Cafe",
-                    category = PlaceCategory.CAFE,
-                    lat = -37.813,
-                    lon = 144.962,
-                    tags = mapOf("category" to "cafe"),
-                    accessibility = accessibilityInfo,
-                    address = "221B Baker Street",
-                    contactInfo = contactInfo
-                ),
+                place = place,
                 zIndex = 1f
             )
         )

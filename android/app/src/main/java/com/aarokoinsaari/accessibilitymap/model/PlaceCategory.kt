@@ -21,78 +21,43 @@ import androidx.annotation.StringRes
 import com.aarokoinsaari.accessibilitymap.R
 
 enum class PlaceCategory(
-    val amenityTag: String,
-    @DrawableRes val iconResId: Int,
-    @StringRes val nameResId: Int,
-    val defaultName: String // Fallback when place does not have a name tag
+    val rawValue: String,
+    @StringRes val displayNameResId: Int,
+    @DrawableRes val iconResId: Int
 ) {
-    CAFE(
-        "cafe",
-        R.drawable.ic_cafe,
-        R.string.category_cafe,
-        "Cafe"
-    ),
+
     RESTAURANT(
-        "restaurant",
-        R.drawable.ic_restaurant,
-        R.string.category_restaurant,
-        "Restaurant"
+        rawValue = "restaurant",
+        displayNameResId = R.string.category_restaurant,
+        iconResId = R.drawable.ic_restaurant
     ),
-    TOILETS(
-        "toilets",
-        R.drawable.ic_wc,
-        R.string.category_toilets,
-        "Toilets"
+    CAFE(
+        rawValue = "cafe",
+        displayNameResId = R.string.category_cafe,
+        iconResId = R.drawable.ic_cafe
     ),
     PARKING(
-        "parking",
-        R.drawable.ic_parking_area,
-        R.string.category_parking,
-        "Parking Area"
+        rawValue = "parking",
+        displayNameResId = R.string.category_parking,
+        iconResId = R.drawable.ic_parking_area
     ),
-    SUPERMARKET(
-        "supermarket",
-        R.drawable.ic_grocery_store,
-        R.string.category_supermarket,
-        "Supermarket"
+    TOILETS(
+        rawValue = "toilets",
+        displayNameResId = R.string.category_toilets,
+        iconResId = R.drawable.ic_wc
     ),
-    SHOP(
-        "shop",
-        R.drawable.ic_shop,
-        R.string.category_shop,
-        "Shop"
-    ),
-    PHARMACY(
-        "pharmacy",
-        R.drawable.ic_pharmacy,
-        R.string.category_pharmacy,
-        "Pharmacy"
-    ),
-    HOSPITAL(
-        "hospital",
-        R.drawable.ic_hospital,
-        R.string.category_hospital,
-        "Hospital"
-    ),
-    BEACH(
-        "beach",
-        R.drawable.ic_beach,
-        R.string.category_beach,
-        "Beach"
-    ),
-    DEFAULT(
-        "default",
-        R.drawable.ic_default_marker,
-        R.string.category_default,
-        "Unknown"
+    UNKNOWN(
+        rawValue = "unknown",
+        displayNameResId = R.string.category_default,
+        iconResId = R.drawable.ic_default_marker
     );
+    // TODO
 
     companion object {
-        fun mapOverpassTagToCategory(apiTag: String): PlaceCategory =
-            PlaceCategory.entries.find { it.amenityTag == apiTag.lowercase() } ?: DEFAULT
-
-        // Used in data converter for Room
-        fun fromAmenityTag(tag: String): PlaceCategory =
-            entries.find { it.amenityTag.equals(tag, ignoreCase = true) } ?: DEFAULT
+        fun fromRawValue(value: String?): PlaceCategory {
+            if (value.isNullOrBlank()) return UNKNOWN
+            return PlaceCategory.entries.firstOrNull { it.rawValue.equals(value, ignoreCase = true) }
+                ?: UNKNOWN
+        }
     }
 }

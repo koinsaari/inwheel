@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface PlacesDao {
     @Query("SELECT * FROM places WHERE lat BETWEEN :southLat AND :northLat AND lon BETWEEN :westLon AND :eastLon")
-    suspend fun getPlacesWithinBounds(
-        southLat: Double,
-        northLat: Double,
-        westLon: Double,
-        eastLon: Double
-    ): List<Place>
-
-    @Query("SELECT * FROM places WHERE lat BETWEEN :southLat AND :northLat AND lon BETWEEN :westLon AND :eastLon")
     fun getPlacesFlowWithinBounds(
         southLat: Double,
         northLat: Double,
@@ -42,14 +34,8 @@ interface PlacesDao {
         eastLon: Double
     ): Flow<List<Place>>
 
-    @Query("SELECT * FROM places")
-    suspend fun getAllPlaces(): List<Place>
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlaces(places: List<Place>)
-
-    @Query("SELECT * FROM places")
-    fun getAllPlacesFlow(): Flow<List<Place>>
 }
 
 @Dao
