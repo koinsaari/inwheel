@@ -1,42 +1,9 @@
-# The application
+# The project
 
-This is a modern Android application designed to provide detailed information about the
-accessibility of various places. The goal of this app is to help users, especially those in
-wheelchair to easily find accessible locations and services. Please note that this is still in early
-development, so not all features are fully stable or functional.
+This is a multi-platform application project that focuses on providing detailed accessibility information for different places (restaurants, etc.) in Switzerland. The project is still in its early stages, and currently, only the Android version is under development.
 
-## Features
-
-- Search for accessible locations (fetched from Overpass API)
-- Detailed information about entrance, parking, restrooms, and more
-- Map-based interface using Google Maps API
-
-## How to run
-
-To run this application locally you'll need your own Google Maps API key.
-
-### Steps to run locally
-
-1. Clone the repository.
-2. Go to Google Cloud Console, create a project and enable **Google Maps API** to it.
-3. Create secrets.properties file in the root of the project
-4. Add your generated API key to the file:
-
-    ```bash
-    MAPS_API_KEY={your_api_key_}
-    ```
-
-5. Run the app in Android Studio.
-
-If you'd like to test the app without setting up the API key, you can join as a tester via Firebase.
-Please reach out to me at aaro.koinsaari@proton.me for more information.
-
-## Contributing
-
-Contributions to this project are welcome! If you're interested in improving the app, fixing bugs,
-or adding new features, feel free to open a pull request or an issue. See the project board
-at (https://github.com/users/AaroKoinsaari/projects/1).
+The goal of this project is to provide detailed and reliable accessibility information for places across Switzerland, specifically tailored for individuals with disabilities. We use a custom database built on top of OpenStreetMap (OSM) data to provide this. The problem is that OSM data does not provide comprehensive or consistent accessibility information, and obtaining such data from other platforms like Google Maps is often costly and restrictive. This project aims to address these issues by building a platform where users can easily contribute and update accessibility details themselves.
 
 ## Contact
 
-For any questions or support, please contact me at aaro.koinsaari@proton.me.
+For any questions or support, please contact me at [aaro.koinsaari@proton.me](mailto:aaro.koinsaari@proton.me).
