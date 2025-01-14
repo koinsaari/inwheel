@@ -22,48 +22,48 @@ import com.aarokoinsaari.accessibilitymap.data.remote.supabase.SupabaseApiServic
 import com.aarokoinsaari.accessibilitymap.data.remote.supabase.toDomain
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.google.android.gms.maps.model.LatLngBounds
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 
 class PlaceRepository(
-    private val supabaseApiService: SupabaseApiService,
-    private val placesDao: PlacesDao,
-//    private val placesFtsDao: PlacesFtsDao
+    private val api: SupabaseApiService,
+    private val dao: PlacesDao,
+//    private val ftsDao: PlacesFtsDao,
 ) {
     fun observePlacesWithinBounds(bounds: LatLngBounds): Flow<List<Place>> =
-        placesDao.getPlacesFlowWithinBounds(
+        dao.getPlacesFlowWithinBounds(
             southLat = bounds.southwest.latitude,
             northLat = bounds.northeast.latitude,
             westLon = bounds.southwest.longitude,
             eastLon = bounds.northeast.longitude
         )
 
-    suspend fun loadPlacesWithinBounds(bounds: LatLngBounds, limit: Int = 50) {
-        val newPlaces = supabaseApiService.fetchPlacesWithGeom(
+    suspend fun fetchAndStorePlaces(
+        bounds: LatLngBounds,
+        existingIds: Set<String> = emptySet(),
+    ): List<Place> {
+        delay(300)
+        val apiPlaces = api.fetchPlacesInBBox(
             westLon = bounds.southwest.longitude,
             southLat = bounds.southwest.latitude,
             eastLon = bounds.northeast.longitude,
             northLat = bounds.northeast.latitude,
-            limit = limit
         ).map { it.toDomain() }
-        Log.d("PlaceRepository", "Loaded ${newPlaces.size} places")
+        Log.d("PlaceRepository", "Loaded ${apiPlaces.size} places from API")
 
-        if (newPlaces.isNotEmpty()) {
-            placesDao.insertPlaces(newPlaces)
-            Log.d("PlaceRepository", "Inserted ${newPlaces.size} places into database")
+        if (apiPlaces.isNotEmpty()) {
+            val newPlaces = apiPlaces
+                .filterNot { it.id in existingIds }
+                .distinctBy { it.id }
+            dao.insertPlaces(newPlaces)
+            Log.d("PlaceRepository", "Inserted ${newPlaces.size} new places into Room")
+
+//            val ftsPlaces = newPlaces
+//                .filterNot { it.category.name.lowercase() in setOf("toilets", "parking", "unknown") }
+//                .map { PlaceFts(rowId = it.id, name = it.name) }
+//            ftsDao.insertPlaces(ftsPlaces)
+//            Log.d("PlaceRepository", "Inserted ${ftsPlaces.size} places into FTS")
         }
-    }
-
-    private fun dataCoversBounds(cachedPlaces: List<Place>, bounds: LatLngBounds): Boolean {
-        if (cachedPlaces.isEmpty()) return false
-
-        val minLat = cachedPlaces.minOf { it.lat }
-        val maxLat = cachedPlaces.maxOf { it.lat }
-        val minLon = cachedPlaces.minOf { it.lon }
-        val maxLon = cachedPlaces.maxOf { it.lon }
-
-        return minLat <= bounds.southwest.latitude &&
-                maxLat >= bounds.northeast.latitude &&
-                minLon <= bounds.southwest.longitude &&
-                maxLon >= bounds.northeast.longitude
+        return apiPlaces
     }
 }

@@ -33,12 +33,11 @@ import io.ktor.http.isSuccess
 class SupabaseApiService(
     private val httpClient: HttpClient,
 ) {
-    suspend fun fetchPlacesWithGeom(
+    suspend fun fetchPlacesInBBox(
         westLon: Double,
         southLat: Double,
         eastLon: Double,
         northLat: Double,
-        limit: Int = 50
     ): List<PlaceDto> {
         val url = "${BuildConfig.SUPABASE_URL}/rest/v1/rpc/places_in_bbox"
 
@@ -59,6 +58,7 @@ class SupabaseApiService(
             Log.d("SupabaseApiService", "Response: ${response.status}")
 
             if (response.status.isSuccess()) {
+                Log.d("SupabaseApiService", "Response body: ${response.body<List<PlaceDto>>()}")
                 response.body()
             } else {
                 val errorBody = response.bodyAsText()

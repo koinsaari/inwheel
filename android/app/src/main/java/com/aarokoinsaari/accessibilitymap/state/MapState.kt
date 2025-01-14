@@ -23,7 +23,7 @@ import com.google.android.gms.maps.model.LatLngBounds
 
 data class MapState(
     val clusterItems: List<PlaceClusterItem> = emptyList(), // Cluster items within current bounds
-    val allClusterItems: List<PlaceClusterItem> = emptyList(),
+    val allClusterItems: List<PlaceClusterItem> = emptyList(), // cached items
     val selectedClusterItem: PlaceClusterItem? = null,
     val selectedPlace: Place? = null, // Used for place details
     val selectedCategories: Set<String> = emptySet(),
