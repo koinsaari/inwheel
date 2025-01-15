@@ -96,4 +96,5 @@
     <string name="door_type">Door type:</string>
     <string name="parking_surface">"Parking surface: "</string>
     <string name="parking_type">"Parking type: "</string>
+    <string name="content_desc_close">Close</string>
 </resources>

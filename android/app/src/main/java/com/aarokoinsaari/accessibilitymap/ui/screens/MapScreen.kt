@@ -23,7 +23,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,9 +41,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -252,6 +253,7 @@ fun MapScreen(
                 MarkerInfoWindow(
                     item = selectedItem,
                     onClick = { onIntent(MapIntent.SelectPlace(selectedItem.placeData)) },
+                    onClose = { onIntent(MapIntent.ClickMap(null)) },
                     modifier = Modifier
                         .onGloballyPositioned { coordinates ->
                             popupSize = coordinates.size
@@ -263,11 +265,9 @@ fun MapScreen(
                             )
                         }
                         .background(
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.surface,
                             shape = RoundedCornerShape(16.dp)
                         )
-                        .padding(16.dp)
-                        .clickable { onIntent(MapIntent.SelectPlace(selectedItem.placeData)) }
                 )
             }
         }
@@ -419,64 +419,77 @@ fun MarkerInfoWindow(
     item: PlaceClusterItem,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = { },
+    onClose: () -> Unit = { }
 ) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.Start,
-        modifier = modifier
-    ) {
-        InfoWindowAccessibilityImage(
-            status = item.placeData.accessibility.accessibilityStatus,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .size(96.dp)
-                .background(
-                    color = item.placeData.accessibility.accessibilityStatus
-                        .getAccessibilityStatusColor(),
-                    shape = CircleShape
-                )
-        )
-        Spacer(Modifier.height(24.dp))
-        Text(
-            text = item.placeData.name,
-            style = MaterialTheme.typography.titleMedium,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.widthIn(max = 200.dp)
-        )
-        Text(
-            text = stringResource(id = item.placeData.category.displayNameResId),
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        InfoWindowAccessibilityInfo(
-            infoLabel = stringResource(id = R.string.accessible_entrance),
-            status = stringResource(
-                id = item.placeData.accessibility.accessibilityStatus
-                    .getEmojiStringRes()
-            )
-        )
-        InfoWindowAccessibilityInfo(
-            infoLabel = stringResource(id = R.string.accessibility_toilet_label),
-            status = stringResource(
-                id = item.placeData.accessibility.accessibilityStatus
-                    .getEmojiStringRes()
-            )
-        )
-        InfoWindowAccessibilityInfo(
-            infoLabel = stringResource(id = R.string.info_window_parking),
-            status = stringResource(
-                id = item.placeData.accessibility.accessibilityStatus
-                    .getEmojiStringRes()
-            )
-        )
-        Spacer(Modifier.height(16.dp))
-        TextButton(
-            onClick = onClick,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
+    Box(modifier) {
+        IconButton(
+            onClick = onClose,
+            modifier = Modifier.align(Alignment.TopEnd)
         ) {
-            Text(text = stringResource(R.string.info_window_view_details))
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(id = R.string.content_desc_close),
+                tint = Color.LightGray // TODO: Use MaterialTheme
+            )
+        }
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            InfoWindowAccessibilityImage(
+                status = item.placeData.accessibility.accessibilityStatus,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .size(96.dp)
+                    .background(
+                        color = item.placeData.accessibility.accessibilityStatus
+                            .getAccessibilityStatusColor(),
+                        shape = CircleShape
+                    )
+            )
+            Spacer(Modifier.height(24.dp))
+            Text(
+                text = item.placeData.name,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.widthIn(max = 200.dp)
+            )
+            Text(
+                text = stringResource(id = item.placeData.category.displayNameResId),
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            InfoWindowAccessibilityInfo(
+                infoLabel = stringResource(id = R.string.accessible_entrance),
+                status = stringResource(
+                    id = item.placeData.accessibility.accessibilityStatus
+                        .getEmojiStringRes()
+                )
+            )
+            InfoWindowAccessibilityInfo(
+                infoLabel = stringResource(id = R.string.accessibility_toilet_label),
+                status = stringResource(
+                    id = item.placeData.accessibility.accessibilityStatus
+                        .getEmojiStringRes()
+                )
+            )
+            InfoWindowAccessibilityInfo(
+                infoLabel = stringResource(id = R.string.info_window_parking),
+                status = stringResource(
+                    id = item.placeData.accessibility.accessibilityStatus
+                        .getEmojiStringRes()
+                )
+            )
+            Spacer(Modifier.height(16.dp))
+            TextButton(
+                onClick = onClick,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+            ) {
+                Text(text = stringResource(R.string.info_window_view_details))
+            }
         }
     }
 }

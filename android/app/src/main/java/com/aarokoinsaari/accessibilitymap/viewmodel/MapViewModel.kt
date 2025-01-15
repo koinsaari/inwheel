@@ -117,7 +117,13 @@ class MapViewModel(private val repository: PlaceRepository) : ViewModel() {
                 zoomLevel = intent.zoomLevel,
                 center = intent.center,
                 currentBounds = intent.bounds,
-                isLoading = true
+                isLoading = true,
+                selectedClusterItem = if (it.selectedClusterItem != null &&
+                    !intent.bounds.contains(it.selectedClusterItem.position)) {
+                    null // closes the info window when out of view
+                } else {
+                    it.selectedClusterItem
+                }
             )
         }
         Log.d("MapViewModel", "MapState before observe: ${_state.value}")
