@@ -21,7 +21,11 @@ import com.aarokoinsaari.accessibilitymap.data.local.PlacesDao
 import com.aarokoinsaari.accessibilitymap.data.remote.supabase.SupabaseApiService
 import com.aarokoinsaari.accessibilitymap.data.remote.supabase.toDomain
 import com.aarokoinsaari.accessibilitymap.model.Place
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 
@@ -43,17 +47,25 @@ class PlaceRepository(
         existingIds: Set<String> = emptySet(),
     ) {
         delay(300)
-        val apiPlaces = api.fetchPlacesInBBox(
-            westLon = bounds.southwest.longitude,
-            southLat = bounds.southwest.latitude,
-            eastLon = bounds.northeast.longitude,
-            northLat = bounds.northeast.latitude,
-        ).map { it.toDomain() }
-        Log.d("PlaceRepository", "Loaded ${apiPlaces.size} places from API")
+        val subBounds = splitBoundsIntoFour(bounds = bounds)
+        val apiPlaces = coroutineScope {
+            subBounds.map { sub ->
+                async {
+                    api.fetchPlacesInBBox(
+                        westLon = sub.southwest.longitude,
+                        southLat = sub.southwest.latitude,
+                        eastLon = sub.northeast.longitude,
+                        northLat = sub.northeast.latitude
+                    )
+                }
+            }
+            .awaitAll().flatten()
+        }
 
         if (apiPlaces.isNotEmpty()) {
             val newPlaces = apiPlaces
                 .filterNot { it.id in existingIds }
+                .map { it.toDomain() }
                 .distinctBy { it.id }
             dao.insertPlaces(newPlaces)
             Log.d("PlaceRepository", "Inserted ${newPlaces.size} new places into Room")
@@ -64,5 +76,33 @@ class PlaceRepository(
 //            ftsDao.insertPlaces(ftsPlaces)
 //            Log.d("PlaceRepository", "Inserted ${ftsPlaces.size} places into FTS")
         }
+    }
+
+    private fun splitBoundsIntoFour(bounds: LatLngBounds, ): List<LatLngBounds> {
+        val midLat = (bounds.southwest.latitude + bounds.northeast.latitude) / 2
+        val midLon = (bounds.southwest.longitude + bounds.northeast.longitude) / 2
+
+        val sw = LatLng(bounds.southwest.latitude, bounds.southwest.longitude)
+        val ne = LatLng(bounds.northeast.latitude, bounds.northeast.longitude)
+        val midSW = LatLng(midLat, midLon)
+
+        return listOf(
+            LatLngBounds(
+                sw,
+                LatLng(midLat, midLon)  // (southwest)
+            ),
+            LatLngBounds(
+                LatLng(bounds.southwest.latitude, midLon),
+                LatLng(midLat, bounds.northeast.longitude) // (southeast)
+            ),
+            LatLngBounds(
+                LatLng(midLat, bounds.southwest.longitude),
+                LatLng(bounds.northeast.latitude, midLon)   // (northwest)
+            ),
+            LatLngBounds(
+                midSW,
+                ne  // (northeast)
+            )
+        )
     }
 }

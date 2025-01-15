@@ -69,6 +69,7 @@ class MapViewModel(
             _state.map { it.currentBounds }
                 .filterNotNull()
                 .distinctUntilChanged()
+                .debounce(DEBOUNCE_VALUE)
                 .flatMapLatest { bounds -> repository.observePlacesWithinBounds(bounds) }
                 .map { places -> places.take(MAX_CLUSTER_ITEMS).map { it.toClusterItem() } }
                 .collect { clusterItems ->
@@ -242,6 +243,6 @@ class MapViewModel(
         private const val MAX_CLUSTER_ITEMS = 500
         private const val ZOOM_THRESHOLD = 12
         private const val EXPAND_FACTOR = 1.5
-        private const val DEBOUNCE_VALUE = 400L
+        private const val DEBOUNCE_VALUE = 300L
     }
 }
