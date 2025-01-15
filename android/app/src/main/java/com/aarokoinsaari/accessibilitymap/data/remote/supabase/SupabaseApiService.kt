@@ -28,6 +28,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import java.util.concurrent.CancellationException
 
 @Suppress("TooGenericExceptionCaught")
 class SupabaseApiService(
@@ -55,7 +56,7 @@ class SupabaseApiService(
                     )
                 )
             }
-            Log.d("SupabaseApiService", "Response: ${response.status}")
+            Log.d("SupabaseApiService", "Response status: ${response.status}")
 
             if (response.status.isSuccess()) {
                 Log.d("SupabaseApiService", "Response body: ${response.body<List<PlaceDto>>()}")
@@ -65,6 +66,9 @@ class SupabaseApiService(
                 Log.e("SupabaseApiService", "Error response: ${response.status}, Body: $errorBody")
                 emptyList()
             }
+        } catch (e: CancellationException) {
+            Log.d("SupabaseApiService", "Request was cancelled", e)
+            emptyList()
         } catch (e: Exception) {
             Log.e("SupabaseApiService", "Error fetching places", e)
             emptyList()

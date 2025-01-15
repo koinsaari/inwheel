@@ -41,7 +41,7 @@ class PlaceRepository(
     suspend fun fetchAndStorePlaces(
         bounds: LatLngBounds,
         existingIds: Set<String> = emptySet(),
-    ): List<Place> {
+    ) {
         delay(300)
         val apiPlaces = api.fetchPlacesInBBox(
             westLon = bounds.southwest.longitude,
@@ -64,6 +64,5 @@ class PlaceRepository(
 //            ftsDao.insertPlaces(ftsPlaces)
 //            Log.d("PlaceRepository", "Inserted ${ftsPlaces.size} places into FTS")
         }
-        return apiPlaces
     }
 }

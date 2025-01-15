@@ -27,36 +27,57 @@ import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.aarokoinsaari.accessibilitymap.ui.models.PlaceClusterItem
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-@OptIn(FlowPreview::class)
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class MapViewModel(private val repository: PlaceRepository) : ViewModel() {
     private val _state = MutableStateFlow(MapState())
     val state: StateFlow<MapState> = _state.asStateFlow()
 
-    private var observeJob: Job? = null
+    private var fetchJob: Job? = null
 
     init {
         // Handle search query changes
         viewModelScope.launch {
-            _state
-                .map { it.searchQuery }
+            _state.map { it.searchQuery }
                 .debounce(DEBOUNCE_VALUE)
                 .distinctUntilChanged()
                 .collect { query ->
                     if (query.isNotBlank()) {
                         applySearchFilter(query)
                     }
+                }
+        }
+
+        // updates cluster items reactively based on changes to currentBounds
+        viewModelScope.launch {
+            _state.map { it.currentBounds }
+                .filterNotNull()
+                .distinctUntilChanged()
+                .flatMapLatest { bounds -> repository.observePlacesWithinBounds(bounds) }
+                .map { places -> places.take(MAX_CLUSTER_ITEMS).map { it.toClusterItem() } }
+                .collect { clusterItems ->
+                    _state.update {
+                        it.copy(
+                            clusterItems = clusterItems,
+                            allClusterItems = (it.allClusterItems + clusterItems)
+                                .distinctBy { it.placeData.id },
+                            isLoading = false
+                        )
+                    }
+                    Log.d("MapViewModel", "Updated cluster items: ${clusterItems.size}")
                 }
         }
     }
@@ -106,44 +127,15 @@ class MapViewModel(private val repository: PlaceRepository) : ViewModel() {
             return
         }
 
-        viewModelScope.launch {
-            val snapshotBounds = _state.value.snapshotBounds
-            if (snapshotBounds == null ||
-                !snapshotBounds.contains(intent.center)
-            ) {
+        val currentSnapshotBounds = _state.value.snapshotBounds
+        if (currentSnapshotBounds == null || !currentSnapshotBounds.contains(intent.center)) {
+            fetchJob?.cancel()
+            fetchJob = viewModelScope.launch {
                 _state.update { it.copy(snapshotBounds = intent.bounds) }
+                val expandedBounds = calculateExpandedBounds(intent.bounds)
                 val existingIds = _state.value.allClusterItems.map { it.placeData.id }.toSet()
-                val fetchedPlaces = repository.fetchAndStorePlaces(_state.value.currentBounds!!, existingIds)
-                Log.d("MapViewModel", "Fetched ${fetchedPlaces.size} places")
-                _state.update { currentState ->
-                    val newClusterItems = fetchedPlaces.map { it.toClusterItem() }
-                    currentState.copy(
-                        allClusterItems = (currentState.allClusterItems + newClusterItems)
-                            .distinctBy { it.placeData.id },
-                        clusterItems = newClusterItems,
-                        isLoading = false
-                    )
-                }
-            } else {
-                _state.update { it.copy(isLoading = false) }
+                repository.fetchAndStorePlaces(expandedBounds, existingIds)
             }
-        }
-
-        observeJob?.cancel()
-        observeJob = viewModelScope.launch {
-            delay(DEBOUNCE_VALUE)
-            repository.observePlacesWithinBounds(intent.bounds)
-                .map { places -> places.take(MAX_CLUSTER_ITEMS) }
-                .collect { list ->
-                    val clusterItems = list.map { it.toClusterItem() }
-                    _state.update {
-                        it.copy(
-                            clusterItems = clusterItems,
-                            isLoading = false
-                        )
-                    }
-                    Log.d("MapViewModel", "MapState after observe: ${_state.value}")
-                }
         }
     }
 
@@ -171,7 +163,6 @@ class MapViewModel(private val repository: PlaceRepository) : ViewModel() {
                 it.copy(
                     clusterItems = emptyList(),
                     currentBounds = null,
-                    snapshotBounds = null,
                     selectedClusterItem = null,
                     isLoading = false
                 )
@@ -226,9 +217,9 @@ class MapViewModel(private val repository: PlaceRepository) : ViewModel() {
     }
 
     companion object {
-        private const val MAX_CLUSTER_ITEMS = 1000
+        private const val MAX_CLUSTER_ITEMS = 500
         private const val ZOOM_THRESHOLD = 12
-        private const val EXPAND_FACTOR = 3.0
+        private const val EXPAND_FACTOR = 1.5
         private const val DEBOUNCE_VALUE = 400L
     }
 }
