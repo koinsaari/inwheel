@@ -96,4 +96,5 @@
     <string name="parking_surface">"Parking surface: "</string>
     <string name="parking_type">"Parking type: "</string>
     <string name="content_desc_close">Close</string>
+    <string name="no_information_available">No information available ☹️.</string>
 </resources>

@@ -17,6 +17,10 @@
 package com.aarokoinsaari.accessibilitymap.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -106,18 +110,18 @@ fun PlaceDetailsScreen(
     val state by stateFlow.collectAsState()
     val place = state.place
 
-    if (place != null) {
-        Scaffold(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            topBar = {
-                PlaceTopAppBar(
-                    place = place,
-                    onIntent = onIntent,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            },
-            content = { innerPadding ->
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        topBar = {
+            PlaceTopAppBar(
+                place = place,
+                onIntent = onIntent,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        content = { innerPadding ->
+            if (place != null) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier
@@ -142,33 +146,44 @@ fun PlaceDetailsScreen(
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                     PlaceDetailsContentSection(place = place, modifier = Modifier)
                 }
-            },
-            modifier = Modifier.fillMaxSize()
-        )
-    } else {
-        TODO()
-    }
+            } else {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                ) {
+                    NoInformationAvailableText(
+                        text = stringResource(R.string.no_information_available)
+                    )
+                }
+            }
+        },
+        modifier = Modifier.fillMaxSize()
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceTopAppBar(
-    place: Place,
+    place: Place?,
     modifier: Modifier = Modifier,
     onIntent: (PlaceDetailsIntent) -> Unit = { },
 ) {
     TopAppBar(
         title = {
-            Column {
-                Text(
-                    text = place.name,
-                    style = MaterialTheme.typography.titleLarge
-                )
-                Text(
-                    text = stringResource(id = place.category.displayNameResId),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                )
+            if (place != null) {
+                Column {
+                    Text(
+                        text = place.name,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(
+                        text = stringResource(id = place.category.displayNameResId),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                }
             }
         },
         navigationIcon = {
@@ -180,20 +195,21 @@ fun PlaceTopAppBar(
             }
         },
         actions = {
-            IconButton(onClick = { onIntent(PlaceDetailsIntent.ClickFavorite(place)) }) {
-                Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
-                    contentDescription = stringResource(id = R.string.content_desc_favourite)
-                )
-            }
-            IconButton(onClick = { onIntent(PlaceDetailsIntent.ClickOptions(place)) }) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = stringResource(id = R.string.content_desc_options)
-                )
+            if (place != null) {
+                IconButton(onClick = { onIntent(PlaceDetailsIntent.ClickFavorite(place)) }) {
+                    Icon(
+                        imageVector = Icons.Default.FavoriteBorder,
+                        contentDescription = stringResource(id = R.string.content_desc_favourite)
+                    )
+                }
+                IconButton(onClick = { onIntent(PlaceDetailsIntent.ClickOptions(place)) }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = stringResource(id = R.string.content_desc_options)
+                    )
+                }
             }
         },
-        // TODO: new colors
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = MaterialTheme.colorScheme.onSurface
@@ -293,7 +309,10 @@ fun ContactDetailsSection(
 }
 
 @Composable
-fun PlaceDetailsContentSection(place: Place, modifier: Modifier = Modifier) {
+fun PlaceDetailsContentSection(
+    place: Place,
+    modifier: Modifier = Modifier,
+) {
     when (place.category.name.lowercase()) {
         "toilets" -> {
             RestroomSection(place.accessibility, modifier)
@@ -315,16 +334,6 @@ fun EntranceSection(
     accessibilityInfo: AccessibilityInfo,
     modifier: Modifier = Modifier,
 ) {
-    if (false) {
-        Text(
-            text = stringResource(R.string.no_information_for_section),
-            style = MaterialTheme.typography.bodyMedium,
-            fontStyle = FontStyle.Italic,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-        )
-        return
-    }
-
     var isExpanded by remember { mutableStateOf(true) }
 
     Row(
@@ -349,7 +358,19 @@ fun EntranceSection(
         )
     }
 
-    AnimatedVisibility(isExpanded) {
+    AnimatedVisibility(
+        visible = isExpanded,
+        enter = expandVertically(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy
+            )
+        ),
+        exit = shrinkVertically(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy
+            )
+        )
+    ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(6.dp),
             horizontalAlignment = Alignment.Start,
@@ -404,12 +425,7 @@ fun RestroomSection(
     modifier: Modifier = Modifier,
 ) {
     if (restroomInfo == null) {
-        Text(
-            text = stringResource(R.string.no_information_for_section),
-            style = MaterialTheme.typography.bodyMedium,
-            fontStyle = FontStyle.Italic,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-        )
+        NoInformationAvailableText(text = stringResource(R.string.no_information_for_section))
         return
     }
 
@@ -437,9 +453,21 @@ fun RestroomSection(
         )
     }
 
-    AnimatedVisibility(isExpanded) {
+    AnimatedVisibility(
+        visible = isExpanded,
+        enter = expandVertically(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy
+            )
+        ),
+        exit = shrinkVertically(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy
+            )
+        )
+    ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(0.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
             horizontalAlignment = Alignment.Start,
             modifier = modifier
         ) {
@@ -493,12 +521,7 @@ fun ParkingSection(
     modifier: Modifier = Modifier,
 ) {
     if (parkingInfo == null) {
-        Text(
-            text = stringResource(R.string.no_information_for_section),
-            style = MaterialTheme.typography.bodyMedium,
-            fontStyle = FontStyle.Italic,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-        )
+        NoInformationAvailableText(text = stringResource(R.string.no_information_for_section))
         return
     }
 
@@ -510,8 +533,8 @@ fun ParkingSection(
             .fillMaxWidth()
             .clickable { isExpanded = !isExpanded }
             .padding(
-                start = ExpandableSectionDefaults.START_PADDING / 2,
-                bottom = ExpandableSectionDefaults.BOTTOM_PADDING
+                horizontal = ExpandableSectionDefaults.START_PADDING / 2,
+                vertical = ExpandableSectionDefaults.BOTTOM_PADDING
             )
     ) {
         Text(
@@ -526,7 +549,19 @@ fun ParkingSection(
         )
     }
 
-    AnimatedVisibility(isExpanded) {
+    AnimatedVisibility(
+        visible = isExpanded,
+        enter = expandVertically(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy
+            )
+        ),
+        exit = shrinkVertically(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy
+            )
+        )
+    ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(6.dp),
             horizontalAlignment = Alignment.Start,
@@ -631,6 +666,20 @@ fun AdditionalInfoRow(
     }
 }
 
+@Composable
+fun NoInformationAvailableText(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        fontStyle = FontStyle.Italic,
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+        modifier = modifier
+    )
+}
+
 // Used only for setting the expandable sections to have same padding values
 // because for now each section is a unique composable.
 object ExpandableSectionDefaults {
@@ -641,7 +690,7 @@ object ExpandableSectionDefaults {
 
 @Preview(showBackground = true)
 @Composable
-private fun MapInfoPopup_Preview() {
+private fun PlaceDetailsScreen_Preview() {
     val contactInfo = ContactInfo(
         email = "example@mail.com",
         phone = "+41 21 123 45 67",
@@ -696,6 +745,15 @@ private fun MapInfoPopup_Preview() {
     )
 
     val stateFlow = MutableStateFlow(PlaceDetailsState(place = place))
+    MaterialTheme {
+        PlaceDetailsScreen(stateFlow)
+    }
+}
+
+@Preview
+@Composable
+private fun PlaceDetailsScreenPlaceNull_Preview() {
+    val stateFlow = MutableStateFlow(PlaceDetailsState(place = null))
     MaterialTheme {
         PlaceDetailsScreen(stateFlow)
     }
