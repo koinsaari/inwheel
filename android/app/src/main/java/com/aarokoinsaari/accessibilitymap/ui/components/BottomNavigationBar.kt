@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import com.aarokoinsaari.accessibilitymap.ui.navigation.NavigationScreen
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         NavigationScreen.Map,
-        NavigationScreen.PlaceList
+        // TODO
     )
     NavigationBar {
         val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -66,7 +66,6 @@ fun BottomNavigationBar(navController: NavHostController) {
 private fun NavigationScreen.getContentDescStringRes(): Int =
     when (this) {
         NavigationScreen.Map -> R.string.content_desc_navigation_map
-        NavigationScreen.PlaceList -> R.string.content_desc_navigation_place_list
         else -> R.string.content_desc_navigation_default
     }
 

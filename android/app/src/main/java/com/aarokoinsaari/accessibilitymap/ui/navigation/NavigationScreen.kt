@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,5 @@ import com.aarokoinsaari.accessibilitymap.R
 
 enum class NavigationScreen(val route: String, @DrawableRes val iconResId: Int?) {
     Map("map", R.drawable.ic_map),
-    PlaceList("places", R.drawable.ic_places_list),
     PlaceDetails("place_details", null)
 }
