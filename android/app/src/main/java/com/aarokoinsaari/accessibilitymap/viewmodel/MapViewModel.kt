@@ -42,7 +42,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-class MapViewModel(private val repository: PlaceRepository) : ViewModel() {
+class MapViewModel(
+    private val repository: PlaceRepository,
+    private val sharedViewModel: SharedViewModel
+) : ViewModel() {
     private val _state = MutableStateFlow(MapState())
     val state: StateFlow<MapState> = _state.asStateFlow()
 
@@ -106,6 +109,7 @@ class MapViewModel(private val repository: PlaceRepository) : ViewModel() {
 
                 is MapIntent.SelectPlace -> {
                     _state.update { it.copy(selectedPlace = intent.place) }
+                    sharedViewModel.selectPlace(intent.place)
                 }
             }
         }
@@ -120,6 +124,7 @@ class MapViewModel(private val repository: PlaceRepository) : ViewModel() {
                 isLoading = true,
                 selectedClusterItem = if (it.selectedClusterItem != null &&
                     !intent.bounds.contains(it.selectedClusterItem.position)) {
+                    sharedViewModel.clearSelectedPlace()
                     null // closes the info window when out of view
                 } else {
                     it.selectedClusterItem
@@ -145,8 +150,19 @@ class MapViewModel(private val repository: PlaceRepository) : ViewModel() {
         }
     }
 
-    private fun handleMapClick(item: PlaceClusterItem?) =
-        _state.update { it.copy(selectedClusterItem = if (item == it.selectedClusterItem) null else item) }
+    private fun handleMapClick(item: PlaceClusterItem?) {
+        _state.update {
+            it.copy(
+                selectedClusterItem = if (item == it.selectedClusterItem) {
+                    sharedViewModel.clearSelectedPlace()
+                    null
+                } else {
+                    sharedViewModel.selectPlace(item?.placeData)
+                    item
+                }
+            )
+        }
+    }
 
     private fun handleToggleFilter(category: PlaceCategory) {
         Log.d("MapViewModel", "Toggled category: $category")

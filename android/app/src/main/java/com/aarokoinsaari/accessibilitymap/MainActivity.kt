@@ -24,6 +24,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -37,9 +38,10 @@ import com.aarokoinsaari.accessibilitymap.ui.screens.PlaceDetailsScreen
 import com.aarokoinsaari.accessibilitymap.ui.theme.AccessibilityMapTheme
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceDetailsViewModel
+import com.aarokoinsaari.accessibilitymap.viewmodel.SharedViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
-@Suppress("LongMethod")
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +49,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AccessibilityMapTheme {
                 val navController = rememberNavController()
-
+                val sharedViewModel: SharedViewModel = koinViewModel()
                 Scaffold(
                     bottomBar = { BottomNavigationBar(navController = navController) },
                     contentWindowInsets = WindowInsets(0)
@@ -65,9 +67,8 @@ class MainActivity : ComponentActivity() {
                                     when (intent) {
                                         is MapIntent.SelectPlace -> {
                                             Log.d("MainActivity", "Selected place: ${intent.place}")
-                                            navController.navigate(
-                                                NavigationScreen.PlaceDetails.route
-                                            )
+                                            sharedViewModel.selectPlace(intent.place)
+                                            navController.navigate(NavigationScreen.PlaceDetails.route)
                                         }
 
                                         else -> viewModel.handleIntent(intent)
@@ -76,7 +77,10 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(NavigationScreen.PlaceDetails.route) {
-                            val viewModel: PlaceDetailsViewModel = koinViewModel()
+                            val place = sharedViewModel.selectedPlace.collectAsState().value
+                            val viewModel: PlaceDetailsViewModel = koinViewModel(
+                                parameters = { parametersOf(place) }
+                            )
                             PlaceDetailsScreen(
                                 stateFlow = viewModel.state,
                                 onIntent = { intent ->
@@ -84,21 +88,8 @@ class MainActivity : ComponentActivity() {
                                         is PlaceDetailsIntent.ClickBack,
                                         is PlaceDetailsIntent.ClickMap -> {
                                             Log.d("MainActivity", "Intent: $intent")
-                                            val currentRoute =
-                                                navController.previousBackStackEntry?.destination?.route
-                                            Log.d("MainActivity", "currentRoute: $currentRoute")
-                                            if (currentRoute == NavigationScreen.PlaceList.route) {
-                                                navController.navigate(NavigationScreen.Map.route) {
-                                                    popUpTo(NavigationScreen.Map.route) {
-                                                        inclusive = false
-                                                    }
-                                                }
-                                            } else {
-                                                navController.popBackStack()
-                                                Log.d("MainActivity", "popBackStack()")
-                                            }
+                                            navController.popBackStack()
                                         }
-
                                         else -> viewModel.handleIntent(intent)
                                     }
                                 }

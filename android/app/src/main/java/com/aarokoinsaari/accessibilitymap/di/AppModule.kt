@@ -27,6 +27,7 @@ import com.aarokoinsaari.accessibilitymap.data.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceDetailsViewModel
+import com.aarokoinsaari.accessibilitymap.viewmodel.SharedViewModel
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.client.HttpClient
@@ -40,21 +41,23 @@ import org.koin.dsl.module
 
 @Suppress("MagicNumber")
 val appModule = module {
+//    single {
+//        Room.databaseBuilder(
+//            androidContext(),
+//            AppDatabase::class.java,
+//            "app_database"
+//        )
+//            .addTypeConverter(get<Converters>())
+//            .fallbackToDestructiveMigration().build()
+//    }
     single {
-        Room.databaseBuilder(
+        Room.inMemoryDatabaseBuilder(
             androidContext(),
             AppDatabase::class.java,
-            "app_database"
         )
             .addTypeConverter(get<Converters>())
             .fallbackToDestructiveMigration().build()
     }
-//    single {
-//        Room.inMemoryDatabaseBuilder(
-//            androidContext(),
-//            AppDatabase::class.java,
-//        ).fallbackToDestructiveMigration().build()
-//    }
 
     single {
         createSupabaseClient(
@@ -90,8 +93,11 @@ val appModule = module {
     single {
         SupabaseApiService(get())
     }
+    single {
+        SharedViewModel()
+    }
     viewModel {
-        MapViewModel(get())
+        MapViewModel(get(), get())
     }
     viewModel { (place: Place) ->
         PlaceDetailsViewModel(place)
