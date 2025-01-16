@@ -17,17 +17,16 @@
 package com.aarokoinsaari.accessibilitymap.data.repository
 
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import com.aarokoinsaari.accessibilitymap.data.local.PlacesDao
 import com.aarokoinsaari.accessibilitymap.data.remote.supabase.SupabaseApiService
 import com.aarokoinsaari.accessibilitymap.data.remote.supabase.toDomain
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 class PlaceRepository(
     private val api: SupabaseApiService,
@@ -46,39 +45,77 @@ class PlaceRepository(
         bounds: LatLngBounds,
         existingIds: Set<String> = emptySet(),
     ) {
-        delay(300)
         val subBounds = splitBoundsIntoFour(bounds = bounds)
-        val apiPlaces = coroutineScope {
-            subBounds.map { sub ->
-                async {
-                    api.fetchPlacesInBBox(
+        val startTime = System.currentTimeMillis()
+
+        coroutineScope {
+            subBounds.forEach { sub ->
+                launch {
+                    val newPlaces = api.fetchPlacesInBBox(
                         westLon = sub.southwest.longitude,
                         southLat = sub.southwest.latitude,
                         eastLon = sub.northeast.longitude,
                         northLat = sub.northeast.latitude
                     )
+                        .filterNot { it.id in existingIds }
+                        .map { it.toDomain() }
+                        .distinctBy { it.id }
+
+                    if (newPlaces.isNotEmpty()) {
+                        dao.insertPlaces(newPlaces)
+                        Log.d("PlaceRepository", "Fetched and inserted ${newPlaces.size} places to Room")
+                    }
                 }
             }
-            .awaitAll().flatten()
         }
-
-        if (apiPlaces.isNotEmpty()) {
-            val newPlaces = apiPlaces
-                .filterNot { it.id in existingIds }
-                .map { it.toDomain() }
-                .distinctBy { it.id }
-            dao.insertPlaces(newPlaces)
-            Log.d("PlaceRepository", "Inserted ${newPlaces.size} new places into Room")
-
+        Log.d(
+            "PlaceRepository",
+            "Total time to fetch and store places: ${System.currentTimeMillis() - startTime} ms"
+        )
 //            val ftsPlaces = newPlaces
 //                .filterNot { it.category.name.lowercase() in setOf("toilets", "parking", "unknown") }
 //                .map { PlaceFts(rowId = it.id, name = it.name) }
 //            ftsDao.insertPlaces(ftsPlaces)
 //            Log.d("PlaceRepository", "Inserted ${ftsPlaces.size} places into FTS")
-        }
     }
 
-    private fun splitBoundsIntoFour(bounds: LatLngBounds, ): List<LatLngBounds> {
+    /*
+     * Left this here for testing/illustration purposes to demonstrate the difference
+     * in efficiency between sequential and asynchronous fetch/store operations.
+     * To test this, remove the annotation and replace the call to `fetchAndStorePlaces`
+     * in the `handleMove` method at `MapViewModel` with this synchronous version.
+     */
+    @VisibleForTesting
+    suspend fun fetchAndStorePlacesSequential(
+        bounds: LatLngBounds,
+        existingIds: Set<String> = emptySet(),
+    ) {
+        val subBounds = splitBoundsIntoFour(bounds = bounds)
+        val startTime = System.currentTimeMillis()
+
+        for (sub in subBounds) {
+            val newPlaces = api.fetchPlacesInBBox(
+                westLon = sub.southwest.longitude,
+                southLat = sub.southwest.latitude,
+                eastLon = sub.northeast.longitude,
+                northLat = sub.northeast.latitude
+            )
+                .filterNot { it.id in existingIds }
+                .map { it.toDomain() }
+                .distinctBy { it.id }
+
+            if (newPlaces.isNotEmpty()) {
+                dao.insertPlaces(newPlaces)
+                Log.d("PlaceRepository", "Fetched and inserted ${newPlaces.size} places to Room")
+            }
+        }
+        Log.d(
+            "PlaceRepository",
+            "Total time to fetch and store places: ${System.currentTimeMillis() - startTime} ms"
+        )
+    }
+
+    private fun splitBoundsIntoFour(bounds: LatLngBounds): List<LatLngBounds> {
         val midLat = (bounds.southwest.latitude + bounds.northeast.latitude) / 2
         val midLon = (bounds.southwest.longitude + bounds.northeast.longitude) / 2
 
