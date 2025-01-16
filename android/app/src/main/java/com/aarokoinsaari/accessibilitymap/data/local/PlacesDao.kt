@@ -26,12 +26,19 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PlacesDao {
-    @Query("SELECT * FROM places WHERE lat BETWEEN :southLat AND :northLat AND lon BETWEEN :westLon AND :eastLon")
+    @Query("""
+    SELECT * FROM places 
+    WHERE lat BETWEEN :southLat AND :northLat 
+      AND lon BETWEEN :westLon AND :eastLon 
+    LIMIT :limit
+""")
     fun getPlacesFlowWithinBounds(
         southLat: Double,
         northLat: Double,
         westLon: Double,
         eastLon: Double
+        eastLon: Double,
+        limit: Int
     ): Flow<List<Place>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

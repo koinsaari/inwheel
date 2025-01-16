@@ -70,8 +70,8 @@ class MapViewModel(
                 .filterNotNull()
                 .distinctUntilChanged()
                 .debounce(DEBOUNCE_VALUE)
-                .flatMapLatest { bounds -> repository.observePlacesWithinBounds(bounds) }
-                .map { places -> places.take(MAX_CLUSTER_ITEMS).map { it.toClusterItem() } }
+                .flatMapLatest { bounds -> repository.observePlacesWithinBounds(bounds, MAX_CLUSTER_ITEMS) }
+                .map { places -> places.map { it.toClusterItem() } }
                 .collect { clusterItems ->
                     _state.update {
                         it.copy(
@@ -124,7 +124,8 @@ class MapViewModel(
                 currentBounds = intent.bounds,
                 isLoading = true,
                 selectedClusterItem = if (it.selectedClusterItem != null &&
-                    !intent.bounds.contains(it.selectedClusterItem.position)) {
+                    !intent.bounds.contains(it.selectedClusterItem.position)
+                ) {
                     sharedViewModel.clearSelectedPlace()
                     null // closes the info window when out of view
                 } else {
@@ -146,6 +147,7 @@ class MapViewModel(
                 _state.update { it.copy(snapshotBounds = intent.bounds) }
                 val expandedBounds = calculateExpandedBounds(intent.bounds)
                 val existingIds = _state.value.allClusterItems.map { it.placeData.id }.toSet()
+                Log.d("MapViewModel", "Fetching places for bounds: $expandedBounds")
                 repository.fetchAndStorePlaces(expandedBounds, existingIds)
             }
         }
@@ -240,9 +242,9 @@ class MapViewModel(
     }
 
     companion object {
-        private const val MAX_CLUSTER_ITEMS = 500
+        private const val MAX_CLUSTER_ITEMS = 300
         private const val ZOOM_THRESHOLD = 12
         private const val EXPAND_FACTOR = 1.5
-        private const val DEBOUNCE_VALUE = 300L
+        private const val DEBOUNCE_VALUE = 100L
     }
 }
