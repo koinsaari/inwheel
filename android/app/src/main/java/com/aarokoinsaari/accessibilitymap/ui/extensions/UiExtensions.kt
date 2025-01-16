@@ -22,6 +22,7 @@ import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatu
 import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus.FULLY_ACCESSIBLE
 import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus.LIMITED_ACCESSIBILITY
 import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus.NOT_ACCESSIBLE
+import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus.UNKNOWN
 
 internal fun AccessibilityStatus?.getStringRes(): Int =
     when (this) {
@@ -64,24 +65,9 @@ internal fun Boolean?.getEmojiStringRes(): Int =
 // TODO: Use MaterialTheme
 internal fun AccessibilityStatus?.getAccessibilityStatusColor(): Color =
     when (this) {
-        AccessibilityStatus.FULLY_ACCESSIBLE -> Color.Green
-        AccessibilityStatus.LIMITED_ACCESSIBILITY -> Color.Yellow
-        AccessibilityStatus.NOT_ACCESSIBLE -> Color.Red
-        AccessibilityStatus.UNKNOWN -> Color.Gray
+        FULLY_ACCESSIBLE -> Color.Green
+        LIMITED_ACCESSIBILITY -> Color.Yellow
+        NOT_ACCESSIBLE -> Color.Red
+        UNKNOWN -> Color.Gray
         null -> Color.Gray
-    }
-
-// TODO
-internal fun String.getIconResId(): Int =
-    when (this) {
-        // Amenity
-        "restaurant" -> R.drawable.ic_restaurant
-        "cafe" -> R.drawable.ic_cafe
-        "pharmacy" -> R.drawable.ic_pharmacy
-        "hospital" -> R.drawable.ic_hospital
-        "parking" -> R.drawable.ic_parking_area
-        "toilets" -> R.drawable.ic_wc
-        "supermarket" -> R.drawable.ic_grocery_store
-
-        else -> R.drawable.ic_default_marker
     }

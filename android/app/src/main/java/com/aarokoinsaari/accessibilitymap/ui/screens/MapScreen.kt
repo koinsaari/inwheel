@@ -225,7 +225,7 @@ fun MapScreen(
                     MapPlaceMarker(
                         category = item.placeData.category,
                         modifier = Modifier
-                            .size(24.dp)
+                            .size(28.dp)
                             .background(
                                 color = item.placeData.accessibility.accessibilityStatus
                                     .getAccessibilityStatusColor(),
@@ -362,7 +362,7 @@ fun FilterChipRow(
 ) {
     LazyRow(modifier = modifier) {
         items(categories) { category ->
-            val isSelected = selectedCategories.contains(category.name.lowercase())
+            val isSelected = selectedCategories.contains(category.rawValue)
             val haptic = LocalHapticFeedback.current
 
             FilterChip(
@@ -387,7 +387,7 @@ fun FilterChipRow(
                     }
                 },
                 colors = FilterChipDefaults.filterChipColors(
-                    containerColor = Color.White // TODO: Use MaterialTheme
+                    containerColor = MaterialTheme.colorScheme.surface
                 ),
                 border = FilterChipDefaults.filterChipBorder(
                     enabled = false,
@@ -402,14 +402,17 @@ fun FilterChipRow(
 }
 
 @Composable
-fun MapPlaceMarker(category: PlaceCategory, modifier: Modifier = Modifier) {
+fun MapPlaceMarker(
+    category: PlaceCategory,
+    modifier: Modifier = Modifier
+) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
     ) {
         Image(
             painter = painterResource(id = category.iconResId),
-            contentDescription = null
+            contentDescription = stringResource(id = category.displayNameResId)
         )
     }
 }

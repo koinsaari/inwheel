@@ -38,7 +38,6 @@ class PlaceRepository(
             southLat = bounds.southwest.latitude,
             northLat = bounds.northeast.latitude,
             westLon = bounds.southwest.longitude,
-            eastLon = bounds.northeast.longitude
             eastLon = bounds.northeast.longitude,
             limit = limit
         )
@@ -65,7 +64,10 @@ class PlaceRepository(
 
                     if (newPlaces.isNotEmpty()) {
                         dao.insertPlaces(newPlaces)
-                        Log.d("PlaceRepository", "Fetched and inserted ${newPlaces.size} places to Room")
+                        Log.d(
+                            "PlaceRepository",
+                            "Fetched and inserted ${newPlaces.size} places to Room"
+                        )
                     }
                 }
             }

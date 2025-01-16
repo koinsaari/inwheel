@@ -171,10 +171,10 @@ class MapViewModel(
         Log.d("MapViewModel", "Toggled category: $category")
         _state.update { currentState ->
             val updatedCategories =
-                if (currentState.selectedCategories.contains(category.name.lowercase())) {
-                    currentState.selectedCategories - category.name.lowercase()
+                if (currentState.selectedCategories.contains(category.rawValue)) {
+                    currentState.selectedCategories - category.rawValue
                 } else {
-                    currentState.selectedCategories + category.name.lowercase()
+                    currentState.selectedCategories + category.rawValue
                 }
             Log.d("MapViewModel", "Updated categories: $updatedCategories")
             currentState.copy(selectedCategories = updatedCategories)
@@ -203,7 +203,7 @@ class MapViewModel(
             allClusterItems
         } else {
             allClusterItems.filter {
-                selectedCategories.contains(it.placeData.category.name.lowercase())
+                selectedCategories.contains(it.placeData.category.rawValue)
             }
         }
         _state.update { it.copy(clusterItems = filteredClusterItems) }
@@ -218,7 +218,7 @@ class MapViewModel(
             allPlaces.filter { place ->
                 // Excludes places without name (toilets, parking spots, etc)
                 place.placeData.name.contains(query, ignoreCase = true) &&
-                        place.placeData.name != place.placeData.category.name.lowercase()
+                        place.placeData.name != place.placeData.category.rawValue
             }
         }
         _state.update { it.copy(filteredPlaces = filtered.map { it.placeData }) }

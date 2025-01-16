@@ -313,7 +313,7 @@ fun PlaceDetailsContentSection(
     place: Place,
     modifier: Modifier = Modifier,
 ) {
-    when (place.category.name.lowercase()) {
+    when (place.category.rawValue) {
         "toilets" -> {
             RestroomSection(place.accessibility, modifier)
         }

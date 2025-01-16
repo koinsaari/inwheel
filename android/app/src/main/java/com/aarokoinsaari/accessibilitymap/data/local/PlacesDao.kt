@@ -36,7 +36,6 @@ interface PlacesDao {
         southLat: Double,
         northLat: Double,
         westLon: Double,
-        eastLon: Double
         eastLon: Double,
         limit: Int
     ): Flow<List<Place>>
