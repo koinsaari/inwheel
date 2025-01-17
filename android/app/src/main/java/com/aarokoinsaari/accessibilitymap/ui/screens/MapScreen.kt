@@ -102,10 +102,12 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMapOptions
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.GoogleMapComposable
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -119,7 +121,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MapScreen(
     stateFlow: StateFlow<MapState>,
-    onIntent: (MapIntent) -> Unit = { },
+    onIntent: (MapIntent) -> Unit = { }
 ) {
     val state by stateFlow.collectAsState()
     val context = LocalContext.current
@@ -194,6 +196,9 @@ fun MapScreen(
         GoogleMap(
             cameraPositionState = cameraPositionState,
             onMapClick = { onIntent(MapIntent.ClickMap(null)) },
+            googleMapOptionsFactory = {
+                GoogleMapOptions().mapId(context.getString(R.string.google_map_id))
+            },
             modifier = Modifier.fillMaxSize()
         ) {
             Clustering(
@@ -358,7 +363,7 @@ fun FilterChipRow(
     categories: List<PlaceCategory>,
     selectedCategories: Set<String>,
     modifier: Modifier = Modifier,
-    onIntent: (MapIntent) -> Unit = { },
+    onIntent: (MapIntent) -> Unit = { }
 ) {
     LazyRow(modifier = modifier) {
         items(categories) { category ->
@@ -402,6 +407,7 @@ fun FilterChipRow(
 }
 
 @Composable
+@GoogleMapComposable
 fun MapPlaceMarker(
     category: PlaceCategory,
     modifier: Modifier = Modifier
@@ -500,7 +506,7 @@ fun MarkerInfoWindow(
 @Composable
 fun InfoWindowAccessibilityImage(
     status: AccessibilityStatus?,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -524,7 +530,7 @@ fun InfoWindowAccessibilityImage(
 fun InfoWindowAccessibilityInfo(
     infoLabel: String,
     status: String,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -545,7 +551,7 @@ fun InfoWindowAccessibilityInfo(
 @Composable
 fun NotificationBar(
     message: String,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
