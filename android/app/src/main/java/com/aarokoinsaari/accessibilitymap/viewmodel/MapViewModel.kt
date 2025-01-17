@@ -30,10 +30,10 @@ import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -50,12 +50,12 @@ class MapViewModel(
     val state: StateFlow<MapState> = _state.asStateFlow()
 
     private var fetchJob: Job? = null
+    private var moveJob: Job? = null
 
     init {
         // Handle search query changes
         viewModelScope.launch {
             _state.map { it.searchQuery }
-                .debounce(DEBOUNCE_VALUE)
                 .distinctUntilChanged()
                 .collect { query ->
                     if (query.isNotBlank()) {
@@ -69,7 +69,6 @@ class MapViewModel(
             _state.map { it.currentBounds }
                 .filterNotNull()
                 .distinctUntilChanged()
-                .debounce(DEBOUNCE_VALUE)
                 .flatMapLatest { bounds -> repository.observePlacesWithinBounds(bounds, MAX_CLUSTER_ITEMS) }
                 .map { places -> places.map { it.toClusterItem() } }
                 .collect { clusterItems ->
@@ -117,38 +116,42 @@ class MapViewModel(
     }
 
     private fun handleMove(intent: MapIntent.MoveMap) {
-        _state.update {
-            it.copy(
-                zoomLevel = intent.zoomLevel,
-                center = intent.center,
-                currentBounds = intent.bounds,
-                isLoading = true,
-                selectedClusterItem = if (it.selectedClusterItem != null &&
-                    !intent.bounds.contains(it.selectedClusterItem.position)
-                ) {
-                    sharedViewModel.clearSelectedPlace()
-                    null // closes the info window when out of view
-                } else {
-                    it.selectedClusterItem
+        moveJob?.cancel()
+        moveJob = viewModelScope.launch {
+            delay(DEBOUNCE_VALUE)
+            _state.update {
+                it.copy(
+                    zoomLevel = intent.zoomLevel,
+                    center = intent.center,
+                    currentBounds = intent.bounds,
+                    isLoading = true,
+                    selectedClusterItem = if (it.selectedClusterItem != null &&
+                        !intent.bounds.contains(it.selectedClusterItem.position)
+                    ) {
+                        sharedViewModel.clearSelectedPlace()
+                        null // closes the info window when out of view
+                    } else {
+                        it.selectedClusterItem
+                    }
+                )
+            }
+            Log.d("MapViewModel", "MapState before observe: ${_state.value}")
+
+            if (intent.zoomLevel < ZOOM_THRESHOLD) {
+                handleClearMarkers()
+                return@launch
+            }
+
+            val currentSnapshotBounds = _state.value.snapshotBounds
+            if (currentSnapshotBounds == null || !currentSnapshotBounds.contains(intent.center)) {
+                fetchJob?.cancel()
+                fetchJob = viewModelScope.launch {
+                    _state.update { it.copy(snapshotBounds = intent.bounds) }
+                    val expandedBounds = calculateExpandedBounds(intent.bounds)
+                    val existingIds = _state.value.allClusterItems.map { it.placeData.id }.toSet()
+                    Log.d("MapViewModel", "Fetching places for bounds: $expandedBounds")
+                    repository.fetchAndStorePlaces(expandedBounds, existingIds)
                 }
-            )
-        }
-        Log.d("MapViewModel", "MapState before observe: ${_state.value}")
-
-        if (intent.zoomLevel < ZOOM_THRESHOLD) {
-            handleClearMarkers()
-            return
-        }
-
-        val currentSnapshotBounds = _state.value.snapshotBounds
-        if (currentSnapshotBounds == null || !currentSnapshotBounds.contains(intent.center)) {
-            fetchJob?.cancel()
-            fetchJob = viewModelScope.launch {
-                _state.update { it.copy(snapshotBounds = intent.bounds) }
-                val expandedBounds = calculateExpandedBounds(intent.bounds)
-                val existingIds = _state.value.allClusterItems.map { it.placeData.id }.toSet()
-                Log.d("MapViewModel", "Fetching places for bounds: $expandedBounds")
-                repository.fetchAndStorePlaces(expandedBounds, existingIds)
             }
         }
     }
@@ -242,9 +245,9 @@ class MapViewModel(
     }
 
     companion object {
-        private const val MAX_CLUSTER_ITEMS = 300
+        private const val MAX_CLUSTER_ITEMS = 400
         private const val ZOOM_THRESHOLD = 12
         private const val EXPAND_FACTOR = 1.5
-        private const val DEBOUNCE_VALUE = 100L
+        private const val DEBOUNCE_VALUE = 200L
     }
 }
