@@ -24,7 +24,6 @@ import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
@@ -59,11 +58,9 @@ class SupabaseApiService(
             Log.d("SupabaseApiService", "Response status: ${response.status}")
 
             if (response.status.isSuccess()) {
-                Log.d("SupabaseApiService", "Response body: ${response.body<List<PlaceDto>>()}")
                 response.body()
             } else {
-                val errorBody = response.bodyAsText()
-                Log.e("SupabaseApiService", "Error response: ${response.status}, Body: $errorBody")
+                Log.e("SupabaseApiService", "Error response: ${response.status}")
                 emptyList()
             }
         } catch (e: CancellationException) {

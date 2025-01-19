@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aarokoinsaari.accessibilitymap.data.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.intent.MapIntent
+import com.aarokoinsaari.accessibilitymap.model.Place
 import com.aarokoinsaari.accessibilitymap.model.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.model.toClusterItem
 import com.aarokoinsaari.accessibilitymap.state.MapState
@@ -44,13 +45,15 @@ import kotlinx.coroutines.launch
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class MapViewModel(
     private val repository: PlaceRepository,
-    private val sharedViewModel: SharedViewModel
+    private val sharedViewModel: SharedViewModel,
 ) : ViewModel() {
     private val _state = MutableStateFlow(MapState())
     val state: StateFlow<MapState> = _state.asStateFlow()
 
     private var fetchJob: Job? = null
     private var moveJob: Job? = null
+    private var cachedPlaces: Set<Place> = emptySet()
+    private val allClusterItems = mutableSetOf<PlaceClusterItem>()
 
     init {
         // Handle search query changes
@@ -64,22 +67,59 @@ class MapViewModel(
                 }
         }
 
-        // updates cluster items reactively based on changes to currentBounds
+        // updates cluster items based on category selections
         viewModelScope.launch {
-            _state.map { it.currentBounds }
+            _state.map { it.selectedCategories }
+                .distinctUntilChanged()
+                .collect { categories ->
+                    if (categories.isEmpty()) {
+                        _state.update { it.copy(clusterItems = allClusterItems.toList()) }
+                        Log.d(
+                            "MapViewModel",
+                            "cluster items: ${_state.value.clusterItems.size}, " +
+                                    "filters: ${_state.value.selectedCategories}"
+                        )
+                        return@collect
+                    }
+                    val filteredItems = allClusterItems.filter {
+                        categories.contains(it.placeData.category.rawValue)
+                    }
+                    _state.update {
+                        it.copy(
+                            selectedCategories = categories,
+                            clusterItems = filteredItems
+                        )
+                    }
+                    Log.d(
+                        "MapViewModel",
+                        "cluster items: ${_state.value.clusterItems.size}, " +
+                                "filters: ${_state.value.selectedCategories}"
+                    )
+                }
+        }
+
+        // updates cluster items based on smaller snapshot bounds changes fetching
+        // directly from Room
+        viewModelScope.launch {
+            _state.map { it.smallSnapshotBounds }
                 .filterNotNull()
                 .distinctUntilChanged()
-                .flatMapLatest { bounds -> repository.observePlacesWithinBounds(bounds, MAX_CLUSTER_ITEMS) }
+                .flatMapLatest { bounds ->
+                    repository.observePlacesWithinBounds(
+                        bounds,
+//                        MAX_CLUSTER_ITEMS
+                    )
+                }
                 .map { places -> places.map { it.toClusterItem() } }
                 .collect { clusterItems ->
                     _state.update {
                         it.copy(
                             clusterItems = clusterItems,
-                            allClusterItems = (it.allClusterItems + clusterItems)
-                                .distinctBy { it.placeData.id },
                             isLoading = false
                         )
                     }
+                    cachedPlaces = clusterItems.map { it.placeData }.toSet()
+                    allClusterItems.addAll(clusterItems)
                     Log.d("MapViewModel", "Updated cluster items: ${clusterItems.size}")
                 }
         }
@@ -119,41 +159,101 @@ class MapViewModel(
         moveJob?.cancel()
         moveJob = viewModelScope.launch {
             delay(DEBOUNCE_VALUE)
-            _state.update {
-                it.copy(
-                    zoomLevel = intent.zoomLevel,
-                    center = intent.center,
-                    currentBounds = intent.bounds,
-                    isLoading = true,
-                    selectedClusterItem = if (it.selectedClusterItem != null &&
-                        !intent.bounds.contains(it.selectedClusterItem.position)
-                    ) {
-                        sharedViewModel.clearSelectedPlace()
-                        null // closes the info window when out of view
-                    } else {
-                        it.selectedClusterItem
-                    }
-                )
-            }
-            Log.d("MapViewModel", "MapState before observe: ${_state.value}")
-
-            if (intent.zoomLevel < ZOOM_THRESHOLD) {
+            if (intent.zoomLevel < ZOOM_THRESHOLD_LARGE) {
                 handleClearMarkers()
                 return@launch
             }
 
-            val currentSnapshotBounds = _state.value.snapshotBounds
-            if (currentSnapshotBounds == null || !currentSnapshotBounds.contains(intent.center)) {
+            val currentLargeBounds = _state.value.largeSnapshotBounds
+            if ((currentLargeBounds == null || !currentLargeBounds.contains(intent.center)) &&
+                intent.zoomLevel >= ZOOM_THRESHOLD_LARGE
+            ) {
                 fetchJob?.cancel()
                 fetchJob = viewModelScope.launch {
-                    _state.update { it.copy(snapshotBounds = intent.bounds) }
-                    val expandedBounds = calculateExpandedBounds(intent.bounds)
-                    val existingIds = _state.value.allClusterItems.map { it.placeData.id }.toSet()
-                    Log.d("MapViewModel", "Fetching places for bounds: $expandedBounds")
-                    repository.fetchAndStorePlaces(expandedBounds, existingIds)
+                    _state.update { it.copy(isLoading = true) }
+                    val newLargeBounds =
+                        calculateExpandedBounds(intent.bounds, intent.zoomLevel, true)
+                    repository.fetchAndStorePlaces(
+                        newLargeBounds,
+                        cachedPlaces.map { it.id }.toSet()
+                    )
+                    _state.update {
+                        it.copy(
+                            zoomLevel = intent.zoomLevel,
+                            center = intent.center,
+                            largeSnapshotBounds = newLargeBounds,
+                            selectedClusterItem = if (it.selectedClusterItem != null &&
+                                !intent.bounds.contains(it.selectedClusterItem.position)
+                            ) {
+                                sharedViewModel.clearSelectedPlace()
+                                null // closes the info window when out of view
+                            } else {
+                                it.selectedClusterItem
+                            },
+                            isLoading = false
+                        )
+                    }
+                    allClusterItems.addAll(_state.value.clusterItems)
                 }
             }
+
+            val currentSmallBounds = _state.value.smallSnapshotBounds
+            if (currentSmallBounds == null || !currentSmallBounds.contains(intent.center) &&
+                intent.zoomLevel >= ZOOM_THRESHOLD_SMALL
+            ) {
+                val newSmallBounds = calculateExpandedBounds(intent.bounds, intent.zoomLevel, false)
+                _state.update {
+                    it.copy(
+                        zoomLevel = intent.zoomLevel,
+                        center = intent.center,
+                        smallSnapshotBounds = newSmallBounds,
+                        selectedClusterItem = if (it.selectedClusterItem != null &&
+                            !intent.bounds.contains(it.selectedClusterItem.position)
+                        ) {
+                            sharedViewModel.clearSelectedPlace()
+                            null // closes the info window when out of view
+                        } else {
+                            it.selectedClusterItem
+                        }
+                    )
+                }
+            }
+            return@launch
         }
+    }
+
+    private fun calculateExpandedBounds(
+        bounds: LatLngBounds,
+        zoomLevel: Float,
+        isLargeBounds: Boolean,
+    ): LatLngBounds {
+        val zoomFactor = if (isLargeBounds) {
+            when {
+                zoomLevel < 12f -> 1.0f
+                zoomLevel in 12f..14f -> 1.5f
+                else -> 2.0f
+            }
+        } else {
+            when {
+                zoomLevel < 15f -> 1.0f
+                zoomLevel in 15f..17f -> 1.5f
+                else -> 2.0f
+            }
+        }
+
+        val latDiff = bounds.northeast.latitude - bounds.southwest.latitude
+        val lonDiff = bounds.northeast.longitude - bounds.southwest.longitude
+
+        val expandedSouthwest = LatLng(
+            bounds.southwest.latitude - latDiff * (zoomFactor - 1) / 2,
+            bounds.southwest.longitude - lonDiff * (zoomFactor - 1) / 2
+        )
+        val expandedNortheast = LatLng(
+            bounds.northeast.latitude + latDiff * (zoomFactor - 1) / 2,
+            bounds.northeast.longitude + lonDiff * (zoomFactor - 1) / 2
+        )
+
+        return LatLngBounds(expandedSouthwest, expandedNortheast)
     }
 
     private fun handleMapClick(item: PlaceClusterItem?) {
@@ -171,18 +271,17 @@ class MapViewModel(
     }
 
     private fun handleToggleFilter(category: PlaceCategory) {
-        Log.d("MapViewModel", "Toggled category: $category")
-        _state.update { currentState ->
-            val updatedCategories =
-                if (currentState.selectedCategories.contains(category.rawValue)) {
-                    currentState.selectedCategories - category.rawValue
-                } else {
-                    currentState.selectedCategories + category.rawValue
-                }
-            Log.d("MapViewModel", "Updated categories: $updatedCategories")
-            currentState.copy(selectedCategories = updatedCategories)
+        val currentState = _state.value
+        val updatedCategories =
+            if (currentState.selectedCategories.contains(category.rawValue)) {
+                currentState.selectedCategories - category.rawValue
+            } else {
+                currentState.selectedCategories + category.rawValue
+            }
+        _state.update {
+            it.copy(selectedCategories = updatedCategories)
         }
-        applyFilters()
+        Log.d("MapViewModel", "Updated categories: $updatedCategories")
     }
 
     private fun handleClearMarkers() {
@@ -197,20 +296,6 @@ class MapViewModel(
             }
             Log.d("MapViewModel", "Clear markers action, current state: ${_state.value}")
         }
-    }
-
-    private fun applyFilters() {
-        val selectedCategories = _state.value.selectedCategories
-        val allClusterItems = _state.value.allClusterItems
-        val filteredClusterItems = if (selectedCategories.isEmpty()) {
-            allClusterItems
-        } else {
-            allClusterItems.filter {
-                selectedCategories.contains(it.placeData.category.rawValue)
-            }
-        }
-        _state.update { it.copy(clusterItems = filteredClusterItems) }
-        Log.d("MapViewModel", "Filtered markers: ${_state.value.clusterItems}")
     }
 
     private fun applySearchFilter(query: String) {
@@ -228,26 +313,10 @@ class MapViewModel(
         Log.d("MapViewModel", "Filtered places: ${_state.value.filteredPlaces}")
     }
 
-    private fun calculateExpandedBounds(bounds: LatLngBounds): LatLngBounds {
-        val latDiff = bounds.northeast.latitude - bounds.southwest.latitude
-        val lonDiff = bounds.northeast.longitude - bounds.southwest.longitude
-
-        val expandedSouthwest = LatLng(
-            bounds.southwest.latitude - latDiff * (EXPAND_FACTOR - 1) / 2,
-            bounds.southwest.longitude - lonDiff * (EXPAND_FACTOR - 1) / 2
-        )
-        val expandedNortheast = LatLng(
-            bounds.northeast.latitude + latDiff * (EXPAND_FACTOR - 1) / 2,
-            bounds.northeast.longitude + lonDiff * (EXPAND_FACTOR - 1) / 2
-        )
-
-        return LatLngBounds(expandedSouthwest, expandedNortheast)
-    }
-
     companion object {
         private const val MAX_CLUSTER_ITEMS = 400
-        private const val ZOOM_THRESHOLD = 12
-        private const val EXPAND_FACTOR = 1.5
+        private const val ZOOM_THRESHOLD_LARGE = 12
+        private const val ZOOM_THRESHOLD_SMALL = 14
         private const val DEBOUNCE_VALUE = 200L
     }
 }

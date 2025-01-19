@@ -24,16 +24,18 @@ import com.aarokoinsaari.accessibilitymap.data.remote.supabase.toDomain
 import com.aarokoinsaari.accessibilitymap.model.Place
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PlaceRepository(
     private val api: SupabaseApiService,
     private val dao: PlacesDao,
 //    private val ftsDao: PlacesFtsDao,
 ) {
-    fun observePlacesWithinBounds(bounds: LatLngBounds, limit: Int): Flow<List<Place>> =
+    fun observePlacesWithinBounds(bounds: LatLngBounds, limit: Int = 2000): Flow<List<Place>> =
         dao.getPlacesFlowWithinBounds(
             southLat = bounds.southwest.latitude,
             northLat = bounds.northeast.latitude,
@@ -45,7 +47,7 @@ class PlaceRepository(
     suspend fun fetchAndStorePlaces(
         bounds: LatLngBounds,
         existingIds: Set<String> = emptySet(),
-    ) {
+    ) = withContext(Dispatchers.IO) {
         val subBounds = splitBoundsIntoFour(bounds = bounds)
         val startTime = System.currentTimeMillis()
 

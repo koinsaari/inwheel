@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,34 +22,35 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 
 data class MapState(
-    val clusterItems: List<PlaceClusterItem> = emptyList(), // Cluster items within current bounds
-    val allClusterItems: List<PlaceClusterItem> = emptyList(), // cached items
-    val selectedClusterItem: PlaceClusterItem? = null,
-    val selectedPlace: Place? = null, // Used for place details
-    val selectedCategories: Set<String> = emptySet(),
-    val searchQuery: String = "",
-    val filteredPlaces: List<Place> = emptyList(),
-    val zoomLevel: Float? = 10f,
     val center: LatLng? = null,
+    val zoomLevel: Float? = 10f,
     val currentBounds: LatLngBounds? = null,
-    val snapshotBounds: LatLngBounds? = null,
+    val smallSnapshotBounds: LatLngBounds? = null,
+    val largeSnapshotBounds: LatLngBounds? = null,
+    val clusterItems: List<PlaceClusterItem> = emptyList(), // Places shown on UI
+    val selectedClusterItem: PlaceClusterItem? = null,
+    val selectedCategories: Set<String> = emptySet(),
+    val selectedPlace: Place? = null, // Used for place details
+    val filteredPlaces: List<Place> = emptyList(),
+    val searchQuery: String = "",
     val isLoading: Boolean = false,
     val errorState: ErrorState = ErrorState.None
 ) {
     override fun toString(): String =
         """
             MapState(
-                clusterItems=${clusterItems.size},
-                allClusterItems=${allClusterItems.size},
-                zoomLevel=$zoomLevel,
                 center=$center,
-                currentBoundingBox=$currentBounds,
-                snapshotBoundingBox=$snapshotBounds,
-                isLoading=$isLoading,
+                zoomLevel=$zoomLevel,
+                currentBounds=$currentBounds,
+                smallSnapshotBounds=$smallSnapshotBounds,
+                largeSnapshotBounds=$largeSnapshotBounds,
+                clusterItems=${clusterItems.size},
                 selectedClusterItem=$selectedClusterItem,
                 selectedCategories=$selectedCategories,
-                filteredPlaces=$filteredPlaces,
-                searchQuery=$searchQuery,
+                selectedPlace=$selectedPlace,
+                filteredPlaces=${filteredPlaces.size},
+                searchQuery='$searchQuery',
+                isLoading=$isLoading,
                 errorState=$errorState
             )
         """.trimIndent()
