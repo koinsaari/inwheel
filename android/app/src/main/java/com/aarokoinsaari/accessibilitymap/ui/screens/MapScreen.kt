@@ -209,6 +209,24 @@ fun MapScreen(
                     )
                     false
                 },
+                clusterContent = { cluster ->
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size((20.dp + cluster.items.size.dp * 2).coerceAtMost(80.dp)) // Scale size with number of items
+                            .background(
+                                color = Color.Blue.copy(alpha = 0.3f),
+                                shape = CircleShape
+                            )
+                    ) {
+                        Text(
+                            text = cluster.items.size.toString(),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.surface,
+                            modifier = Modifier.padding(4.dp)
+                        )
+                    }
+                },
                 onClusterItemClick = { clusterItem ->
                     onIntent(MapIntent.ClickMap(clusterItem))
                     coroutineScope.launch {
