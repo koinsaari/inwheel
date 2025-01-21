@@ -17,6 +17,7 @@
 package com.aarokoinsaari.accessibilitymap.ui.screens
 
 import android.Manifest
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -31,7 +32,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -53,6 +53,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -63,17 +64,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.aarokoinsaari.accessibilitymap.R
@@ -94,7 +92,6 @@ import com.aarokoinsaari.accessibilitymap.state.MapState
 import com.aarokoinsaari.accessibilitymap.ui.components.PlaceSearchBar
 import com.aarokoinsaari.accessibilitymap.ui.extensions.getAccessibilityStatusColor
 import com.aarokoinsaari.accessibilitymap.ui.extensions.getEmojiStringRes
-import com.aarokoinsaari.accessibilitymap.ui.models.PlaceClusterItem
 import com.aarokoinsaari.accessibilitymap.utils.extensions.getLastLocationSuspended
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -109,6 +106,8 @@ import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.GoogleMapComposable
 import com.google.maps.android.compose.MapsComposeExperimentalApi
+import com.google.maps.android.compose.MarkerInfoWindowComposable
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.clustering.Clustering
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.delay
@@ -121,7 +120,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MapScreen(
     stateFlow: StateFlow<MapState>,
-    onIntent: (MapIntent) -> Unit = { }
+    onIntent: (MapIntent) -> Unit = { },
 ) {
     val state by stateFlow.collectAsState()
     val context = LocalContext.current
@@ -192,10 +191,15 @@ fun MapScreen(
         }
     }
 
+//    val clusterItemsToShow = if (state.selectedClusterItem != null) {
+//        // filter out the selected item from the clustering
+//        state.clusterItems.filter { it != state.selectedClusterItem }
+//    } else state.clusterItems
+
     Box {
         GoogleMap(
             cameraPositionState = cameraPositionState,
-            onMapClick = { onIntent(MapIntent.ClickMap(null)) },
+            onMapClick = { onIntent(MapIntent.ClickMap(null, null)) },
             googleMapOptionsFactory = {
                 GoogleMapOptions().mapId(context.getString(R.string.google_map_id))
             },
@@ -228,17 +232,7 @@ fun MapScreen(
                     }
                 },
                 onClusterItemClick = { clusterItem ->
-                    onIntent(MapIntent.ClickMap(clusterItem))
-                    coroutineScope.launch {
-                        val adjustedPosition = LatLng(
-                            clusterItem.position.latitude + 0.003,
-                            clusterItem.position.longitude
-                        )
-                        cameraPositionState.animate(
-                            update = CameraUpdateFactory.newLatLng(adjustedPosition),
-                            durationMs = 200
-                        )
-                    }
+                    onIntent(MapIntent.ClickMap(clusterItem, clusterItem.position))
                     true
                 },
                 // Workaround for issue: https://github.com/googlemaps/android-maps-compose/issues/409
@@ -246,52 +240,59 @@ fun MapScreen(
                 // is using basic Composables instead.
                 clusterItemContent = { item ->
                     MapPlaceMarker(
-                        category = item.placeData.category,
-                        modifier = Modifier
-                            .size(28.dp)
-                            .background(
-                                color = item.placeData.accessibility.accessibilityStatus
-                                    .getAccessibilityStatusColor(),
-                                shape = CircleShape
-                            )
-                            .padding(all = 6.dp),
+                        place = item.placeData,
                     )
+                    true
                 }
             )
-        }
 
-        // Since ClusterItem info windows currently cannot be customized,
-        // for now the only reasonable solution is to insert the custom info
-        // window according to the selected cluster item. This should be changed
-        // when the issue mentioned above is closed and Marker Composables can be used instead.
-        state.selectedClusterItem?.let { selectedItem ->
-            val screenPosition =
-                cameraPositionState.projection?.toScreenLocation(selectedItem.position)
+            // We use a bit hacky solution here until the issue mentioned above is closed:
+            // A new Marker composable is drawn on top of the cluster item to get the benefits
+            // of a Marker composable with the info window etc. since it cannot be directly used in
+            // clusterItemContent.
+            val selectedItem = state.selectedClusterItem
+            if (selectedItem != null) {
+                // Wrapping inside `key` ensures proper recomposition when the selected item changes. Without this,
+                // the MapPlaceMarker does not update correctly, causing the newly selected marker to
+                // retain the appearance of the previously clicked marker. Couldn't find a better
+                // solution but this seemed to resolve the issue for now.
+                key(selectedItem) {
+                    Log.d("MapScreen", "Selected cluster item: $selectedItem")
+                    val markerState = remember(selectedItem) {
+                        MarkerState(position = selectedItem.position)
+                    }
+                    Log.d("MapScreen", "Marker state: $markerState")
 
-            if (screenPosition != null) {
-                var popupSize by remember { mutableStateOf(IntSize.Zero) }
-                val markerHeight =
-                    with(LocalDensity.current) { 24.dp.roundToPx() }
+                    // this is to open the info window immediately when the marker is created, so
+                    // that user do not need to explicitly click again on the marker to open it
+                    LaunchedEffect(selectedItem) {
+                        cameraPositionState.animate(
+                            update = CameraUpdateFactory.newLatLng(selectedItem.position),
+                            durationMs = 300
+                        )
+                        markerState.showInfoWindow()
+                    }
 
-                MarkerInfoWindow(
-                    item = selectedItem,
-                    onClick = { onIntent(MapIntent.SelectPlace(selectedItem.placeData)) },
-                    onClose = { onIntent(MapIntent.ClickMap(null)) },
-                    modifier = Modifier
-                        .onGloballyPositioned { coordinates ->
-                            popupSize = coordinates.size
-                        }
-                        .offset {
-                            IntOffset(
-                                x = screenPosition.x - (popupSize.width / 2),
-                                y = screenPosition.y - popupSize.height - markerHeight
+                    MarkerInfoWindowComposable(
+                        state = markerState,
+                        zIndex = 2f, // sets marker on top of the cluster item
+//                    onInfoWindowClick = { onIntent(MapIntent.SelectPlace(selectedItem.placeData)) },
+                        onInfoWindowClose = { onIntent(MapIntent.ClickMap(null, selectedItem.position)) },
+                        infoContent = {
+                            InfoWindow(
+                                item = selectedItem.placeData,
+                                onClick = { onIntent(MapIntent.SelectPlace(selectedItem.placeData)) },
+                                onClose = { onIntent(MapIntent.ClickMap(null, selectedItem.position)) }
+                            )
+                        },
+                        content = {
+                            MapPlaceMarker(
+                                place = selectedItem.placeData,
+                                size = 32.dp
                             )
                         }
-                        .background(
-                            color = MaterialTheme.colorScheme.surface,
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                )
+                    )
+                }
             }
         }
 
@@ -313,7 +314,7 @@ fun MapScreen(
                 onExpandedChange = { expanded = it },
                 searchResults = state.filteredPlaces,
                 onPlaceSelected = { place ->
-                    onIntent(MapIntent.ClickClusterItem(place))
+                    onIntent(MapIntent.SelectPlace(place))
                     expanded = false
 
                     // Moves map to the selected place
@@ -381,7 +382,7 @@ fun FilterChipRow(
     categories: List<PlaceCategory>,
     selectedCategories: Set<String>,
     modifier: Modifier = Modifier,
-    onIntent: (MapIntent) -> Unit = { }
+    onIntent: (MapIntent) -> Unit = { },
 ) {
     LazyRow(modifier = modifier) {
         items(categories) { category ->
@@ -427,28 +428,37 @@ fun FilterChipRow(
 @Composable
 @GoogleMapComposable
 fun MapPlaceMarker(
-    category: PlaceCategory,
-    modifier: Modifier = Modifier
+    place: Place,
+    modifier: Modifier = Modifier,
+    size: Dp = 28.dp,
 ) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
+            .size(size)
+            .background(
+                color = place.accessibility.accessibilityStatus
+                    .getAccessibilityStatusColor(),
+                shape = CircleShape
+            )
+            .padding(all = 6.dp)
     ) {
         Image(
-            painter = painterResource(id = category.iconResId),
-            contentDescription = stringResource(id = category.displayNameResId)
+            painter = painterResource(id = place.category.iconResId),
+            contentDescription = stringResource(id = place.category.displayNameResId)
         )
     }
 }
 
 @Composable
-fun MarkerInfoWindow(
-    item: PlaceClusterItem,
+@GoogleMapComposable
+fun InfoWindow(
+    item: Place,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = { },
-    onClose: () -> Unit = { }
+    onClose: () -> Unit = { },
 ) {
-    Box(modifier) {
+    Box(modifier.background(color = MaterialTheme.colorScheme.surface)) {
         IconButton(
             onClick = onClose,
             modifier = Modifier.align(Alignment.TopEnd)
@@ -465,47 +475,47 @@ fun MarkerInfoWindow(
             modifier = Modifier.padding(16.dp)
         ) {
             InfoWindowAccessibilityImage(
-                status = item.placeData.accessibility.accessibilityStatus,
+                status = item.accessibility.accessibilityStatus,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .size(96.dp)
                     .background(
-                        color = item.placeData.accessibility.accessibilityStatus
+                        color = item.accessibility.accessibilityStatus
                             .getAccessibilityStatusColor(),
                         shape = CircleShape
                     )
             )
             Spacer(Modifier.height(24.dp))
             Text(
-                text = item.placeData.name,
+                text = item.name,
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.widthIn(max = 200.dp)
             )
             Text(
-                text = stringResource(id = item.placeData.category.displayNameResId),
+                text = stringResource(id = item.category.displayNameResId),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             InfoWindowAccessibilityInfo(
                 infoLabel = stringResource(id = R.string.accessible_entrance),
                 status = stringResource(
-                    id = item.placeData.accessibility.accessibilityStatus
+                    id = item.accessibility.accessibilityStatus
                         .getEmojiStringRes()
                 )
             )
             InfoWindowAccessibilityInfo(
                 infoLabel = stringResource(id = R.string.accessibility_toilet_label),
                 status = stringResource(
-                    id = item.placeData.accessibility.accessibilityStatus
+                    id = item.accessibility.accessibilityStatus
                         .getEmojiStringRes()
                 )
             )
             InfoWindowAccessibilityInfo(
                 infoLabel = stringResource(id = R.string.info_window_parking),
                 status = stringResource(
-                    id = item.placeData.accessibility.accessibilityStatus
+                    id = item.accessibility.accessibilityStatus
                         .getEmojiStringRes()
                 )
             )
@@ -522,9 +532,10 @@ fun MarkerInfoWindow(
 }
 
 @Composable
+@GoogleMapComposable
 fun InfoWindowAccessibilityImage(
     status: AccessibilityStatus?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -545,10 +556,11 @@ fun InfoWindowAccessibilityImage(
 }
 
 @Composable
+@GoogleMapComposable
 fun InfoWindowAccessibilityInfo(
     infoLabel: String,
     status: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -569,7 +581,7 @@ fun InfoWindowAccessibilityInfo(
 @Composable
 fun NotificationBar(
     message: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
@@ -666,11 +678,8 @@ private fun MapInfoPopup_Preview() {
     )
 
     MaterialTheme {
-        MarkerInfoWindow(
-            PlaceClusterItem(
-                place = place,
-                zIndex = 1f
-            )
+        InfoWindow(
+            place
         )
     }
 }

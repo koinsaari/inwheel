@@ -53,7 +53,7 @@ class MapViewModel(
     private var fetchJob: Job? = null
     private var moveJob: Job? = null
     private var cachedPlaces: Set<Place> = emptySet()
-    private val allClusterItems = mutableSetOf<PlaceClusterItem>()
+    private val cachedClusterItems = mutableSetOf<PlaceClusterItem>()
 
     init {
         // Handle search query changes
@@ -73,7 +73,7 @@ class MapViewModel(
                 .distinctUntilChanged()
                 .collect { categories ->
                     if (categories.isEmpty()) {
-                        _state.update { it.copy(clusterItems = allClusterItems.toList()) }
+                        _state.update { it.copy(clusterItems = cachedClusterItems.toList()) }
                         Log.d(
                             "MapViewModel",
                             "cluster items: ${_state.value.clusterItems.size}, " +
@@ -81,7 +81,7 @@ class MapViewModel(
                         )
                         return@collect
                     }
-                    val filteredItems = allClusterItems.filter {
+                    val filteredItems = cachedClusterItems.filter {
                         categories.contains(it.placeData.category.rawValue)
                     }
                     _state.update {
@@ -119,7 +119,7 @@ class MapViewModel(
                         )
                     }
                     cachedPlaces = clusterItems.map { it.placeData }.toSet()
-                    allClusterItems.addAll(clusterItems)
+                    cachedClusterItems.addAll(clusterItems)
                     Log.d("MapViewModel", "Updated cluster items: ${clusterItems.size}")
                 }
         }
@@ -129,19 +129,9 @@ class MapViewModel(
         viewModelScope.launch {
             when (intent) {
                 is MapIntent.MoveMap -> handleMove(intent)
-                is MapIntent.ClickMap -> handleMapClick(intent.item)
+                is MapIntent.ClickMap -> handleMapClick(intent.item, intent.position)
                 is MapIntent.ToggleFilter -> handleToggleFilter(intent.category)
                 is MapIntent.SearchPlace -> applySearchFilter(intent.query)
-                is MapIntent.ClickClusterItem -> {
-                    _state.update {
-                        it.copy(
-                            selectedClusterItem = PlaceClusterItem(
-                                intent.place,
-                                1f
-                            )
-                        )
-                    }
-                }
 
                 is MapIntent.UpdateQuery -> {
                     _state.update { it.copy(searchQuery = intent.query) }
@@ -193,7 +183,7 @@ class MapViewModel(
                             isLoading = false
                         )
                     }
-                    allClusterItems.addAll(_state.value.clusterItems)
+                    cachedClusterItems.addAll(_state.value.clusterItems)
                 }
             }
 
@@ -256,18 +246,14 @@ class MapViewModel(
         return LatLngBounds(expandedSouthwest, expandedNortheast)
     }
 
-    private fun handleMapClick(item: PlaceClusterItem?) {
+    private fun handleMapClick(item: PlaceClusterItem?, position: LatLng?) {
         _state.update {
             it.copy(
-                selectedClusterItem = if (item == it.selectedClusterItem) {
-                    sharedViewModel.clearSelectedPlace()
-                    null
-                } else {
-                    sharedViewModel.selectPlace(item?.placeData)
-                    item
-                }
+                selectedClusterItem = item,
+                center = if (position != null) position else return
             )
         }
+        Log.d("MapViewModel", "Selected cluster item: ${_state.value.selectedClusterItem}")
     }
 
     private fun handleToggleFilter(category: PlaceCategory) {
@@ -299,22 +285,21 @@ class MapViewModel(
     }
 
     private fun applySearchFilter(query: String) {
-        val allPlaces = _state.value.clusterItems
         val filtered = if (query.isBlank()) {
             emptyList()
         } else {
-            allPlaces.filter { place ->
+            cachedPlaces.filter { place ->
                 // Excludes places without name (toilets, parking spots, etc)
-                place.placeData.name.contains(query, ignoreCase = true) &&
-                        place.placeData.name != place.placeData.category.rawValue
+                place.name.contains(query, ignoreCase = true) &&
+                        place.name != place.category.rawValue
             }
         }
-        _state.update { it.copy(filteredPlaces = filtered.map { it.placeData }) }
-        Log.d("MapViewModel", "Filtered places: ${_state.value.filteredPlaces}")
+        _state.update { it.copy(filteredPlaces = filtered) }
+        Log.d("MapViewModel", "Filtered places count: ${_state.value.filteredPlaces.size}")
     }
 
     companion object {
-        private const val MAX_CLUSTER_ITEMS = 400
+        private const val MAX_CLUSTER_ITEMS = 500
         private const val ZOOM_THRESHOLD_LARGE = 12
         private const val ZOOM_THRESHOLD_SMALL = 14
         private const val DEBOUNCE_VALUE = 200L

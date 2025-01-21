@@ -29,10 +29,12 @@ sealed class MapIntent {
         val bounds: LatLngBounds
     ) : MapIntent()
 
-    data class ClickMap(val item: PlaceClusterItem?) : MapIntent()
+    data class ClickMap(
+        val item: PlaceClusterItem?,
+        val position: LatLng?
+    ) : MapIntent()
     data class UpdateQuery(val query: String) : MapIntent()
     data class SearchPlace(val query: String) : MapIntent()
-    data class ClickClusterItem(val place: Place) : MapIntent()
     data class SelectPlace(val place: Place) : MapIntent()
     data class ToggleFilter(val category: PlaceCategory) : MapIntent()
 }
