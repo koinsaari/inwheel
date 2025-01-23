@@ -104,12 +104,7 @@ class MapViewModel(
             _state.map { it.smallSnapshotBounds }
                 .filterNotNull()
                 .distinctUntilChanged()
-                .flatMapLatest { bounds ->
-                    repository.observePlacesWithinBounds(
-                        bounds,
-//                        MAX_CLUSTER_ITEMS
-                    )
-                }
+                .flatMapLatest { bounds -> repository.observePlacesWithinBounds(bounds) }
                 .map { places -> places.map { it.toClusterItem() } }
                 .collect { clusterItems ->
                     _state.update {
@@ -150,13 +145,15 @@ class MapViewModel(
         moveJob = viewModelScope.launch {
             delay(DEBOUNCE_VALUE)
             if (intent.zoomLevel < ZOOM_THRESHOLD_LARGE) {
+                cachedClusterItems.addAll(_state.value.clusterItems)
+                Log.d("MapViewModel", "Cached cluster items: ${cachedClusterItems.size}")
                 handleClearMarkers()
                 return@launch
             }
 
             val currentLargeBounds = _state.value.largeSnapshotBounds
-            if ((currentLargeBounds == null || !currentLargeBounds.contains(intent.center)) &&
-                intent.zoomLevel >= ZOOM_THRESHOLD_LARGE
+            if (currentLargeBounds == null || (!currentLargeBounds.contains(intent.center) &&
+                        intent.zoomLevel >= ZOOM_THRESHOLD_LARGE)
             ) {
                 fetchJob?.cancel()
                 fetchJob = viewModelScope.launch {
@@ -188,8 +185,8 @@ class MapViewModel(
             }
 
             val currentSmallBounds = _state.value.smallSnapshotBounds
-            if (currentSmallBounds == null || !currentSmallBounds.contains(intent.center) &&
-                intent.zoomLevel >= ZOOM_THRESHOLD_SMALL
+            if (currentSmallBounds == null || (!currentSmallBounds.contains(intent.center) &&
+                        intent.zoomLevel >= ZOOM_THRESHOLD_SMALL)
             ) {
                 val newSmallBounds = calculateExpandedBounds(intent.bounds, intent.zoomLevel, false)
                 _state.update {
@@ -276,6 +273,7 @@ class MapViewModel(
                 it.copy(
                     clusterItems = emptyList(),
                     currentBounds = null,
+                    smallSnapshotBounds = null,
                     selectedClusterItem = null,
                     isLoading = false
                 )
@@ -299,7 +297,6 @@ class MapViewModel(
     }
 
     companion object {
-        private const val MAX_CLUSTER_ITEMS = 500
         private const val ZOOM_THRESHOLD_LARGE = 12
         private const val ZOOM_THRESHOLD_SMALL = 14
         private const val DEBOUNCE_VALUE = 200L
