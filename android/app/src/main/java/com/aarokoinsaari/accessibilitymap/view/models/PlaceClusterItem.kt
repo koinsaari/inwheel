@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package com.aarokoinsaari.accessibilitymap.viewmodel
+package com.aarokoinsaari.accessibilitymap.view.models
 
-import androidx.lifecycle.ViewModel
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.clustering.ClusterItem
 
-class SharedViewModel : ViewModel() {
-    private val _selectedPlace = MutableStateFlow<Place?>(null)
-    val selectedPlace: StateFlow<Place?> = _selectedPlace
+data class PlaceClusterItem(
+    private val place: Place,
+    private val zIndex: Float?
+) : ClusterItem {
 
-    fun selectPlace(place: Place?) {
-        _selectedPlace.value = place
-    }
+    val placeData: Place
+        get() = place
 
-    fun clearSelectedPlace() {
-        _selectedPlace.value = null
-    }
+    override fun getPosition(): LatLng = LatLng(place.lat, place.lon)
+    override fun getTitle(): String = place.name
+    override fun getSnippet(): String = place.category.name
+    override fun getZIndex(): Float? = null
 }

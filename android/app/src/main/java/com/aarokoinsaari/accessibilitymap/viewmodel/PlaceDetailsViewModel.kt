@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 package com.aarokoinsaari.accessibilitymap.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.aarokoinsaari.accessibilitymap.intent.PlaceDetailsIntent
-import com.aarokoinsaari.accessibilitymap.model.Place
-import com.aarokoinsaari.accessibilitymap.state.PlaceDetailsState
+import com.aarokoinsaari.accessibilitymap.domain.intent.PlaceDetailsIntent
+import com.aarokoinsaari.accessibilitymap.domain.model.Place
+import com.aarokoinsaari.accessibilitymap.domain.state.PlaceDetailsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

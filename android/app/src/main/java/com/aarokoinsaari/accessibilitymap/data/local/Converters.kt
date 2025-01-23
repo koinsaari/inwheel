@@ -19,9 +19,9 @@ package com.aarokoinsaari.accessibilitymap.data.local
 
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
-import com.aarokoinsaari.accessibilitymap.model.ContactInfo
-import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityInfo
-import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.domain.model.ContactInfo
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityInfo
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 

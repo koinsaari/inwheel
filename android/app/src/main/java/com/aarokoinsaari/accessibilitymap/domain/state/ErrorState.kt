@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package com.aarokoinsaari.accessibilitymap.data.local
+package com.aarokoinsaari.accessibilitymap.domain.state
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import com.aarokoinsaari.accessibilitymap.domain.model.Place
-import com.aarokoinsaari.accessibilitymap.domain.model.PlaceFts
-
-@Database(entities = [Place::class, PlaceFts::class], version = 1, exportSchema = false)
-@TypeConverters(Converters::class)
-abstract class AppDatabase : RoomDatabase() {
-    abstract fun placesDao(): PlacesDao
-    abstract fun placesFtsDao(): PlacesFtsDao
+sealed class ErrorState {
+    object None : ErrorState()
+    object NoInternet : ErrorState()
+    object Timeout : ErrorState()
+    data class ApiError(val code: Int, val message: String?) : ErrorState()
+    data class Unknown(val error: Throwable?) : ErrorState()
 }

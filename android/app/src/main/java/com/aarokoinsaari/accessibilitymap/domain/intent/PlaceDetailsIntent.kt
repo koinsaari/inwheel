@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Aaro Koinsaari
+ * Copyright (c) 2024–2025 Aaro Koinsaari
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package com.aarokoinsaari.accessibilitymap.viewmodel
+package com.aarokoinsaari.accessibilitymap.domain.intent
 
-import androidx.lifecycle.ViewModel
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
-class SharedViewModel : ViewModel() {
-    private val _selectedPlace = MutableStateFlow<Place?>(null)
-    val selectedPlace: StateFlow<Place?> = _selectedPlace
-
-    fun selectPlace(place: Place?) {
-        _selectedPlace.value = place
-    }
-
-    fun clearSelectedPlace() {
-        _selectedPlace.value = null
-    }
+sealed class PlaceDetailsIntent {
+    data class ClickMap(val place: Place) : PlaceDetailsIntent()
+    data class ClickFavorite(val place: Place) : PlaceDetailsIntent()
+    data class ClickOptions(val place: Place) : PlaceDetailsIntent()
+    data object ClickBack : PlaceDetailsIntent()
 }

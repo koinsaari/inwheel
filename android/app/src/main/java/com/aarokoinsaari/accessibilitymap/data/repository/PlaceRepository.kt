@@ -21,7 +21,7 @@ import androidx.annotation.VisibleForTesting
 import com.aarokoinsaari.accessibilitymap.data.local.PlacesDao
 import com.aarokoinsaari.accessibilitymap.data.remote.supabase.SupabaseApiService
 import com.aarokoinsaari.accessibilitymap.data.remote.supabase.toDomain
-import com.aarokoinsaari.accessibilitymap.model.Place
+import com.aarokoinsaari.accessibilitymap.domain.model.Place
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.Dispatchers

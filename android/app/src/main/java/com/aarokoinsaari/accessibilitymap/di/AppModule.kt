@@ -24,7 +24,7 @@ import com.aarokoinsaari.accessibilitymap.data.local.PlacesDao
 import com.aarokoinsaari.accessibilitymap.data.local.PlacesFtsDao
 import com.aarokoinsaari.accessibilitymap.data.remote.supabase.SupabaseApiService
 import com.aarokoinsaari.accessibilitymap.data.repository.PlaceRepository
-import com.aarokoinsaari.accessibilitymap.model.Place
+import com.aarokoinsaari.accessibilitymap.domain.model.Place
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceDetailsViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.SharedViewModel

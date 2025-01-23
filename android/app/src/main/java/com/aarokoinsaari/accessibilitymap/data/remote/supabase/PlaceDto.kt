@@ -18,14 +18,14 @@ package com.aarokoinsaari.accessibilitymap.data.remote.supabase
 
 import android.util.Log
 import androidx.room.PrimaryKey
-import com.aarokoinsaari.accessibilitymap.model.ContactInfo
-import com.aarokoinsaari.accessibilitymap.model.Place
-import com.aarokoinsaari.accessibilitymap.model.PlaceCategory
-import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityInfo
-import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityInfo.GeneralAccessibility
-import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityInfo.ParkingAccessibility
-import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityInfo.ToiletAccessibility
-import com.aarokoinsaari.accessibilitymap.model.accessibility.AccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.domain.model.ContactInfo
+import com.aarokoinsaari.accessibilitymap.domain.model.Place
+import com.aarokoinsaari.accessibilitymap.domain.model.PlaceCategory
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityInfo
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityInfo.GeneralAccessibility
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityInfo.ParkingAccessibility
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityInfo.ToiletAccessibility
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
