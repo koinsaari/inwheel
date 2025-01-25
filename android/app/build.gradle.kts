@@ -83,6 +83,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.play.services.maps)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.maps.utils.ktx)
     implementation(libs.maps.compose)
     implementation(libs.maps.compose.utils)

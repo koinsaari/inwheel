@@ -15,6 +15,7 @@ composeBom = "2025.01.00"
 loggingInterceptor = "4.9.0"
 mapsCompose = "6.4.1"
 mapsUtilsKtx = "5.1.1"
+materialIcons = "1.7.6"
 navigationCompose = "2.8.5"
 playServicesMaps = "19.0.0"
 roomKtx = "2.6.1"
@@ -27,6 +28,7 @@ playServicesLocation = "21.3.0"
 [libraries]
 android-maps-utils = { module = "com.google.maps.android:android-maps-utils", version.ref = "androidMapsUtils" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIcons" }
 androidx-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "runtime" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
