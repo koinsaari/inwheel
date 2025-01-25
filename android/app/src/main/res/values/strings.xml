@@ -133,4 +133,5 @@
     <string name="category_sports">Sports store</string>
     <string name="category_books">Books store</string>
     <string name="google_map_id">e030cf9b88fce692</string>
+    <string name="close_detail_sheet_button">Close detail sheet</string>
 </resources>
