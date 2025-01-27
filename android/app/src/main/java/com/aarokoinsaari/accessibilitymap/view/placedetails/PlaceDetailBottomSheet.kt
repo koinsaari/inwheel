@@ -19,14 +19,11 @@ package com.aarokoinsaari.accessibilitymap.view.placedetails
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocationOn
@@ -34,7 +31,6 @@ import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,7 +54,6 @@ import com.aarokoinsaari.accessibilitymap.view.theme.AccessibilityMapTheme
 fun PlaceDetailBottomSheet(
     place: Place,
     modifier: Modifier = Modifier,
-    onClose: () -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier
@@ -66,32 +61,7 @@ fun PlaceDetailBottomSheet(
             .padding(16.dp)
     ) {
         item {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = place.name,
-                    style = MaterialTheme.typography.titleLarge
-                )
-                IconButton(
-                    onClick = onClose,
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(id = R.string.close_detail_sheet_button),
-                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                    )
-                }
-            }
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = stringResource(id = place.category.displayNameRes),
-                style = MaterialTheme.typography.labelLarge
-            )
             if (place.contact.address != null) {
-            Spacer(Modifier.height(8.dp))
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -168,7 +138,6 @@ fun ContactInfoSection(
 @Preview(showBackground = true)
 @Composable
 private fun PlaceDetailBottomSheet_Preview() {
-
     val contactInfo = ContactInfo(
         email = "example@mail.com",
         phone = "+41 21 123 45 67",

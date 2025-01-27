@@ -18,7 +18,6 @@ package com.aarokoinsaari.accessibilitymap.domain.intent
 
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
 import com.aarokoinsaari.accessibilitymap.domain.model.PlaceCategory
-import com.aarokoinsaari.accessibilitymap.view.models.PlaceClusterItem
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 
@@ -27,11 +26,6 @@ sealed class MapIntent {
         val center: LatLng,
         val zoomLevel: Float,
         val bounds: LatLngBounds
-    ) : MapIntent()
-
-    data class ClickMap(
-        val item: PlaceClusterItem?,
-        val position: LatLng?
     ) : MapIntent()
     data class UpdateQuery(val query: String) : MapIntent()
     data class SearchPlace(val query: String) : MapIntent()

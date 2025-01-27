@@ -17,13 +17,11 @@
 package com.aarokoinsaari.accessibilitymap.view.map
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -43,18 +41,15 @@ import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.clustering.Clustering
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, MapsComposeExperimentalApi::class)
 @Composable
 fun MapContent(
     state: MapState,
     cameraPositionState: CameraPositionState,
-    bottomSheetScaffoldState: BottomSheetScaffoldState,
     modifier: Modifier = Modifier,
     onIntent: (MapIntent) -> Unit = {},
-    ) {
-    val scope = rememberCoroutineScope()
+) {
     val context = LocalContext.current
     val config = LocalConfiguration.current
     val screenWidthDp = config.screenWidthDp
@@ -78,13 +73,13 @@ fun MapContent(
 
     GoogleMap(
         cameraPositionState = cameraPositionState,
-        onMapClick = { onIntent(MapIntent.ClickMap(null, null)) },
         googleMapOptionsFactory = {
             GoogleMapOptions().mapId(context.getString(R.string.google_map_id))
         },
         modifier = modifier.fillMaxSize()
     ) {
-        val clusterManagerState = remember { mutableStateOf<ClusterManager<PlaceClusterItem>?>(null) }
+        val clusterManagerState =
+            remember { mutableStateOf<ClusterManager<PlaceClusterItem>?>(null) }
 
         MapEffect(context) { map ->
             val cm = ClusterManager<PlaceClusterItem>(context, map)
@@ -97,14 +92,8 @@ fun MapContent(
                 false
             }
             cm.setOnClusterItemClickListener { item ->
-                onIntent(MapIntent.ClickMap(item, item.position))
-                scope.launch { bottomSheetScaffoldState.bottomSheetState.expand() }
-                scope.launch {
-                    cameraPositionState.animate(
-                        update = CameraUpdateFactory.newLatLng(item.position),
-                        durationMs = 200
-                    )
-                }
+                onIntent(MapIntent.SelectPlace(item.placeData))
+                map.animateCamera(CameraUpdateFactory.newLatLng(item.position))
                 true
             }
             cm.setRenderer(

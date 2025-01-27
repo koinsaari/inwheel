@@ -124,7 +124,6 @@ class MapViewModel(
         viewModelScope.launch {
             when (intent) {
                 is MapIntent.MoveMap -> handleMove(intent)
-                is MapIntent.ClickMap -> handleMapClick(intent.item, intent.position)
                 is MapIntent.ToggleFilter -> handleToggleFilter(intent.category)
                 is MapIntent.SearchPlace -> applySearchFilter(intent.query)
 
@@ -241,16 +240,6 @@ class MapViewModel(
         )
 
         return LatLngBounds(expandedSouthwest, expandedNortheast)
-    }
-
-    private fun handleMapClick(item: PlaceClusterItem?, position: LatLng?) {
-        _state.update {
-            it.copy(
-                selectedClusterItem = item,
-                center = if (position != null) position else return
-            )
-        }
-        Log.d("MapViewModel", "Selected cluster item: ${_state.value.selectedClusterItem}")
     }
 
     private fun handleToggleFilter(category: PlaceCategory) {

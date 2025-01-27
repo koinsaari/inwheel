@@ -21,26 +21,49 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.BottomSheetDefaults.DragHandle
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.aarokoinsaari.accessibilitymap.domain.intent.MapIntent
-import com.aarokoinsaari.accessibilitymap.domain.intent.PlaceDetailsIntent
-import com.aarokoinsaari.accessibilitymap.view.components.BottomNavigationBar
 import com.aarokoinsaari.accessibilitymap.view.map.MapScreen
 import com.aarokoinsaari.accessibilitymap.view.navigation.NavigationScreen
-import com.aarokoinsaari.accessibilitymap.view.placedetails.PlaceDetailsScreen
+import com.aarokoinsaari.accessibilitymap.view.placedetails.PlaceDetailBottomSheet
 import com.aarokoinsaari.accessibilitymap.view.theme.AccessibilityMapTheme
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
-import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceDetailsViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.SharedViewModel
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,54 +71,121 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AccessibilityMapTheme {
-                val navController = rememberNavController()
-                val sharedViewModel: SharedViewModel = koinViewModel()
-                Scaffold(
-                    bottomBar = { BottomNavigationBar(navController = navController) },
-                    contentWindowInsets = WindowInsets(0)
-                ) { innerPadding ->
-                    NavHost(
-                        navController = navController,
-                        startDestination = NavigationScreen.Map.route,
-                        modifier = Modifier.padding(innerPadding)
-                    ) {
-                        composable(NavigationScreen.Map.route) {
-                            val viewModel: MapViewModel = koinViewModel()
-                            MapScreen(
-                                stateFlow = viewModel.state,
-                                onIntent = { intent ->
-                                    when (intent) {
-                                        is MapIntent.SelectPlace -> {
-                                            Log.d("MainActivity", "Selected place: ${intent.place}")
-                                            sharedViewModel.selectPlace(intent.place)
-                                            navController.navigate(NavigationScreen.PlaceDetails.route)
-                                        }
+                MainScreen()
+            }
+        }
+    }
+}
 
-                                        else -> viewModel.handleIntent(intent)
-                                    }
-                                }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainScreen() {
+    val navController = rememberNavController()
+    val scope = rememberCoroutineScope()
+    val sharedViewModel: SharedViewModel = koinViewModel()
+    val selectedPlaceState = sharedViewModel.selectedPlace.collectAsState()
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberStandardBottomSheetState(
+            initialValue = SheetValue.Hidden,
+            skipHiddenState = false
+        )
+    )
+
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.windowInsetsPadding(
+            WindowInsets.systemBars.only(
+                WindowInsetsSides.Bottom
+            )
+        )
+    ) {
+        BottomSheetScaffold(
+            scaffoldState = bottomSheetScaffoldState,
+            sheetPeekHeight = 96.dp,
+            sheetContent = {
+                val place = selectedPlaceState.value
+                if (place != null) {
+                    PlaceDetailBottomSheet(place = place)
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.no_place_selected),
+                        modifier = Modifier.padding(16.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontStyle = FontStyle.Italic
+                    )
+                }
+            },
+            sheetDragHandle = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    val place = selectedPlaceState.value
+                    if (place != null) {
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .padding(top = 36.dp)
+                        ) {
+                            Text(
+                                text = place.name,
+                                style = MaterialTheme.typography.titleLarge
                             )
-                        }
-                        composable(NavigationScreen.PlaceDetails.route) {
-                            val place = sharedViewModel.selectedPlace.collectAsState().value
-                            val viewModel: PlaceDetailsViewModel = koinViewModel(
-                                parameters = { parametersOf(place) }
-                            )
-                            PlaceDetailsScreen(
-                                stateFlow = viewModel.state,
-                                onIntent = { intent ->
-                                    when (intent) {
-                                        is PlaceDetailsIntent.ClickBack,
-                                        is PlaceDetailsIntent.ClickMap -> {
-                                            Log.d("MainActivity", "Intent: $intent")
-                                            navController.popBackStack()
-                                        }
-                                        else -> viewModel.handleIntent(intent)
-                                    }
-                                }
+                            Text(
+                                text = stringResource(id = place.category.displayNameRes),
+                                style = MaterialTheme.typography.labelLarge
                             )
                         }
                     }
+
+                    DragHandle(Modifier.align(Alignment.TopCenter))
+
+                    IconButton(
+                        onClick = {
+                            scope.launch {
+                                bottomSheetScaffoldState.bottomSheetState.hide()
+                            }
+                            sharedViewModel.clearSelectedPlace()
+                        },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 16.dp)
+                            .size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(id = R.string.close_detail_sheet_button),
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                        )
+                    }
+                }
+            }
+        ) { innerPadding ->
+            NavHost(
+                navController = navController,
+                startDestination = NavigationScreen.Map.route
+            ) {
+                composable(NavigationScreen.Map.route) {
+                    val viewModel: MapViewModel = koinViewModel()
+                    MapScreen(
+                        stateFlow = viewModel.state,
+                        onIntent = { intent ->
+                            when (intent) {
+                                is MapIntent.SelectPlace -> {
+                                    Log.d("MainScreen", "Selected place: ${intent.place}")
+                                    sharedViewModel.selectPlace(intent.place)
+
+                                    scope.launch {
+                                        bottomSheetScaffoldState.bottomSheetState.partialExpand()
+                                    }
+                                }
+
+                                else -> viewModel.handleIntent(intent)
+                            }
+                        }
+                    )
                 }
             }
         }

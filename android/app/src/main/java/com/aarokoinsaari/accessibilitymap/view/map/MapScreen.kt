@@ -32,14 +32,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -64,7 +63,6 @@ import com.aarokoinsaari.accessibilitymap.domain.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.domain.model.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.domain.state.MapState
 import com.aarokoinsaari.accessibilitymap.utils.extensions.getLastLocationSuspended
-import com.aarokoinsaari.accessibilitymap.view.placedetails.PlaceDetailBottomSheet
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -80,11 +78,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun MapScreen(
     stateFlow: StateFlow<MapState>,
-    onIntent: (MapIntent) -> Unit = { },
+    modifier: Modifier = Modifier,
+    onIntent: (MapIntent) -> Unit = {},
 ) {
     val state by stateFlow.collectAsState()
     val scope = rememberCoroutineScope()
-    val scaffoldState = rememberBottomSheetScaffoldState()
     val defaultLocation = LatLng(46.462, 6.841) // Vevey
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
@@ -95,105 +93,74 @@ fun MapScreen(
     var searchExpanded by rememberSaveable { mutableStateOf(false) }
     var showNotification by rememberSaveable { mutableStateOf(true) }
 
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 0.dp,
-        sheetContent = {
-            val selectedPlace = state.selectedClusterItem?.placeData
-            if (selectedPlace != null) {
-                PlaceDetailBottomSheet(
-                    place = selectedPlace,
-                    onClose = {
-                        scope.launch {
-                            scaffoldState.bottomSheetState.hide()
-                        }
-                        onIntent(MapIntent.ClickMap(null, null))
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        modifier = modifier.fillMaxSize()
+    ) {
+        MapContent(
+            state = state,
+            cameraPositionState = cameraPositionState,
+            onIntent = onIntent
+        )
 
+        Column(Modifier.fillMaxWidth()) {
+            PlaceSearchBar(
+                query = state.searchQuery,
+                onQueryChange = { text ->
+                    onIntent(MapIntent.UpdateQuery(text))
+                },
+                onSearch = {
+                    searchExpanded = false
+                    onIntent(MapIntent.SearchPlace(state.searchQuery))
+                },
+                expanded = searchExpanded,
+                onExpandedChange = { searchExpanded = it },
+                searchResults = state.filteredPlaces,
+                onPlaceSelected = { place ->
+                    onIntent(MapIntent.SelectPlace(place))
+                    searchExpanded = false
+
+                    // Moves map to the selected place
+                    scope.launch {
+                        cameraPositionState.animate(
+                            update = CameraUpdateFactory.newLatLngZoom(
+                                LatLng(place.lat, place.lon),
+                                20f
+                            ),
+                            durationMs = 1000
+                        )
                     }
-                )
-            } else {
-                Text(
-                    text = "No place selected",
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        },
-    ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            MapContent(
-                state = state,
-                cameraPositionState = cameraPositionState,
-                onIntent = onIntent,
-                bottomSheetScaffoldState = scaffoldState
-            )
-
-            Column(
+                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.TopCenter)
+                    .zIndex(1f)
+            )
+
+            FilterChipRow(
+                categories = PlaceCategory.entries,
+                selectedCategories = state.selectedCategories,
+                onIntent = onIntent,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Transparent)
+                    .padding(horizontal = 12.dp, vertical = 4.dp)
+                    .zIndex(1f)
+            )
+        }
+
+        AnimatedVisibility(
+            visible = showNotification,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                PlaceSearchBar(
-                    query = state.searchQuery,
-                    onQueryChange = { text ->
-                        onIntent(MapIntent.UpdateQuery(text))
-                    },
-                    onSearch = {
-                        searchExpanded = false
-                        onIntent(MapIntent.SearchPlace(state.searchQuery))
-                    },
-                    expanded = searchExpanded,
-                    onExpandedChange = { searchExpanded = it },
-                    searchResults = state.filteredPlaces,
-                    onPlaceSelected = { place ->
-                        onIntent(MapIntent.SelectPlace(place))
-                        searchExpanded = false
-
-                        // Moves map to the selected place
-                        scope.launch {
-                            cameraPositionState.animate(
-                                update = CameraUpdateFactory.newLatLngZoom(
-                                    LatLng(place.lat, place.lon),
-                                    20f
-                                ),
-                                durationMs = 1000
-                            )
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .zIndex(1f)
+                NotificationBar(
+                    message = stringResource(id = R.string.map_zoom_notification)
                 )
-
-                FilterChipRow(
-                    categories = PlaceCategory.entries,
-                    selectedCategories = state.selectedCategories,
-                    onIntent = onIntent,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Transparent)
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
-                        .zIndex(1f)
-                )
-            }
-
-            AnimatedVisibility(
-                visible = showNotification,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    NotificationBar(
-                        message = stringResource(id = R.string.map_zoom_notification)
-                    )
-                }
             }
         }
     }
@@ -222,7 +189,7 @@ fun FilterChipRow(
     categories: List<PlaceCategory>,
     selectedCategories: Set<String>,
     modifier: Modifier = Modifier,
-    onIntent: (MapIntent) -> Unit = { },
+    onIntent: (MapIntent) -> Unit = {},
 ) {
     LazyRow(modifier = modifier) {
         items(categories) { category ->
