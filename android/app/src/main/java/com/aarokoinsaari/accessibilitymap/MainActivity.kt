@@ -21,8 +21,10 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,9 +35,11 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.BottomSheetDefaults.DragHandle
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -51,11 +55,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.aarokoinsaari.accessibilitymap.domain.intent.MapIntent
+import com.aarokoinsaari.accessibilitymap.domain.model.Place
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.accessibilityStatus
 import com.aarokoinsaari.accessibilitymap.view.map.MapScreen
 import com.aarokoinsaari.accessibilitymap.view.navigation.NavigationScreen
 import com.aarokoinsaari.accessibilitymap.view.placedetails.PlaceDetailBottomSheet
@@ -100,20 +109,15 @@ fun MainScreen() {
             )
         )
     ) {
+        val sheetPeek = calculateBottomSheetPeekHeight(selectedPlaceState.value)
+        Log.d("MainScreen", "Sheet peek height: $sheetPeek")
         BottomSheetScaffold(
             scaffoldState = bottomSheetScaffoldState,
-            sheetPeekHeight = 96.dp,
+            sheetPeekHeight = sheetPeek,
             sheetContent = {
                 val place = selectedPlaceState.value
                 if (place != null) {
-                    PlaceDetailBottomSheet(place = place)
-                } else {
-                    Text(
-                        text = stringResource(id = R.string.no_place_selected),
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontStyle = FontStyle.Italic
-                    )
+                    PlaceDetailBottomSheet(place)
                 }
             },
             sheetDragHandle = {
@@ -131,12 +135,34 @@ fun MainScreen() {
                         ) {
                             Text(
                                 text = place.name,
-                                style = MaterialTheme.typography.titleLarge
+                                style = MaterialTheme.typography.titleLarge,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                             Text(
                                 text = stringResource(id = place.category.displayNameRes),
                                 style = MaterialTheme.typography.labelLarge
                             )
+                            val contactAddress = place.contact.address
+                            if (contactAddress != null) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(top = 4.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.LocationOn,
+                                        contentDescription = stringResource(id = R.string.content_desc_address),
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Text(
+                                        text = place.contact.address,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontStyle = FontStyle.Italic
+                                    )
+                                }
+                            }
+                            HorizontalDivider(Modifier.padding(top = 24.dp, bottom = 8.dp))
                         }
                     }
 
@@ -191,3 +217,12 @@ fun MainScreen() {
         }
     }
 }
+
+private fun calculateBottomSheetPeekHeight(place: Place?): Dp =
+    when {
+        place == null -> 56.dp
+        place.contact.address != null -> 128.dp
+        place.accessibility.accessibilityStatus != null &&
+                place.accessibility.accessibilityStatus != AccessibilityStatus.UNKNOWN -> 108.dp
+        else -> 108.dp
+    }

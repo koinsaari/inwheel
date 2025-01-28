@@ -60,11 +60,34 @@ internal fun Boolean?.getEmojiStringRes(): Int =
         null -> R.string.emoji_question
     }
 
-// TODO: Use MaterialTheme
 internal fun AccessibilityStatus?.getAccessibilityStatusMarkerBgDrawableRes(): Int =
     when (this) {
         FULLY_ACCESSIBLE -> R.drawable.bg_marker_green
         LIMITED_ACCESSIBILITY -> R.drawable.bg_marker_yellow
         NOT_ACCESSIBLE -> R.drawable.bg_marker_red
         else -> R.drawable.bg_marker_grey
+    }
+
+internal fun AccessibilityStatus?.getAccessibilityStatusIconRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.drawable.ic_accessible_general
+        LIMITED_ACCESSIBILITY -> R.drawable.ic_accessible_limited
+        NOT_ACCESSIBLE -> R.drawable.ic_not_accessible
+        else -> R.drawable.ic_accessible_general
+    }
+
+internal fun AccessibilityStatus?.getAccessibilityStatusContentDescStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.content_desc_fully_accessible
+        LIMITED_ACCESSIBILITY -> R.string.content_desc_limited_accessibility
+        NOT_ACCESSIBLE -> R.string.content_desc_not_accessible
+        else -> R.string.content_desc_unknown_accessibility
+    }
+
+internal fun AccessibilityStatus?.getAccessibilityStatusDrawableRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.drawable.accessibility_status_green
+        LIMITED_ACCESSIBILITY -> R.drawable.accessibility_status_yellow
+        NOT_ACCESSIBLE -> R.drawable.accessibility_status_red
+        else -> R.drawable.accessibility_status_grey
     }

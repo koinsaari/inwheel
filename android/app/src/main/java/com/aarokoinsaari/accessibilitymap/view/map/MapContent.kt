@@ -82,31 +82,32 @@ fun MapContent(
             remember { mutableStateOf<ClusterManager<PlaceClusterItem>?>(null) }
 
         MapEffect(context) { map ->
-            val cm = ClusterManager<PlaceClusterItem>(context, map)
-            cm.setAlgorithm(
-                NonHierarchicalViewBasedAlgorithm<PlaceClusterItem>(screenWidthDp, screenHeightDp)
-            )
-            cm.setAnimation(true)
-            cm.setOnClusterClickListener { cluster ->
-                cameraPositionState.move(CameraUpdateFactory.zoomIn())
-                false
-            }
-            cm.setOnClusterItemClickListener { item ->
-                onIntent(MapIntent.SelectPlace(item.placeData))
-                map.animateCamera(CameraUpdateFactory.newLatLng(item.position))
-                true
-            }
-            cm.setRenderer(
-                PlaceClusterRenderer(
-                    context = context,
-                    clusterItemSize = 72,
-                    map = map,
-                    clusterManager = cm
+            clusterManagerState.value = ClusterManager<PlaceClusterItem>(context, map).apply {
+                setAlgorithm(
+                    NonHierarchicalViewBasedAlgorithm<PlaceClusterItem>(
+                        screenWidthDp,
+                        screenHeightDp
+                    )
                 )
-            )
-
-            // save for usage by the Clustering composable
-            clusterManagerState.value = cm
+                setAnimation(true)
+                setOnClusterClickListener { cluster ->
+                    cameraPositionState.move(CameraUpdateFactory.zoomIn())
+                    false
+                }
+                setOnClusterItemClickListener { item ->
+                    onIntent(MapIntent.SelectPlace(item.placeData))
+                    map.animateCamera(CameraUpdateFactory.newLatLng(item.position))
+                    true
+                }
+                setRenderer(
+                    PlaceClusterRenderer(
+                        context = context,
+                        clusterItemSize = 72,
+                        map = map,
+                        clusterManager = this
+                    )
+                )
+            }
         }
 
         val clusterManager = clusterManagerState.value

@@ -47,28 +47,28 @@ class PlaceClusterRenderer(
         )
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap))
     }
+}
 
-    private fun createMarkerBitmap(
-        context: Context,
-        @DrawableRes backgroundRes: Int,
-        @DrawableRes iconRes: Int,
-        size: Int = 72,
-        iconPadding: Int = 16
-    ): Bitmap {
-        val iconSize = size - iconPadding * 2
+private fun createMarkerBitmap(
+    context: Context,
+    @DrawableRes backgroundRes: Int,
+    @DrawableRes iconRes: Int,
+    size: Int = 72,
+    iconPadding: Int = 16
+): Bitmap {
+    val iconSize = size - iconPadding * 2
 
-        return Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888).apply {
-            val canvas = Canvas(this)
+    return Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888).apply {
+        val canvas = Canvas(this)
 
-            ContextCompat.getDrawable(context, backgroundRes)?.apply {
-                setBounds(0, 0, size, size)
-                draw(canvas)
-            }
+        ContextCompat.getDrawable(context, backgroundRes)?.apply {
+            setBounds(0, 0, size, size)
+            draw(canvas)
+        }
 
-            ContextCompat.getDrawable(context, iconRes)?.apply {
-                setBounds(iconPadding, iconPadding, iconPadding + iconSize, iconPadding + iconSize)
-                draw(canvas)
-            }
+        ContextCompat.getDrawable(context, iconRes)?.apply {
+            setBounds(iconPadding, iconPadding, iconPadding + iconSize, iconPadding + iconSize)
+            draw(canvas)
         }
     }
 }
