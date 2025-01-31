@@ -16,6 +16,8 @@
 
 package com.aarokoinsaari.accessibilitymap.domain.model.accessibility
 
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityInfo.GeneralAccessibility.EntranceAccessibility
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityInfo.GeneralAccessibility.RestroomAccessibility
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -223,5 +225,17 @@ val AccessibilityInfo?.additionalInfo: String?
         is AccessibilityInfo.GeneralAccessibility -> this.additionalInfo
         is AccessibilityInfo.ToiletAccessibility -> this.additionalInfo
         is AccessibilityInfo.ParkingAccessibility -> this.additionalInfo
+        else -> null
+    }
+
+val AccessibilityInfo?.entrance: EntranceAccessibility?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.entrance
+        else -> null
+    }
+
+val AccessibilityInfo?.restroom: RestroomAccessibility?
+    get() = when (this) {
+        is AccessibilityInfo.GeneralAccessibility -> this.restroom
         else -> null
     }

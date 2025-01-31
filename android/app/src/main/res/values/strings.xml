@@ -143,4 +143,17 @@
     <string name="image_descript_fully_accessible">Fully accessible!</string>
     <string name="image_descript_limited_accessibility">Requires an assistant!</string>
     <string name="image_descript_not_accessible">Not accessible at all!</string>
+    <string name="no_contact_info_available">No contact info provided for this place. ☹️</string>
+    <string name="fully_accessible_status_title">This place is marked as fully accessible. \nPerson in a wheelchair should not need assistance</string>
+    <string name="limited_accessibility_status_title">This place is marked as partially accessible. \nPerson in a wheelchair might need assistance.</string>
+    <string name="not_accessible_status_title">This place is marked as not accessible.</string>
+    <string name="entrance_fully_accessible_label">No steps or has lift/ramp on entrance.</string>
+    <string name="entrance_limited_accessibility_label">Max 1 step not too steep on entrance, or the door is not practical to open.</string>
+    <string name="entrance_not_accessible_label">Multiple steps on entrance, or door is not wide enough.</string>
+    <string name="indoor_accessible_status_label">Inside spacious enough to move with a wheelchair.</string>
+    <string name="indoor_limited_accessibility_status_label">Inside some areas may be difficult to access with a wheelchair.</string>
+    <string name="indoor_not_accessible_status_label">Not enough space to move with a wheelchair.</string>
+    <string name="restroom_accessibility_status_label">The restroom is spacious and fully wheelchair accessible.</string>
+    <string name="restroom_limited_accessibility_status_label">The restroom is partially accessible and may require assistance.</string>
+    <string name="restroom_not_accessible_status_label">The restroom is not accessible for wheelchair users.</string>
 </resources>
