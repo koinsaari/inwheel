@@ -64,10 +64,10 @@ class SupabaseApiService(
                 emptyList()
             }
         } catch (e: CancellationException) {
-            Log.d("SupabaseApiService", "Request was cancelled", e)
+            Log.d("SupabaseApiService", "Request was cancelled $e")
             emptyList()
         } catch (e: Exception) {
-            Log.e("SupabaseApiService", "Error fetching places", e)
+            Log.e("SupabaseApiService", "Error fetching places: $e")
             emptyList()
         }
     }

@@ -35,7 +35,7 @@ class PlaceRepository(
     private val dao: PlacesDao,
 //    private val ftsDao: PlacesFtsDao,
 ) {
-    fun observePlacesWithinBounds(bounds: LatLngBounds, limit: Int = 2000): Flow<List<Place>> =
+    fun observePlacesWithinBounds(bounds: LatLngBounds, limit: Int = 5000): Flow<List<Place>> =
         dao.getPlacesFlowWithinBounds(
             southLat = bounds.southwest.latitude,
             northLat = bounds.northeast.latitude,
