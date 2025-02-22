@@ -39,7 +39,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,7 +72,7 @@ import com.aarokoinsaari.accessibilitymap.view.theme.AccessibilityMapTheme
 @Composable
 fun PlaceDetailBottomSheet(
     place: Place,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(
         modifier = modifier
@@ -81,7 +80,7 @@ fun PlaceDetailBottomSheet(
             .padding(16.dp)
     ) {
         item {
-            AccessibilityStatusDisplaySection(place)
+            AccessibilityStatusDisplaySection(place = place)
         }
         if (place.category.rawValue != "toilets") {
             item {
@@ -96,11 +95,10 @@ fun PlaceDetailBottomSheet(
 @Composable
 fun AccessibilityStatusDisplaySection(
     place: Place,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
-    if (place.accessibility.accessibilityStatus == null ||
-        place.accessibility.accessibilityStatus == UNKNOWN
-    ) {
+    val accessibilityStatus = place.accessibility.accessibilityStatus
+    if (accessibilityStatus == null || accessibilityStatus == UNKNOWN) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = modifier
@@ -146,7 +144,7 @@ fun AccessibilityStatusDisplaySection(
             )
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(0.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -161,8 +159,6 @@ fun AccessibilityStatusDisplaySection(
                     ),
                     modifier = Modifier.size(86.dp)
                 )
-
-                VerticalDivider(thickness = 1.dp, modifier = Modifier.padding(4.dp))
 
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -310,8 +306,8 @@ private fun AccessibilityStatus?.getEntranceAccessibilityLabelStringRes(): Int =
         FULLY_ACCESSIBLE -> R.string.entrance_fully_accessible_label
         LIMITED_ACCESSIBILITY -> R.string.entrance_limited_accessibility_label
         NOT_ACCESSIBLE -> R.string.entrance_not_accessible_label
-        UNKNOWN -> R.string.wheelchair_access_unknown
-        null -> R.string.wheelchair_access_unknown
+        UNKNOWN -> R.string.entrance_unknown_label
+        null -> R.string.entrance_unknown_label
     }
 
 private fun AccessibilityStatus?.getIndoorAccessibilityStringRes(): Int =
@@ -319,8 +315,8 @@ private fun AccessibilityStatus?.getIndoorAccessibilityStringRes(): Int =
         FULLY_ACCESSIBLE -> R.string.indoor_accessible_status_label
         LIMITED_ACCESSIBILITY -> R.string.indoor_limited_accessibility_status_label
         NOT_ACCESSIBLE -> R.string.indoor_not_accessible_status_label
-        UNKNOWN -> R.string.wheelchair_access_unknown
-        null -> R.string.wheelchair_access_unknown
+        UNKNOWN -> R.string.indoor_unknown_label
+        null -> R.string.indoor_unknown_label
     }
 
 private fun AccessibilityStatus?.getRestroomAccessibilityStringRes(): Int =
@@ -328,8 +324,8 @@ private fun AccessibilityStatus?.getRestroomAccessibilityStringRes(): Int =
         FULLY_ACCESSIBLE -> R.string.restroom_accessibility_status_label
         LIMITED_ACCESSIBILITY -> R.string.restroom_limited_accessibility_status_label
         NOT_ACCESSIBLE -> R.string.restroom_not_accessible_status_label
-        UNKNOWN -> R.string.wheelchair_access_unknown
-        null -> R.string.wheelchair_access_unknown
+        UNKNOWN -> R.string.restroom_unknown_label
+        null -> R.string.restroom_unknown_label
     }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -376,6 +372,40 @@ private fun PlaceDetailBottomSheet_Preview() {
         entrance = entranceAccessibility,
         restroom = restroomAccessibility,
         additionalInfo = "This location is mostly accessible."
+    )
+
+    val place = Place(
+        id = "1",
+        name = "Example Cafe",
+        category = PlaceCategory.CAFE,
+        lat = 46.460071,
+        lon = 6.843391,
+        contact = contactInfo,
+        accessibility = generalAccessibility
+    )
+
+    AccessibilityMapTheme {
+        PlaceDetailBottomSheet(place)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun PlaceDetailBottomSheetUnknownAccessibility_Preview() {
+    val contactInfo = ContactInfo(
+        email = "example@mail.com",
+        phone = "+41 21 123 45 67",
+        website = "https://www.example.com",
+        address = "Grande Place 1, Vevey 1800"
+    )
+
+    val generalAccessibility = AccessibilityInfo.GeneralAccessibility(
+        accessibilityStatus = null,
+        indoorAccessibility = null,
+        entrance = null,
+        restroom = null,
+        additionalInfo = null
     )
 
     val place = Place(

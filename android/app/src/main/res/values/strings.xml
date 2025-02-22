@@ -156,4 +156,7 @@
     <string name="restroom_accessibility_status_label">The restroom is spacious and fully wheelchair accessible.</string>
     <string name="restroom_limited_accessibility_status_label">The restroom is partially accessible and may require assistance.</string>
     <string name="restroom_not_accessible_status_label">The restroom is not accessible for wheelchair users.</string>
+    <string name="entrance_unknown_label">No detailed information given about entrance.</string>
+    <string name="indoor_unknown_label">No detailed information given about indoor accessibility.</string>
+    <string name="restroom_unknown_label">No information given about toilets inside.</string>
 </resources>
