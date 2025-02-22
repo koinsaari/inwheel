@@ -159,4 +159,18 @@
     <string name="entrance_unknown_label">No detailed information given about entrance.</string>
     <string name="indoor_unknown_label">No detailed information given about indoor accessibility.</string>
     <string name="restroom_unknown_label">No information given about toilets inside.</string>
+    <string name="details_entrance_step_count">Step count:</string>
+    <string name="details_entrance_step_height">Step height:</string>
+    <string name="details_entrance_ramp">Ramp:</string>
+    <string name="details_entrance_lift">Lift:</string>
+    <string name="details_title_entrance">Entrance</string>
+    <string name="details_title_restroom">Restroom</string>
+    <string name="details_restroom_door_width">Door width:</string>
+    <string name="details_restroom_room_maneuver">Room maneuver:</string>
+    <string name="details_restroom_grab_rails">Grab rails:</string>
+    <string name="details_restroom_sink">Sink:</string>
+    <string name="details_restroom_toilet_seat">Toilet seat:</string>
+    <string name="details_restroom_emergency_alarm">Emergency alarm:</string>
+    <string name="details_restroom_accessible_via">Accessible via:</string>
+    <string name="details_restroom_euro_key">EuroKey:</string>
 </resources>

@@ -38,14 +38,6 @@ internal fun AccessibilityStatus?.getFullStringRes(): Int =
         else -> R.string.wheelchair_access_unknown
     }
 
-internal fun AccessibilityStatus?.getEmojiStringRes(): Int =
-    when (this) {
-        FULLY_ACCESSIBLE -> R.string.emoji_checkmark
-        LIMITED_ACCESSIBILITY -> R.string.emoji_warning
-        NOT_ACCESSIBLE -> R.string.emoji_cross
-        else -> R.string.emoji_question
-    }
-
 internal fun Boolean?.getStringRes(): Int =
     when (this) {
         true -> R.string.accessibility_status_yes

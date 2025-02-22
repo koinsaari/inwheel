@@ -21,6 +21,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -61,9 +62,21 @@ import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.Accessibili
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus.NOT_ACCESSIBLE
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus.UNKNOWN
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.accessibilityStatus
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.accessibleVia
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.emergencyAlarm
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.entrance
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.euroKey
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.grabRails
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.indoorAccessibility
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.lift
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.ramp
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.restroom
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.restroomDoorWidth
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.roomManeuver
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.sink
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.stepHeight
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.stepsCount
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.toiletSeat
 import com.aarokoinsaari.accessibilitymap.view.extensions.getAccessibilityStatusContentDescStringRes
 import com.aarokoinsaari.accessibilitymap.view.extensions.getAccessibilityStatusDrawableRes
 import com.aarokoinsaari.accessibilitymap.view.theme.AccessibilityMapTheme
@@ -72,7 +85,7 @@ import com.aarokoinsaari.accessibilitymap.view.theme.AccessibilityMapTheme
 @Composable
 fun PlaceDetailBottomSheet(
     place: Place,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         modifier = modifier
@@ -89,13 +102,36 @@ fun PlaceDetailBottomSheet(
                 HorizontalDivider(Modifier.padding(vertical = 16.dp))
             }
         }
+        item {
+            Text(
+                text = stringResource(id = R.string.details_title_entrance),
+                style = MaterialTheme.typography.labelSmall
+            )
+            EntranceDetailsSection(
+                place = place,
+                modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp)
+            )
+
+            Spacer(Modifier.padding(vertical = 6.dp))
+
+            Text(
+                text = stringResource(id = R.string.details_title_restroom),
+                style = MaterialTheme.typography.labelSmall
+            )
+            RestroomDetailsSection(
+                place = place,
+                modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp)
+            )
+
+            Spacer(Modifier.padding(vertical = 6.dp))
+        }
     }
 }
 
 @Composable
 fun AccessibilityStatusDisplaySection(
     place: Place,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val accessibilityStatus = place.accessibility.accessibilityStatus
     if (accessibilityStatus == null || accessibilityStatus == UNKNOWN) {
@@ -293,12 +329,148 @@ fun ContactInfoSection(
     }
 }
 
+@Composable
+fun EntranceDetailsSection(place: Place, modifier: Modifier) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = modifier
+    ) {
+        val stepCount = place.accessibility.stepsCount
+        DetailItem(
+            label = stringResource(id = R.string.details_entrance_step_count),
+            value = if (stepCount == null) {
+                stringResource(id = R.string.emoji_question)
+            } else {
+                stepCount.toString()
+            }
+        )
+
+        if (stepCount != 0) {
+            DetailItem(
+                label = stringResource(id = R.string.details_entrance_step_height),
+                value = stringResource(
+                    id = place.accessibility.stepHeight
+                        .getAccessibilityStatusEmojiStringRes()
+                ),
+            )
+
+            DetailItem(
+                label = stringResource(id = R.string.details_entrance_ramp),
+                value = stringResource(
+                    id = place.accessibility.ramp
+                        .getAccessibilityStatusEmojiStringRes()
+                ),
+            )
+
+            DetailItem(
+                label = stringResource(id = R.string.details_entrance_lift),
+                value = stringResource(
+                    id = place.accessibility.lift
+                        .getAccessibilityStatusEmojiStringRes()
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+fun RestroomDetailsSection(place: Place, modifier: Modifier) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = modifier
+    ) {
+        DetailItem(
+            label = stringResource(id = R.string.details_restroom_door_width),
+            value = stringResource(
+                id = place.accessibility.restroomDoorWidth.getAccessibilityStatusEmojiStringRes())
+        )
+
+        DetailItem(
+            label = stringResource(id = R.string.details_restroom_room_maneuver),
+            value = stringResource(
+                id = place.accessibility.roomManeuver.getAccessibilityStatusEmojiStringRes())
+        )
+
+        DetailItem(
+            label = stringResource(id = R.string.details_restroom_grab_rails),
+            value = stringResource(
+                id = place.accessibility.grabRails.getAccessibilityStatusEmojiStringRes())
+        )
+
+        DetailItem(
+            label = stringResource(id = R.string.details_restroom_sink),
+            value = stringResource(
+                id = place.accessibility.sink.getAccessibilityStatusEmojiStringRes())
+        )
+
+        DetailItem(
+            label = stringResource(id = R.string.details_restroom_toilet_seat),
+            value = stringResource(
+                id = place.accessibility.toiletSeat.getAccessibilityStatusEmojiStringRes())
+        )
+
+        DetailItem(
+            label = stringResource(id = R.string.details_restroom_emergency_alarm),
+            value = stringResource(
+                id = place.accessibility.emergencyAlarm.getAccessibilityStatusEmojiStringRes())
+        )
+
+        DetailItem(
+            label = stringResource(id = R.string.details_restroom_accessible_via),
+            value = place.accessibility.accessibleVia
+                ?: stringResource(id = R.string.emoji_question)
+        )
+
+        DetailItem(
+            label = stringResource(id = R.string.details_restroom_euro_key),
+            value = stringResource(id = place.accessibility.euroKey.getBooleanEmojiStringRes())
+        )
+    }
+}
+
+@Composable
+fun DetailItem(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.fillMaxWidth(0.7f)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
 private fun AccessibilityStatus?.getAccessibilityStatusStringRes(): Int =
     when (this) {
         FULLY_ACCESSIBLE -> R.string.fully_accessible_status_title
         LIMITED_ACCESSIBILITY -> R.string.limited_accessibility_status_title
         NOT_ACCESSIBLE -> R.string.not_accessible_status_title
         else -> R.string.wheelchair_access_unknown
+    }
+
+private fun AccessibilityStatus?.getAccessibilityStatusEmojiStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.emoji_checkmark
+        LIMITED_ACCESSIBILITY -> R.string.emoji_warning
+        NOT_ACCESSIBLE -> R.string.emoji_cross
+        else -> R.string.emoji_question
+    }
+
+private fun Boolean?.getBooleanEmojiStringRes(): Int =
+    when (this) {
+        true -> R.string.emoji_checkmark
+        false -> R.string.emoji_cross
+        null -> R.string.emoji_question
     }
 
 private fun AccessibilityStatus?.getEntranceAccessibilityLabelStringRes(): Int =
@@ -339,10 +511,10 @@ private fun PlaceDetailBottomSheet_Preview() {
         address = "Grande Place 1, Vevey 1800"
     )
     val entranceAccessibility = EntranceAccessibility(
-        accessibilityStatus = FULLY_ACCESSIBLE,
+        accessibilityStatus = LIMITED_ACCESSIBILITY,
         steps = EntranceAccessibility.StepsAccessibility(
-            stepCount = 0,
-            stepHeight = null,
+            stepCount = 1,
+            stepHeight = FULLY_ACCESSIBLE,
             ramp = FULLY_ACCESSIBLE,
             lift = UNKNOWN
         ),
