@@ -63,7 +63,7 @@ def parse_width(value: Optional[str]) -> Optional[str]:
     return None
     
 
-def parse_restroom_manuever(front: Optional[str], side: Optional[str]) -> Optional[str]:
+def parse_restroom_maneuver(front: Optional[str], side: Optional[str]) -> Optional[str]:
     if front is None or side is None:
         return None
     
@@ -108,12 +108,12 @@ def parse_general_accessibility_info(tags: Dict[str, str]) -> Dict[str, Optional
     def parse_restroom(tags: Dict[str, str]) -> Dict[str, Optional[float]]:
         return {
             "door_width": parse_width(tags.get("toilets:wheelchair:door_width")),
-            "room_manuever": parse_restroom_manuever("toilets:wheelchair:space_front", "toilets:wheelchair:space_side"),
+            "room_maneuver": parse_restroom_maneuver("toilets:wheelchair:space_front", "toilets:wheelchair:space_side"),
             "toilet_seat": None,
             "grab_rails": None,
             "sink": None,
             "emergency_alarm": None,
-            "euro_key": tags.get("toilets:centralkey") == "eurokey",
+            "euro_key": tags.get("centralkey") == "eurokey" if "centralkey" in tags else None,
             "accessible_via": tags.get("toilets:wheelchair:accessible_via"),
             "additional_info": None
         }
@@ -133,12 +133,12 @@ def parse_general_accessibility_info(tags: Dict[str, str]) -> Dict[str, Optional
 def parse_toilets_info(tags: Dict[str, str]) -> Dict[str, Optional[float]]:
     return {
         "door_width": parse_width(tags.get("door:width") or tags.get("entrance:width")),
-        "room_manuever": parse_restroom_manuever(tags.get("toilets:wheelchair:space_front"), tags.get("toilets:wheelchair:space_side")),
+        "room_maneuver": parse_restroom_maneuver(tags.get("toilets:wheelchair:space_front"), tags.get("toilets:wheelchair:space_side")),
         "grab_rails": parse_yes_no(tags.get("toilets:wheelchair:grab_rails")),
         "toilet_seat": None,
         "sink": None,
         "emergency_alarm": None,
-        "euro_key": tags.get("centralkey") == "eurokey",
+        "euro_key": tags.get("centralkey") == "eurokey" if "centralkey" in tags else None,
         "additional_info": tags.get("wheelchair:description")
     }
 

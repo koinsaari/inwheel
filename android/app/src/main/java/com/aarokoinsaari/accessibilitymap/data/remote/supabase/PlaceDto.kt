@@ -104,7 +104,7 @@ private fun parseAccessibility(
                 toiletSeat = parseStatus(getMergedString("toilet_seat")),
                 emergencyAlarm = parseStatus(getMergedString("emergency_alarm")),
                 sink = parseStatus(getMergedString("sink")),
-                euroKey = getMergedBoolean("euro_key") == true,
+                euroKey = getMergedBoolean("euro_key"),
                 additionalInfo = getMergedString("additional_info")
             )
         }
@@ -192,12 +192,12 @@ private fun parseRestroom(json: JsonObject?): GeneralAccessibility.RestroomAcces
     return GeneralAccessibility.RestroomAccessibility(
         accessibility = parseStatus(json["accessibility_status"]?.jsonPrimitive?.contentOrNull),
         doorWidth = parseStatus(json["door_width"]?.jsonPrimitive?.contentOrNull),
-        roomManeuver = parseStatus(json["room_manuever"]?.jsonPrimitive?.contentOrNull),
+        roomManeuver = parseStatus(json["room_maneuver"]?.jsonPrimitive?.contentOrNull),
         grabRails = parseStatus(json["grab_rails"]?.jsonPrimitive?.contentOrNull),
         toiletSeat = parseStatus(json["toilet_seat"]?.jsonPrimitive?.contentOrNull),
         emergencyAlarm = parseStatus(json["emergency_alarm"]?.jsonPrimitive?.contentOrNull),
         sink = parseStatus(json["sink"]?.jsonPrimitive?.contentOrNull),
-        euroKey = json["euro_key"]?.jsonPrimitive?.booleanOrNull == true,
+        euroKey = json["euro_key"]?.jsonPrimitive?.booleanOrNull,
         accessibleVia = json["accessible_via"]?.jsonPrimitive?.contentOrNull,
         additionalInfo = json["additional_info"]?.jsonPrimitive?.contentOrNull
     )
