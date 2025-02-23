@@ -239,3 +239,13 @@ val AccessibilityInfo?.restroom: RestroomAccessibility?
         is AccessibilityInfo.GeneralAccessibility -> this.restroom
         else -> null
     }
+
+val AccessibilityInfo?.entranceAdditionalInfo: String?
+    get() = (this as? AccessibilityInfo.GeneralAccessibility)
+        ?.entrance
+        ?.additionalInfo
+
+val AccessibilityInfo?.restroomAdditionalInfo: String?
+    get() = (this as? AccessibilityInfo.GeneralAccessibility)
+        ?.restroom
+        ?.additionalInfo

@@ -65,12 +65,14 @@ import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.accessibili
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.accessibleVia
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.emergencyAlarm
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.entrance
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.entranceAdditionalInfo
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.euroKey
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.grabRails
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.indoorAccessibility
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.lift
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.ramp
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.restroom
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.restroomAdditionalInfo
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.restroomDoorWidth
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.roomManeuver
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.sink
@@ -349,25 +351,28 @@ fun EntranceDetailsSection(place: Place, modifier: Modifier) {
             DetailItem(
                 label = stringResource(id = R.string.details_entrance_step_height),
                 value = stringResource(
-                    id = place.accessibility.stepHeight
-                        .getAccessibilityStatusEmojiStringRes()
-                ),
+                    id = place.accessibility.stepHeight.getAccessibilityStatusEmojiStringRes()),
             )
 
             DetailItem(
                 label = stringResource(id = R.string.details_entrance_ramp),
                 value = stringResource(
-                    id = place.accessibility.ramp
-                        .getAccessibilityStatusEmojiStringRes()
-                ),
+                    id = place.accessibility.ramp.getAccessibilityStatusEmojiStringRes()),
             )
 
             DetailItem(
                 label = stringResource(id = R.string.details_entrance_lift),
                 value = stringResource(
-                    id = place.accessibility.lift
-                        .getAccessibilityStatusEmojiStringRes()
-                ),
+                    id = place.accessibility.lift.getAccessibilityStatusEmojiStringRes()),
+            )
+        }
+
+        val additionalInfo = place.accessibility.entranceAdditionalInfo
+        if (additionalInfo != null && additionalInfo.isNotEmpty()) {
+            DetailItem(
+                label = stringResource(id = R.string.details_additional_info),
+                value = additionalInfo,
+                isAdditionalInfo = true
             )
         }
     }
@@ -425,6 +430,15 @@ fun RestroomDetailsSection(place: Place, modifier: Modifier) {
             label = stringResource(id = R.string.details_restroom_euro_key),
             value = stringResource(id = place.accessibility.euroKey.getBooleanEmojiStringRes())
         )
+
+        val additionalInfo = place.accessibility.restroomAdditionalInfo
+        if (additionalInfo != null && additionalInfo.isNotEmpty()) {
+            DetailItem(
+                label = stringResource(id = R.string.details_additional_info),
+                value = additionalInfo,
+                isAdditionalInfo = true
+            )
+        }
     }
 }
 
@@ -433,20 +447,35 @@ fun DetailItem(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
+    isAdditionalInfo: Boolean = false
 ) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.fillMaxWidth(0.7f)
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium
-        )
+    if (isAdditionalInfo) {
+        Column(modifier) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium,
+                fontStyle = FontStyle.Italic
+            )
+        }
+    } else {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier.fillMaxWidth(0.7f)
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 }
 
