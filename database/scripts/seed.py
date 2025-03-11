@@ -17,7 +17,6 @@ import requests
 import subprocess
 import psycopg2
 from typing import List
-from psycopg2.extras import Json
 from dotenv import load_dotenv
 from place import PlaceHandler, Place, TAGS
 
@@ -65,47 +64,144 @@ def parse_filtered_pbf() -> List[Place]:
 
 
 def seed_places(places: List[Place], limit: int = None):
+    if limit:
+        places = places[:limit]
+
     conn = psycopg2.connect(DATABASE_URL)
     cur = conn.cursor()
 
-    places_to_seed = places[:limit] if limit else places
-
-    for p in places_to_seed:
-        accessibility_json = Json(p.accessibility_osm)
-        contact_json = Json(p.contact)
-        data_tuple = (
+    place_values = [
+        (
             p.osm_id,
             p.name,
             p.category,
-            p.lat,
-            p.lon,
-            p.lon,  # longitude for MakePoint
-            p.lat,  # latitude for MakePoint
-            contact_json,
-            accessibility_json
+            p.lat, p.lon,  # Regular columns
+            p.lon, p.lat  # Geometry column
         )
-        try:
-            cur.execute("""
-                INSERT INTO places (osm_id, name, category, lat, lon, geom, contact, accessibility_osm, last_osm_update, created_at)
-                VALUES (%s, %s, %s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s), 4326)::GEOGRAPHY, %s, %s, NOW(), NOW())
-                ON CONFLICT (osm_id) DO UPDATE
-                SET name = EXCLUDED.name,
-                    category = EXCLUDED.category,
-                    lat = EXCLUDED.lat,
-                    lon = EXCLUDED.lon,
-                    geom = EXCLUDED.geom,
-                    contact = EXCLUDED.contact,
-                    accessibility_osm = EXCLUDED.accessibility_osm,
-                    last_osm_update = NOW()
-            """, data_tuple)
+        for p in places
+    ]
 
-            print(f"Inserting place osm_id={p.osm_id}, name={p.name}, category={p.category}")
-        except Exception as e:
-            print(f"Error inserting osm_id={p.osm_id}: {e}")
+    print("Inserting places. This might take a while...")
+    cur.executemany(
+        """
+        INSERT INTO public.places (
+        osm_id, name, category, lat, lon, geom, last_osm_update
+        )
+        VALUES (
+        %s, %s, %s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s),4326), now()
+        )
+        ON CONFLICT (osm_id) DO NOTHING
+        """,
+        place_values
+    )
+
+    for p in places:
+        ga = p.general_accessibility
+        cur.execute(
+            """
+            INSERT INTO public.general_accessibility (place_id, accessibility, indoor_accessibility, additional_info)
+            SELECT id, %s, %s, %s FROM public.places WHERE osm_id = %s
+            ON CONFLICT (place_id) DO UPDATE SET 
+              accessibility = EXCLUDED.accessibility,
+              indoor_accessibility = EXCLUDED.indoor_accessibility,
+              additional_info = EXCLUDED.additional_info
+            """,
+            (
+                ga.get("accessibility"),
+                ga.get("indoor_accessibility"),
+                ga.get("additional_info")[:1000] if ga.get("additional_info") else None,
+                p.osm_id
+            )
+        )
+        
+        ea = p.entrance_accessibility
+        cur.execute(
+            """
+            INSERT INTO public.entrance_accessibility (
+              place_id, accessibility, step_count, step_height, ramp, lift, width, type, additional_info
+            )
+            SELECT id, %s, %s, %s, %s, %s, %s, %s, %s FROM public.places WHERE osm_id = %s
+            ON CONFLICT (place_id) DO UPDATE SET
+              accessibility = EXCLUDED.accessibility,
+              step_count = EXCLUDED.step_count,
+              step_height = EXCLUDED.step_height,
+              ramp = EXCLUDED.ramp,
+              lift = EXCLUDED.lift,
+              width = EXCLUDED.width,
+              type = EXCLUDED.type,
+              additional_info = EXCLUDED.additional_info
+            """,
+            (
+                ea.get("accessibility"),
+                ea.get("step_count"),
+                ea.get("step_height"),
+                ea.get("ramp"),
+                ea.get("lift"),
+                ea.get("width"),
+                ea.get("type"),
+                ea.get("additional_info")[:1000] if ea.get("additional_info") else None,
+                p.osm_id
+            )
+        )
+        
+        ra = p.restroom_accessibility
+        cur.execute(
+            """
+            INSERT INTO public.restroom_accessibility (
+              place_id, accessibility, door_width, room_maneuver, grab_rails,
+              sink, toilet_seat, emergency_alarm, accessible_via, euro_key, additional_info
+            )
+            SELECT id, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s FROM public.places WHERE osm_id = %s
+            ON CONFLICT (place_id) DO UPDATE SET
+              accessibility = EXCLUDED.accessibility,
+              door_width = EXCLUDED.door_width,
+              room_maneuver = EXCLUDED.room_maneuver,
+              grab_rails = EXCLUDED.grab_rails,
+              sink = EXCLUDED.sink,
+              toilet_seat = EXCLUDED.toilet_seat,
+              emergency_alarm = EXCLUDED.emergency_alarm,
+              accessible_via = EXCLUDED.accessible_via,
+              euro_key = EXCLUDED.euro_key,
+              additional_info = EXCLUDED.additional_info
+            """,
+            (
+                ra.get("accessibility"),
+                ra.get("door_width"),
+                ra.get("room_maneuver"),
+                ra.get("grab_rails"),
+                ra.get("sink"),
+                ra.get("toilet_seat"),
+                ra.get("emergency_alarm"),
+                ra.get("accessible_via"),
+                ra.get("euro_key"),
+                ra.get("additional_info")[:1000] if ra.get("additional_info") else None,
+                p.osm_id
+            )
+        )
+
+        cur.execute(
+            """
+            INSERT INTO public.contact (place_id, phone, website, email, address)
+            SELECT id, %s, %s, %s, %s FROM public.places WHERE osm_id = %s
+            ON CONFLICT (place_id) DO UPDATE SET 
+              phone = EXCLUDED.phone,
+              website = EXCLUDED.website,
+              email = EXCLUDED.email,
+              address = EXCLUDED.address
+            """,
+            (
+                p.contact.get("phone"),
+                p.contact.get("website"),
+                p.contact.get("email"),
+                p.contact.get("address"),
+                p.osm_id
+            )
+        )
+
     conn.commit()
     cur.close()
     conn.close()
-    print(f"Seeding done. {len(places_to_seed)} places seeded.")
+    print(f"Seeding done. {len(places)} places seeded.")
 
 
 def main():

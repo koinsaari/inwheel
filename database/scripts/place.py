@@ -13,17 +13,16 @@
 # limitations under the License.
 
 import osmium
-from parsers import parse_toilets_info, parse_parking_info, parse_general_accessibility_info
+from parsers import parse_accessibility_info, format_address
 
 TAGS = {
     "amenity": [
-        "restaurant", "cafe", "bar", "pub" "fast_food", "pharmacy", "hospital",
-        "parking", "fuel", "toilets", "library", "bank", "post_office",
-        "cinema", "university", "school", "kindergarten", "college", "clinic", "casino",
-        "nightclub", "courthouse"
+        "restaurant", "cafe", "bar", "pub", "pharmacy", "hospital",
+        "fuel", "toilets", "library", "bank", "cinema", "university",
+        "school", "kindergarten", "college", "clinic", "nightclub", "courthouse"
     ],
     "tourism": [
-        "hotel", "hostel", "motel", "guest-house", "chalet", "museum"
+        "hotel", "hostel", "museum"
     ],
     "shop": [
         "supermarket", "bakery", "clothes",
@@ -33,73 +32,29 @@ TAGS = {
     ]
 }
 
-def initialize_accessibility(tags: dict, category: str) -> dict:
-    if category == "toilets":
-        return parse_toilets_info(tags)
-    elif category == "parking":
-        return parse_parking_info(tags)
-    else:
-        return parse_general_accessibility_info(tags)
-
-
-def initialize_user_accessibility(osm_accessibility: dict) -> dict:
-    def recursive_default(structure):
-        if isinstance(structure, dict):
-            return {k: recursive_default(v) for k, v in structure.items()}
-        return None
-    
-    return recursive_default(osm_accessibility)
-
-
-def format_address(tags: dict) -> str:
-    """
-    Formats an address from tags.
-
-    If "addr:full" exists, it is returned as-is. Otherwise, constructs the address as:
-    "street housenumber, city postcode". Skips missing components.
-
-    Args:
-        tags (dict): Dictionary with address keys like "addr:full", "addr:street",
-                    "addr:housenumber", "addr:city", "addr:postcode".
-
-    Returns:
-        str: Formatted address or None if no components are available.
-    """
-    if "addr:full" in tags:
-        return tags["addr:full"]
-
-    street_and_number = " ".join(
-        part for part in [tags.get("addr:street", ""), tags.get("addr:housenumber", "")] if part
-    )
-    city_and_postcode = " ".join(
-        part for part in [tags.get("addr:city", ""), tags.get("addr:postcode", "")] if part
-    )
-    address_parts = [street_and_number, city_and_postcode]
-    formatted_address = ", ".join(part for part in address_parts if part)
-
-    return formatted_address or None
-
 
 class Place:
     def __init__(
-            self,
-            osm_id: int,
-            name: str,
-            category: str,
-            lat: float,
-            lon: float,
-            contact: dict,
-            accessibility_osm: dict,
-            accessibility_user: dict
-        ):
+        self,
+        osm_id: int,
+        name: str,
+        category: str,
+        lat: float,
+        lon: float,
+        contact: dict,
+        general_accessibility: dict,
+        entrance_accessibility: dict,
+        restroom_accessibility: dict
+    ):
         self.osm_id = osm_id
         self.name = name
         self.category = category
         self.lat = lat
         self.lon = lon
         self.contact = contact
-        self.accessibility_osm = accessibility_osm
-        self.accessibility_user = accessibility_user
+        self.general_accessibility = general_accessibility
+        self.entrance_accessibility = entrance_accessibility
+        self.restroom_accessibility = restroom_accessibility
 
 
 class PlaceHandler(osmium.SimpleHandler):
@@ -119,24 +74,23 @@ class PlaceHandler(osmium.SimpleHandler):
             cat = tags["tourism"]
 
         if cat:
-            osm_accessibility = initialize_accessibility(tags, cat)
-            user_accessibility = initialize_user_accessibility(osm_accessibility)
-
+            general_acc, entrance_acc, restroom_acc = parse_accessibility_info(tags)
             contact = {
                 "address": format_address(tags),
-                "phone": tags.get("phone"),
-                "email": tags.get("email"),
-                "website": tags.get("website"),
+                "phone": tags.get("phone")[:255] if tags.get("phone") else None,
+                "email": tags.get("email")[:255] if tags.get("email") else None,
+                "website": tags.get("website")[:255] if tags.get("website") else None,
             }
 
             place = Place(
                 osm_id=n.id,
-                name=tags.get("name", "Unknown"),
-                category=cat,
+                name=tags.get("name", "Unknown")[:150],
+                category=cat[:50],
                 lat=n.location.lat,
                 lon=n.location.lon,
                 contact=contact,
-                accessibility_osm=osm_accessibility,
-                accessibility_user=user_accessibility
+                general_accessibility=general_acc,
+                entrance_accessibility=entrance_acc,
+                restroom_accessibility=restroom_acc
             )
             self.places.append(place)
