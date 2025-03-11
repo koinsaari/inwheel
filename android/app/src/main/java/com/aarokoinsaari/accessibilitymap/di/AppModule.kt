@@ -25,6 +25,7 @@ import com.aarokoinsaari.accessibilitymap.data.local.PlacesFtsDao
 import com.aarokoinsaari.accessibilitymap.data.remote.supabase.SupabaseApiService
 import com.aarokoinsaari.accessibilitymap.data.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
+import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceDetailsViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.SharedViewModel
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
@@ -96,5 +97,8 @@ val appModule = module {
     }
     viewModel {
         MapViewModel(get(), get())
+    }
+    viewModel {
+        PlaceDetailsViewModel(get())
     }
 }

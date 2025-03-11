@@ -21,7 +21,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.accessibilityStatus
+import androidx.core.graphics.createBitmap
 import com.aarokoinsaari.accessibilitymap.view.extensions.getAccessibilityStatusMarkerBgDrawableRes
 import com.aarokoinsaari.accessibilitymap.view.models.PlaceClusterItem
 import com.google.android.gms.maps.GoogleMap
@@ -40,7 +40,7 @@ class PlaceClusterRenderer(
     override fun onBeforeClusterItemRendered(item: PlaceClusterItem, markerOptions: MarkerOptions) {
         val bitmap = createMarkerBitmap(
             context = context,
-            backgroundRes = item.placeData.accessibility.accessibilityStatus
+            backgroundRes = item.placeData.accessibility.general?.accessibilityStatus
                 .getAccessibilityStatusMarkerBgDrawableRes(),
             iconRes = item.placeData.category.iconRes,
             size = clusterItemSize
@@ -54,11 +54,11 @@ private fun createMarkerBitmap(
     @DrawableRes backgroundRes: Int,
     @DrawableRes iconRes: Int,
     size: Int = 72,
-    iconPadding: Int = 16
+    iconPadding: Int = 16,
 ): Bitmap {
     val iconSize = size - iconPadding * 2
 
-    return Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888).apply {
+    return createBitmap(size, size).apply {
         val canvas = Canvas(this)
 
         ContextCompat.getDrawable(context, backgroundRes)?.apply {

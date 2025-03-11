@@ -21,6 +21,7 @@ import com.aarokoinsaari.accessibilitymap.BuildConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.header
+import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -69,6 +70,26 @@ class SupabaseApiService(
         } catch (e: Exception) {
             Log.e("SupabaseApiService", "Error fetching places: $e")
             emptyList()
+        }
+    }
+
+    suspend fun updatePlaceGeneralAccessibility(placeId: String, status: String) {
+        val url = "${BuildConfig.SUPABASE_URL}/rest/v1/places?id=eq.$placeId"
+        try {
+            val response: HttpResponse = httpClient.patch(url) {
+                header("apikey", BuildConfig.SUPABASE_KEY)
+                header("Authorization", "Bearer ${BuildConfig.SUPABASE_KEY}")
+                contentType(ContentType.Application.Json)
+                setBody(mapOf("accessibility" to status))
+            }
+            Log.d("SupabaseApiService", "Update response status: ${response.status}")
+            if (!response.status.isSuccess()) {
+                Log.e("SupabaseApiService", "Error updating place: ${response.status}")
+            }
+        } catch (e: CancellationException) {
+            Log.d("SupabaseApiService", "Request was cancelled $e")
+        } catch (e: Exception) {
+            Log.e("SupabaseApiService", "Error updating place: $e")
         }
     }
 }

@@ -69,11 +69,9 @@
     <string name="no_information_available">No information available ☹️.</string>
     <string name="category_bar">Bar</string>
     <string name="category_pub">Pub</string>
-    <string name="category_fast_food">Fast food</string>
     <string name="category_gas_station">Gas station</string>
     <string name="category_library">Library</string>
     <string name="category_bank">Bank</string>
-    <string name="category_post_office">Post office</string>
     <string name="category_cinema">Cinema</string>
     <string name="category_university">University</string>
     <string name="category_school">School</string>
@@ -85,9 +83,6 @@
     <string name="category_courthouse">Courthouse</string>
     <string name="category_hotel">Hotel</string>
     <string name="category_hostel">Hostel</string>
-    <string name="category_motel">Motel</string>
-    <string name="category_guest_house">Guest gouse</string>
-    <string name="category_chalet">Chalet</string>
     <string name="category_museum">Museum</string>
     <string name="category_bakery">Bakery</string>
     <string name="category_clothes">Clothes shop</string>

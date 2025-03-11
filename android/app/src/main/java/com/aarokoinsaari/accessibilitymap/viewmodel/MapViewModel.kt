@@ -179,6 +179,7 @@ class MapViewModel(
                             isLoading = false
                         )
                     }
+                    Log.d("MapViewModel", "Updated state: ${_state.value}")
                     cachedClusterItems.addAll(_state.value.clusterItems)
                 }
             }
@@ -203,6 +204,7 @@ class MapViewModel(
                         }
                     )
                 }
+                Log.d("MapViewModel", "Updated state: ${_state.value}")
             }
             return@launch
         }

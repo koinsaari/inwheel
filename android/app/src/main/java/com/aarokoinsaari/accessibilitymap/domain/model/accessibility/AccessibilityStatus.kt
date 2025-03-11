@@ -57,7 +57,7 @@ package com.aarokoinsaari.accessibilitymap.domain.model.accessibility
  */
 enum class AccessibilityStatus {
     FULLY_ACCESSIBLE,
-    LIMITED_ACCESSIBILITY,
+    PARTIALLY_ACCESSIBLE,
     NOT_ACCESSIBLE,
     UNKNOWN;
 }

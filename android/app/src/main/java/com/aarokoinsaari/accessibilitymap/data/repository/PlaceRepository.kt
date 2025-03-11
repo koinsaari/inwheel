@@ -85,6 +85,11 @@ class PlaceRepository(
 //            Log.d("PlaceRepository", "Inserted ${ftsPlaces.size} places into FTS")
     }
 
+    suspend fun updatePlaceGeneralAccessibility(place: Place) = withContext(Dispatchers.IO) {
+//        dao.updatePlaceGeneralAccessibility(place.id, place.accessibility.accessibilityStatus.name)
+//        api.updatePlaceGeneralAccessibility(place.id, place.accessibility.accessibilityStatus.name)
+    }
+
     /*
      * Left this here for testing/illustration purposes to demonstrate the difference
      * in efficiency between sequential and asynchronous fetch/store operations.

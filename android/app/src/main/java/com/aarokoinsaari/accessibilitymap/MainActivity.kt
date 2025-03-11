@@ -64,12 +64,12 @@ import androidx.navigation.compose.rememberNavController
 import com.aarokoinsaari.accessibilitymap.domain.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.accessibilityStatus
 import com.aarokoinsaari.accessibilitymap.view.map.MapScreen
 import com.aarokoinsaari.accessibilitymap.view.navigation.NavigationScreen
 import com.aarokoinsaari.accessibilitymap.view.placedetails.PlaceDetailBottomSheet
 import com.aarokoinsaari.accessibilitymap.view.theme.AccessibilityMapTheme
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
+import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceDetailsViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.SharedViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -117,7 +117,11 @@ fun MainScreen() {
             sheetContent = {
                 val place = selectedPlaceState.value
                 if (place != null) {
-                    PlaceDetailBottomSheet(place)
+                    val placeDetailsViewModel: PlaceDetailsViewModel = koinViewModel()
+                    PlaceDetailBottomSheet(
+                        place = place,
+                        viewModel = placeDetailsViewModel
+                    )
                 }
             },
             sheetDragHandle = {
@@ -222,7 +226,7 @@ private fun calculateBottomSheetPeekHeight(place: Place?): Dp =
     when {
         place == null -> 56.dp
         place.contact.address != null -> 128.dp
-        place.accessibility.accessibilityStatus != null &&
-                place.accessibility.accessibilityStatus != AccessibilityStatus.UNKNOWN -> 108.dp
+        place.accessibility.general?.accessibilityStatus != null &&
+                place.accessibility.general.accessibilityStatus != AccessibilityStatus.UNKNOWN -> 108.dp
         else -> 108.dp
     }

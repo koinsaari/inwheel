@@ -22,18 +22,12 @@ import com.aarokoinsaari.accessibilitymap.domain.model.ContactInfo
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
 import com.aarokoinsaari.accessibilitymap.domain.model.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityInfo
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityInfo.GeneralAccessibility
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityInfo.ParkingAccessibility
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityInfo.ToiletAccessibility
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.EntranceAccessibility
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.GeneralAccessibility
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.RestroomAccessibility
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.intOrNull
-import kotlinx.serialization.json.jsonPrimitive
 
 @Serializable
 data class PlaceDto(
@@ -43,162 +37,130 @@ data class PlaceDto(
     val category: String,
     val lat: Double,
     val lon: Double,
-    val contact: Map<String, String?>?,
-    @SerialName("accessibility_osm") val accessibilityOsm: Map<String, JsonElement>?,
-    @SerialName("accessibility_user") val accessibilityUser: Map<String, JsonElement>?,
     @SerialName("last_osm_update") val lastOsmUpdate: String?,
     @SerialName("last_user_update") val lastUserUpdate: String?,
     @SerialName("created_at") val createdAt: String,
+    val contact: ContactDto?,
+    val generalAccessibility: GeneralAccessibilityDto?,
+    val entranceAccessibility: EntranceAccessibilityDto?,
+    val restroomAccessibility: RestroomAccessibilityDto?,
 )
 
-fun PlaceDto.toDomain(): Place =
-    Place(
-        id = this.id,
-        name = this.name,
-        category = PlaceCategory.fromRawValue(this.category),
-        lat = this.lat,
-        lon = this.lon,
-        contact = this.contact?.let {
-            ContactInfo(
-                email = it["email"],
-                phone = it["phone"],
-                address = it["address"],
-                website = it["website"]
-            )
-        } ?: ContactInfo(),
-        accessibility = parseAccessibility(
-            osm = this.accessibilityOsm,
-            user = this.accessibilityUser,
-            category = this.category
-        )
+@Serializable
+data class ContactDto(
+    val phone: String? = null,
+    val website: String? = null,
+    val email: String? = null,
+    val address: String? = null
+)
+
+@Serializable
+data class GeneralAccessibilityDto(
+    val accessibility: String?,
+    @SerialName("indoor_accessibility") val indoorAccessibility: String?,
+    @SerialName("additional_info") val additionalInfo: String?,
+    @SerialName("user_modified") val userModified: Boolean? = false
+)
+
+@Serializable
+data class EntranceAccessibilityDto(
+    val accessibility: String?,
+    @SerialName("step_count") val stepCount: Int?,
+    @SerialName("step_height") val stepHeight: String?,
+    val ramp: String?,
+    val lift: String?,
+    val width: String?,
+    val type: String?,
+    @SerialName("additional_info") val additionalInfo: String?,
+    @SerialName("user_modified") val userModified: Boolean? = false
+)
+
+@Serializable
+data class RestroomAccessibilityDto(
+    val accessibility: String?,
+    @SerialName("door_width") val doorWidth: String?,
+    @SerialName("room_maneuver") val roomManeuver: String?,
+    @SerialName("grab_rails") val grabRails: String?,
+    val sink: String?,
+    @SerialName("toilet_seat") val toiletSeat: String?,
+    @SerialName("emergency_alarm") val emergencyAlarm: String?,
+    @SerialName("accessible_via") val accessibleVia: String?,
+    @SerialName("euro_key") val euroKey: Boolean?,
+    @SerialName("additional_info") val additionalInfo: String?,
+    @SerialName("user_modified") val userModified: Boolean? = false
+)
+
+fun PlaceDto.toDomain(): Place {
+    val contactInfo = ContactInfo(
+        email = contact?.email,
+        phone = contact?.phone,
+        address = contact?.address,
+        website = contact?.website
     )
-
-// Tries to cast a JsonElement to a JsonObject
-private val JsonElement.jsonObjectOrNull: JsonObject?
-    get() = this as? JsonObject
-
-private fun parseAccessibility(
-    osm: Map<String, JsonElement>?,
-    user: Map<String, JsonElement>?,
-    category: String?,
-): AccessibilityInfo {
-
-    fun getMergedJson(key: String): JsonElement? =
-        user?.get(key) ?: osm?.get(key)
-
-    fun getMergedString(key: String): String? =
-        getMergedJson(key)?.jsonPrimitive?.contentOrNull
-
-    fun getMergedBoolean(key: String): Boolean? =
-        getMergedJson(key)?.jsonPrimitive?.booleanOrNull
-
-    fun getMergedInt(key: String): Int? =
-        getMergedJson(key)?.jsonPrimitive?.intOrNull
-
-    return when (category) {
-        "toilets" -> {
-            ToiletAccessibility(
-                accessibilityStatus = parseStatus(getMergedString("accessibility_status")),
-                doorWidth = parseStatus(getMergedString("door_width")),
-                grabRails = parseStatus(getMergedString("grab_rails")),
-                toiletSeat = parseStatus(getMergedString("toilet_seat")),
-                emergencyAlarm = parseStatus(getMergedString("emergency_alarm")),
-                sink = parseStatus(getMergedString("sink")),
-                euroKey = getMergedBoolean("euro_key"),
-                additionalInfo = getMergedString("additional_info")
-            )
-        }
-
-        "parking" -> {
-            ParkingAccessibility(
-                accessibilityStatus = parseStatus(getMergedString("accessibility_status")),
-                accessibleSpotCount = getMergedInt("accessible_spot_count"),
-                surface = getMergedString("surface"),
-                parkingType = getMergedString("parking_type"),
-                hasElevator = getMergedBoolean("has_elevator"),
-                additionalInfo = getMergedString("additional_info")
-            )
-        }
-
-        else -> {
-            val mergedEntrance = mergeJsonObjects(
-                osm?.get("entrance")?.jsonObjectOrNull,
-                user?.get("entrance")?.jsonObjectOrNull
-            )
-            val mergedRestroom = mergeJsonObjects(
-                osm?.get("restroom")?.jsonObjectOrNull,
-                user?.get("restroom")?.jsonObjectOrNull
-            )
-
-            GeneralAccessibility(
-                accessibilityStatus = parseStatus(getMergedString("accessibility_status")),
-                indoorAccessibility = parseStatus(getMergedString("indoor_accessibility")),
-                entrance = parseEntrance(mergedEntrance),
-                restroom = parseRestroom(mergedRestroom),
-                additionalInfo = getMergedString("additional_info")
-            )
-        }
-    }
+    val accessibilityInfo = mergeAccessibility(
+        generalAccessibility = generalAccessibility,
+        entranceAccessibility = entranceAccessibility,
+        restroomAccessibility = restroomAccessibility
+    )
+    return Place(
+        id = id,
+        name = name,
+        category = PlaceCategory.valueOf(category.uppercase()),
+        lat = lat,
+        lon = lon,
+        contact = contactInfo,
+        accessibility = accessibilityInfo
+    )
 }
 
-private fun parseStatus(value: String?): AccessibilityStatus =
+private fun mergeAccessibility(
+    generalAccessibility: GeneralAccessibilityDto?,
+    entranceAccessibility: EntranceAccessibilityDto?,
+    restroomAccessibility: RestroomAccessibilityDto?
+) : AccessibilityInfo {
+    val general = GeneralAccessibility(
+        accessibilityStatus = parseStatus(generalAccessibility?.accessibility),
+        indoorAccessibility = parseStatus(generalAccessibility?.indoorAccessibility),
+        additionalInfo = generalAccessibility?.additionalInfo
+    )
+    val entrance = EntranceAccessibility(
+        accessibilityStatus = parseStatus(entranceAccessibility?.accessibility),
+        stepCount = entranceAccessibility?.stepCount,
+        stepHeight = parseStatus(entranceAccessibility?.stepHeight),
+        ramp = parseStatus(entranceAccessibility?.ramp),
+        lift = parseStatus(entranceAccessibility?.lift),
+        width = parseStatus(entranceAccessibility?.width),
+        type = entranceAccessibility?.type,
+        additionalInfo = entranceAccessibility?.additionalInfo
+    )
+    val restroom = RestroomAccessibility(
+        accessibility = parseStatus(restroomAccessibility?.accessibility),
+        doorWidth = parseStatus(restroomAccessibility?.doorWidth),
+        roomManeuver = parseStatus(restroomAccessibility?.roomManeuver),
+        grabRails = parseStatus(restroomAccessibility?.grabRails),
+        toiletSeat = parseStatus(restroomAccessibility?.toiletSeat),
+        emergencyAlarm = parseStatus(restroomAccessibility?.emergencyAlarm),
+        sink = parseStatus(restroomAccessibility?.sink),
+        euroKey = restroomAccessibility?.euroKey,
+        accessibleVia = restroomAccessibility?.accessibleVia,
+        additionalInfo = restroomAccessibility?.additionalInfo
+    )
+
+    return AccessibilityInfo(
+        general = general,
+        entrance = entrance,
+        restroom = restroom
+    )
+}
+
+private fun parseStatus(value: String?): AccessibilityStatus {
     if (value.isNullOrBlank()) {
-        AccessibilityStatus.UNKNOWN
-    } else {
-        try {
-            AccessibilityStatus.valueOf(value.uppercase())
-        } catch (e: IllegalArgumentException) {
-            Log.e("parseStatus", "Invalid enum value: $value", e)
-            AccessibilityStatus.UNKNOWN
-        }
+        return AccessibilityStatus.UNKNOWN
     }
-
-// Merges two JsonObjects, where the second JsonObject (user changes) overrides any matching
-// keys in the first (osm changes)
-private fun mergeJsonObjects(a: JsonObject?, b: JsonObject?): JsonObject? {
-    if (a == null && b == null) return null
-    val merged = a?.toMutableMap() ?: mutableMapOf()
-    b?.forEach { (k, v) -> merged[k] = v }
-    return JsonObject(merged)
-}
-
-private fun parseEntrance(json: JsonObject?): GeneralAccessibility.EntranceAccessibility? {
-    if (json == null) return null
-    val stepsObj = json["steps"]?.jsonObjectOrNull
-    val doorObj = json["door"]?.jsonObjectOrNull
-
-    return GeneralAccessibility.EntranceAccessibility(
-        accessibilityStatus = parseStatus(json["accessibility_status"]?.jsonPrimitive?.contentOrNull),
-        steps = stepsObj?.let {
-            GeneralAccessibility.EntranceAccessibility.StepsAccessibility(
-                stepCount = it["step_count"]?.jsonPrimitive?.intOrNull,
-                stepHeight = parseStatus(it["step_height"]?.jsonPrimitive?.contentOrNull),
-                ramp = parseStatus(it["ramp"]?.jsonPrimitive?.contentOrNull),
-                lift = parseStatus(it["lift"]?.jsonPrimitive?.contentOrNull)
-            )
-        },
-        door = doorObj?.let { door ->
-            GeneralAccessibility.EntranceAccessibility.DoorAccessibility(
-                doorWidth = parseStatus(door["width"]?.jsonPrimitive?.contentOrNull),
-                doorType = door["type"]?.jsonPrimitive?.contentOrNull
-            )
-        },
-        additionalInfo = json["additional_info"]?.jsonPrimitive?.contentOrNull
-    )
-}
-
-private fun parseRestroom(json: JsonObject?): GeneralAccessibility.RestroomAccessibility? {
-    if (json == null) return null
-    return GeneralAccessibility.RestroomAccessibility(
-        accessibility = parseStatus(json["accessibility_status"]?.jsonPrimitive?.contentOrNull),
-        doorWidth = parseStatus(json["door_width"]?.jsonPrimitive?.contentOrNull),
-        roomManeuver = parseStatus(json["room_maneuver"]?.jsonPrimitive?.contentOrNull),
-        grabRails = parseStatus(json["grab_rails"]?.jsonPrimitive?.contentOrNull),
-        toiletSeat = parseStatus(json["toilet_seat"]?.jsonPrimitive?.contentOrNull),
-        emergencyAlarm = parseStatus(json["emergency_alarm"]?.jsonPrimitive?.contentOrNull),
-        sink = parseStatus(json["sink"]?.jsonPrimitive?.contentOrNull),
-        euroKey = json["euro_key"]?.jsonPrimitive?.booleanOrNull,
-        accessibleVia = json["accessible_via"]?.jsonPrimitive?.contentOrNull,
-        additionalInfo = json["additional_info"]?.jsonPrimitive?.contentOrNull
-    )
+    return try {
+        AccessibilityStatus.valueOf(value.uppercase())
+    } catch (e: IllegalArgumentException) {
+        Log.e("parseStatus", "Unknown accessibility status: $value with error: $e")
+        AccessibilityStatus.UNKNOWN
+    }
 }

@@ -35,11 +35,6 @@ enum class PlaceCategory(
         displayNameRes = R.string.category_cafe,
         iconRes = R.drawable.ic_cafe
     ),
-    FAST_FOOD(
-        rawValue = "fast_food",
-        displayNameRes = R.string.category_fast_food,
-        iconRes = R.drawable.ic_fast_food
-    ),
     BAR(
         rawValue = "bar",
         displayNameRes = R.string.category_bar,
@@ -90,22 +85,12 @@ enum class PlaceCategory(
         displayNameRes = R.string.category_bank,
         iconRes = R.drawable.ic_bank
     ),
-    POST_OFFICE(
-        rawValue = "post_office",
-        displayNameRes = R.string.category_post_office,
-        iconRes = R.drawable.ic_post_office
-    ),
     TOILETS(
         rawValue = "toilets",
         displayNameRes = R.string.category_toilets,
         iconRes = R.drawable.ic_toilet
     ),
-    PARKING(
-        rawValue = "parking",
-        displayNameRes = R.string.category_parking,
-        iconRes = R.drawable.ic_parking
-    ),
-    GAS_STATION(
+    FUEL(
         rawValue = "fuel",
         displayNameRes = R.string.category_gas_station,
         iconRes = R.drawable.ic_gas_station
@@ -120,21 +105,6 @@ enum class PlaceCategory(
         displayNameRes = R.string.category_hostel,
         iconRes = R.drawable.ic_hotel
     ),
-    MOTEL(
-        rawValue = "motel",
-        displayNameRes = R.string.category_motel,
-        iconRes = R.drawable.ic_hotel
-    ),
-    GUEST_HOUSE(
-        rawValue = "guest-house",
-        displayNameRes = R.string.category_guest_house,
-        iconRes = R.drawable.ic_hotel
-    ),
-    CHALET(
-        rawValue = "chalet",
-        displayNameRes = R.string.category_chalet,
-        iconRes = R.drawable.ic_chalet
-    ),
     MUSEUM(
         rawValue = "museum",
         displayNameRes = R.string.category_museum,
@@ -144,11 +114,6 @@ enum class PlaceCategory(
         rawValue = "cinema",
         displayNameRes = R.string.category_cinema,
         iconRes = R.drawable.ic_cinema
-    ),
-    CASINO(
-        rawValue = "casino",
-        displayNameRes = R.string.category_casino,
-        iconRes = R.drawable.ic_casino
     ),
     NIGHTCLUB(
         rawValue = "nightclub",
@@ -170,10 +135,20 @@ enum class PlaceCategory(
         displayNameRes = R.string.category_clothes,
         iconRes = R.drawable.ic_clothes
     ),
+    SHOES(
+        rawValue = "shoes",
+        displayNameRes = R.string.category_shoes,
+        iconRes = R.drawable.ic_shoe
+    ),
     COSMETICS(
         rawValue = "cosmetics",
         displayNameRes = R.string.category_cosmetics,
         iconRes = R.drawable.ic_cosmetics
+    ),
+    JEWELRY(
+        rawValue = "jewelry",
+        displayNameRes = R.string.category_jewelry,
+        iconRes = R.drawable.ic_jewelry
     ),
     FURNITURE(
         rawValue = "furniture",
