@@ -73,8 +73,8 @@ class SupabaseApiService(
         }
     }
 
-    suspend fun updatePlaceGeneralAccessibility(placeId: String, status: String) {
-        val url = "${BuildConfig.SUPABASE_URL}/rest/v1/places?id=eq.$placeId"
+    suspend fun updatePlaceGeneralAccessibility(placeId: String, status: String?) {
+        val url = "${BuildConfig.SUPABASE_URL}/rest/v1/general_accessibility?place_id=eq.$placeId"
         try {
             val response: HttpResponse = httpClient.patch(url) {
                 header("apikey", BuildConfig.SUPABASE_KEY)

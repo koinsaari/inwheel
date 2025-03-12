@@ -71,7 +71,7 @@ internal fun AccessibilityStatus?.getAccessibilityStatusIconRes(): Int =
 internal fun AccessibilityStatus?.getAccessibilityStatusContentDescStringRes(): Int =
     when (this) {
         FULLY_ACCESSIBLE -> R.string.content_desc_fully_accessible
-        PARTIALLY_ACCESSIBLE -> R.string.content_desc_limited_accessibility
+        PARTIALLY_ACCESSIBLE -> R.string.content_desc_partially_accessible
         NOT_ACCESSIBLE -> R.string.content_desc_not_accessible
         else -> R.string.content_desc_unknown_accessibility
     }

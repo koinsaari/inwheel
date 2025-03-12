@@ -101,12 +101,12 @@
     <string name="close_detail_sheet_button">Close detail sheet</string>
     <string name="no_place_selected">No place selected.</string>
     <string name="content_desc_fully_accessible">Fully accessible</string>
-    <string name="content_desc_limited_accessibility">Limited accessibility</string>
+    <string name="content_desc_partially_accessible">Partially accessible</string>
     <string name="content_desc_not_accessible">Not accessible</string>
     <string name="content_desc_unknown_accessibility">Unknown accessibility</string>
     <string name="how_accessible_question">How accessible is this place?</string>
     <string name="image_descript_fully_accessible">Fully accessible!</string>
-    <string name="image_descript_limited_accessibility">Requires an assistant!</string>
+    <string name="image_descript_partially_accessible">Requires an assistant!</string>
     <string name="image_descript_not_accessible">Not accessible at all!</string>
     <string name="no_contact_info_available">No contact info provided for this place. ☹️</string>
     <string name="fully_accessible_status_title">This place is marked as fully accessible. \nPerson in a wheelchair should not need assistance</string>
@@ -138,4 +138,5 @@
     <string name="details_restroom_emergency_alarm">Emergency alarm:</string>
     <string name="details_restroom_accessible_via">Accessible via:</string>
     <string name="details_restroom_euro_key">EuroKey:</string>
+    <string name="general_accessibility_update_dialog_title">How accessible is this place?</string>
 </resources>

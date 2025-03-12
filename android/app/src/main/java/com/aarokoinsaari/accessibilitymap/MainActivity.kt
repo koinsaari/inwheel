@@ -118,9 +118,12 @@ fun MainScreen() {
                 val place = selectedPlaceState.value
                 if (place != null) {
                     val placeDetailsViewModel: PlaceDetailsViewModel = koinViewModel()
+                    placeDetailsViewModel.setPlace(place)
                     PlaceDetailBottomSheet(
-                        place = place,
-                        viewModel = placeDetailsViewModel
+                        stateFlow = placeDetailsViewModel.state,
+                        onIntent = { intent ->
+                            placeDetailsViewModel.handleIntent(intent)
+                        },
                     )
                 }
             },
@@ -228,5 +231,6 @@ private fun calculateBottomSheetPeekHeight(place: Place?): Dp =
         place.contact.address != null -> 128.dp
         place.accessibility.general?.accessibilityStatus != null &&
                 place.accessibility.general.accessibilityStatus != AccessibilityStatus.UNKNOWN -> 108.dp
+
         else -> 108.dp
     }

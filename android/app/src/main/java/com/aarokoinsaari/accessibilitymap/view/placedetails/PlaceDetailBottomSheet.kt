@@ -17,17 +17,22 @@
 package com.aarokoinsaari.accessibilitymap.view.placedetails
 
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
@@ -36,76 +41,189 @@ import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.QuestionMark
 import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.aarokoinsaari.accessibilitymap.R
+import com.aarokoinsaari.accessibilitymap.domain.intent.PlaceDetailIntent
 import com.aarokoinsaari.accessibilitymap.domain.model.ContactInfo
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
+import com.aarokoinsaari.accessibilitymap.domain.model.PlaceCategory
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityInfo
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus.FULLY_ACCESSIBLE
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus.NOT_ACCESSIBLE
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus.PARTIALLY_ACCESSIBLE
 import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus.UNKNOWN
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.EntranceAccessibility
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.GeneralAccessibility
+import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.RestroomAccessibility
+import com.aarokoinsaari.accessibilitymap.domain.state.PlaceDetailState
 import com.aarokoinsaari.accessibilitymap.view.extensions.getAccessibilityStatusContentDescStringRes
 import com.aarokoinsaari.accessibilitymap.view.extensions.getAccessibilityStatusDrawableRes
-import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceDetailsViewModel
+import com.aarokoinsaari.accessibilitymap.view.theme.AccessibilityMapTheme
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @ExperimentalMaterial3Api
 @Composable
 fun PlaceDetailBottomSheet(
-    place: Place,
-    viewModel: PlaceDetailsViewModel,
+    stateFlow: StateFlow<PlaceDetailState>,
     modifier: Modifier = Modifier,
+    onIntent: (PlaceDetailIntent) -> Unit = {},
 ) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        item {
-            AccessibilityStatusDisplaySection(
-                place = place,
-                viewModel = viewModel
-            )
-        }
-        if (place.category.rawValue != "toilets") {
+    val state = stateFlow.collectAsState()
+    val place = state.value.place
+    if (place != null) {
+        LazyColumn(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
             item {
-                HorizontalDivider(Modifier.padding(vertical = 16.dp))
-                ContactInfoSection(place.contact)
-                HorizontalDivider(Modifier.padding(vertical = 16.dp))
+                AccessibilityStatusDisplaySection(
+                    place = place,
+                    onIntent = onIntent
+                )
+            }
+            if (place.category.rawValue != "toilets") {
+                item {
+                    HorizontalDivider(Modifier.padding(vertical = 16.dp))
+                    ContactInfoSection(place.contact)
+                    HorizontalDivider(Modifier.padding(vertical = 16.dp))
+                }
+            }
+            item {
+                Text(
+                    text = stringResource(id = R.string.details_title_entrance),
+                    style = MaterialTheme.typography.labelSmall
+                )
+                EntranceDetailsSection(
+                    place = place,
+                    modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp)
+                )
+                Spacer(Modifier.padding(vertical = 6.dp))
+                Text(
+                    text = stringResource(id = R.string.details_title_restroom),
+                    style = MaterialTheme.typography.labelSmall
+                )
+                RestroomDetailsSection(
+                    place = place,
+                    modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp)
+                )
+                Spacer(Modifier.padding(vertical = 6.dp))
             }
         }
-        item {
-            Text(
-                text = stringResource(id = R.string.details_title_entrance),
-                style = MaterialTheme.typography.labelSmall
-            )
-            EntranceDetailsSection(
+
+        if (state.value.showGeneralAccessibilityUpdateDialog) {
+            GeneralAccessibilityUpdateDialog(
                 place = place,
-                modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp)
+                onIntent = onIntent
             )
-            Spacer(Modifier.padding(vertical = 6.dp))
-            Text(
-                text = stringResource(id = R.string.details_title_restroom),
-                style = MaterialTheme.typography.labelSmall
-            )
-            RestroomDetailsSection(
-                place = place,
-                modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp)
-            )
-            Spacer(Modifier.padding(vertical = 6.dp))
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GeneralAccessibilityUpdateDialog(
+    place: Place,
+    modifier: Modifier = Modifier,
+    onIntent: (PlaceDetailIntent) -> Unit = {},
+) {
+    BasicAlertDialog(
+        onDismissRequest = { onIntent(PlaceDetailIntent.CloseGeneralAccessibilityUpdateDialog(place)) },
+        modifier = modifier
+    ) {
+        Box(
+            modifier = Modifier.widthIn(max = 500.dp)
+        ) {
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                tonalElevation = 8.dp,
+                shadowElevation = 8.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.general_accessibility_update_dialog_title),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Box(Modifier.weight(1f)) {
+                            AccessibilityStatusItem(
+                                imageRes = R.drawable.accessibility_status_green,
+                                contentDescription = R.string.content_desc_fully_accessible,
+                                imageText = R.string.image_descript_fully_accessible,
+                                onClick = {
+                                    onIntent(
+                                        PlaceDetailIntent.UpdateGeneralAccessibility(
+                                            place,
+                                            FULLY_ACCESSIBLE
+                                        )
+                                    )
+                                }
+                            )
+                        }
+                        Box(Modifier.weight(1f)) {
+                            AccessibilityStatusItem(
+                                imageRes = R.drawable.accessibility_status_yellow,
+                                contentDescription = R.string.content_desc_partially_accessible,
+                                imageText = R.string.image_descript_partially_accessible,
+                                onClick = {
+                                    onIntent(
+                                        PlaceDetailIntent.UpdateGeneralAccessibility(
+                                            place,
+                                            PARTIALLY_ACCESSIBLE
+                                        )
+                                    )
+                                }
+                            )
+                        }
+                        Box(Modifier.weight(1f)) {
+                            AccessibilityStatusItem(
+                                imageRes = R.drawable.accessibility_status_red,
+                                contentDescription = R.string.content_desc_not_accessible,
+                                imageText = R.string.image_descript_not_accessible,
+                                onClick = {
+                                    onIntent(
+                                        PlaceDetailIntent.UpdateGeneralAccessibility(
+                                            place,
+                                            NOT_ACCESSIBLE
+                                        )
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -113,8 +231,8 @@ fun PlaceDetailBottomSheet(
 @Composable
 fun AccessibilityStatusDisplaySection(
     place: Place,
-    viewModel: PlaceDetailsViewModel,
     modifier: Modifier = Modifier,
+    onIntent: (PlaceDetailIntent) -> Unit = {},
 ) {
     val accessibilityStatus = place.accessibility.general?.accessibilityStatus
     if (accessibilityStatus == null || accessibilityStatus == UNKNOWN) {
@@ -132,26 +250,42 @@ fun AccessibilityStatusDisplaySection(
             ) {
                 AccessibilityStatusItem(
                     imageRes = R.drawable.accessibility_status_green,
-                    descriptionText = stringResource(id = R.string.image_descript_fully_accessible),
-                    contentDescription = stringResource(id = R.string.content_desc_fully_accessible),
-                    viewModel = viewModel,
-                    place = place
+                    contentDescription = R.string.content_desc_fully_accessible,
+                    imageText = R.string.image_descript_fully_accessible,
+                    onClick = {
+                        onIntent(
+                            PlaceDetailIntent.UpdateGeneralAccessibility(
+                                place = place,
+                                status = FULLY_ACCESSIBLE
+                            )
+                        )
+                    }
                 )
-
                 AccessibilityStatusItem(
                     imageRes = R.drawable.accessibility_status_yellow,
-                    descriptionText = stringResource(id = R.string.image_descript_limited_accessibility),
-                    contentDescription = stringResource(id = R.string.content_desc_limited_accessibility),
-                    viewModel = viewModel,
-                    place = place
+                    contentDescription = R.string.content_desc_partially_accessible,
+                    imageText = R.string.image_descript_partially_accessible,
+                    onClick = {
+                        onIntent(
+                            PlaceDetailIntent.UpdateGeneralAccessibility(
+                                place = place,
+                                status = PARTIALLY_ACCESSIBLE
+                            )
+                        )
+                    }
                 )
-
                 AccessibilityStatusItem(
                     imageRes = R.drawable.accessibility_status_red,
-                    descriptionText = stringResource(id = R.string.image_descript_not_accessible),
-                    contentDescription = stringResource(id = R.string.content_desc_not_accessible),
-                    viewModel = viewModel,
-                    place = place
+                    contentDescription = R.string.content_desc_not_accessible,
+                    imageText = R.string.image_descript_not_accessible,
+                    onClick = {
+                        onIntent(
+                            PlaceDetailIntent.UpdateGeneralAccessibility(
+                                place = place,
+                                status = NOT_ACCESSIBLE
+                            )
+                        )
+                    }
                 )
             }
         }
@@ -173,16 +307,16 @@ fun AccessibilityStatusDisplaySection(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Image(
-                    painter = painterResource(
-                        id = place.accessibility.general.accessibilityStatus
-                            .getAccessibilityStatusDrawableRes()
-                    ),
-                    contentDescription = stringResource(
-                        id = place.accessibility.general.accessibilityStatus
-                            .getAccessibilityStatusContentDescStringRes()
-                    ),
-                    modifier = Modifier.size(86.dp)
+                AccessibilityStatusItem(
+                    imageRes = place.accessibility.general.accessibilityStatus
+                        .getAccessibilityStatusDrawableRes(),
+                    contentDescription = place.accessibility.general.accessibilityStatus
+                        .getAccessibilityStatusContentDescStringRes(),
+                    onClick = {
+                        onIntent(
+                            PlaceDetailIntent.OpenGeneralAccessibilityUpdateDialog(place)
+                        )
+                    }
                 )
 
                 Column(
@@ -235,31 +369,39 @@ fun AccessibilityStatusDisplaySection(
 @Composable
 fun AccessibilityStatusItem(
     @DrawableRes imageRes: Int,
-    descriptionText: String,
-    contentDescription: String,
-    viewModel: PlaceDetailsViewModel,
-    place: Place,
+    @StringRes contentDescription: Int,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
     imageSize: Dp = 86.dp,
+    @StringRes imageText: Int? = null,
 ) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-    ) {
+    if (imageText != null) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = stringResource(id = contentDescription),
+                modifier = modifier
+                    .size(imageSize)
+                    .clickable(onClick = onClick)
+            )
+            Text(
+                text = stringResource(id = imageText),
+                style = MaterialTheme.typography.labelSmall,
+                fontStyle = FontStyle.Italic,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.width(86.dp)
+            )
+        }
+    } else {
         Image(
             painter = painterResource(id = imageRes),
-            contentDescription = contentDescription,
-            modifier = Modifier
+            contentDescription = stringResource(id = contentDescription),
+            modifier = modifier
                 .size(imageSize)
-                .clickable { viewModel.updatePlaceGeneralAccessibility(place) }
-        )
-        Text(
-            text = descriptionText,
-            style = MaterialTheme.typography.labelSmall,
-            fontStyle = FontStyle.Italic,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.width(imageSize)
+                .clickable(onClick = onClick)
         )
     }
 }
@@ -338,19 +480,22 @@ fun EntranceDetailsSection(place: Place, modifier: Modifier) {
             DetailItem(
                 label = stringResource(id = R.string.details_entrance_step_height),
                 value = stringResource(
-                    id = place.accessibility.entrance?.stepHeight.getAccessibilityStatusEmojiStringRes()),
+                    id = place.accessibility.entrance?.stepHeight.getAccessibilityStatusEmojiStringRes()
+                ),
             )
 
             DetailItem(
                 label = stringResource(id = R.string.details_entrance_ramp),
                 value = stringResource(
-                    id = place.accessibility.entrance?.ramp.getAccessibilityStatusEmojiStringRes()),
+                    id = place.accessibility.entrance?.ramp.getAccessibilityStatusEmojiStringRes()
+                ),
             )
 
             DetailItem(
                 label = stringResource(id = R.string.details_entrance_lift),
                 value = stringResource(
-                    id = place.accessibility.entrance?.lift.getAccessibilityStatusEmojiStringRes()),
+                    id = place.accessibility.entrance?.lift.getAccessibilityStatusEmojiStringRes()
+                ),
             )
         }
 
@@ -374,37 +519,43 @@ fun RestroomDetailsSection(place: Place, modifier: Modifier) {
         DetailItem(
             label = stringResource(id = R.string.details_restroom_door_width),
             value = stringResource(
-                id = place.accessibility.restroom?.doorWidth.getAccessibilityStatusEmojiStringRes())
+                id = place.accessibility.restroom?.doorWidth.getAccessibilityStatusEmojiStringRes()
+            )
         )
 
         DetailItem(
             label = stringResource(id = R.string.details_restroom_room_maneuver),
             value = stringResource(
-                id = place.accessibility.restroom?.roomManeuver.getAccessibilityStatusEmojiStringRes())
+                id = place.accessibility.restroom?.roomManeuver.getAccessibilityStatusEmojiStringRes()
+            )
         )
 
         DetailItem(
             label = stringResource(id = R.string.details_restroom_grab_rails),
             value = stringResource(
-                id = place.accessibility.restroom?.grabRails.getAccessibilityStatusEmojiStringRes())
+                id = place.accessibility.restroom?.grabRails.getAccessibilityStatusEmojiStringRes()
+            )
         )
 
         DetailItem(
             label = stringResource(id = R.string.details_restroom_sink),
             value = stringResource(
-                id = place.accessibility.restroom?.sink.getAccessibilityStatusEmojiStringRes())
+                id = place.accessibility.restroom?.sink.getAccessibilityStatusEmojiStringRes()
+            )
         )
 
         DetailItem(
             label = stringResource(id = R.string.details_restroom_toilet_seat),
             value = stringResource(
-                id = place.accessibility.restroom?.toiletSeat.getAccessibilityStatusEmojiStringRes())
+                id = place.accessibility.restroom?.toiletSeat.getAccessibilityStatusEmojiStringRes()
+            )
         )
 
         DetailItem(
             label = stringResource(id = R.string.details_restroom_emergency_alarm),
             value = stringResource(
-                id = place.accessibility.restroom?.emergencyAlarm.getAccessibilityStatusEmojiStringRes())
+                id = place.accessibility.restroom?.emergencyAlarm.getAccessibilityStatusEmojiStringRes()
+            )
         )
 
         DetailItem(
@@ -434,7 +585,7 @@ fun DetailItem(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
-    isAdditionalInfo: Boolean = false
+    isAdditionalInfo: Boolean = false,
 ) {
     if (isAdditionalInfo) {
         Column(modifier) {
@@ -516,97 +667,147 @@ private fun AccessibilityStatus?.getRestroomAccessibilityStringRes(): Int =
         null -> R.string.restroom_unknown_label
     }
 
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Preview(showBackground = true)
-//@Composable
-//private fun PlaceDetailBottomSheet_Preview() {
-//    val contactInfo = ContactInfo(
-//        email = "example@mail.com",
-//        phone = "+41 21 123 45 67",
-//        website = "https://www.example.com",
-//        address = "Grande Place 1, Vevey 1800"
-//    )
-//    val entranceAccessibility = EntranceAccessibility(
-//        accessibilityStatus = LIMITED_ACCESSIBILITY,
-//        steps = EntranceAccessibility.StepsAccessibility(
-//            stepCount = 1,
-//            stepHeight = FULLY_ACCESSIBLE,
-//            ramp = FULLY_ACCESSIBLE,
-//            lift = UNKNOWN
-//        ),
-//        door = EntranceAccessibility.DoorAccessibility(
-//            doorWidth = FULLY_ACCESSIBLE,
-//            doorType = "Automatic"
-//        ),
-//        additionalInfo = "Entrance is fully accessible with automatic doors."
-//    )
-//
-//    val restroomAccessibility = AccessibilityInfo.GeneralAccessibility.RestroomAccessibility(
-//        accessibility = NOT_ACCESSIBLE,
-//        doorWidth = FULLY_ACCESSIBLE,
-//        roomManeuver = NOT_ACCESSIBLE,
-//        grabRails = LIMITED_ACCESSIBILITY,
-//        toiletSeat = FULLY_ACCESSIBLE,
-//        emergencyAlarm = NOT_ACCESSIBLE,
-//        sink = FULLY_ACCESSIBLE,
-//        euroKey = false,
-//        accessibleVia = "Elevator",
-//        additionalInfo = "Not accessible restroom on the ground floor."
-//    )
-//
-//    val generalAccessibility = AccessibilityInfo.GeneralAccessibility(
-//        accessibilityStatus = LIMITED_ACCESSIBILITY,
-//        indoorAccessibility = LIMITED_ACCESSIBILITY,
-//        entrance = entranceAccessibility,
-//        restroom = restroomAccessibility,
-//        additionalInfo = "This location is mostly accessible."
-//    )
-//
-//    val place = Place(
-//        id = "1",
-//        name = "Example Cafe",
-//        category = PlaceCategory.CAFE,
-//        lat = 46.460071,
-//        lon = 6.843391,
-//        contact = contactInfo,
-//        accessibility = generalAccessibility
-//    )
-//
-//    AccessibilityMapTheme {
-//        PlaceDetailBottomSheet(place)
-//    }
-//}
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Preview(showBackground = true)
-//@Composable
-//private fun PlaceDetailBottomSheetUnknownAccessibility_Preview() {
-//    val contactInfo = ContactInfo(
-//        email = "example@mail.com",
-//        phone = "+41 21 123 45 67",
-//        website = "https://www.example.com",
-//        address = "Grande Place 1, Vevey 1800"
-//    )
-//
-//    val generalAccessibility = AccessibilityInfo.GeneralAccessibility(
-//        accessibilityStatus = null,
-//        indoorAccessibility = null,
-//        entrance = null,
-//        restroom = null,
-//        additionalInfo = null
-//    )
-//
-//    val place = Place(
-//        id = "1",
-//        name = "Example Cafe",
-//        category = PlaceCategory.CAFE,
-//        lat = 46.460071,
-//        lon = 6.843391,
-//        contact = contactInfo,
-//        accessibility = generalAccessibility
-//    )
-//
-//    AccessibilityMapTheme {
-//        PlaceDetailBottomSheet(place)
-//    }
-//}
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun PlaceDetailBottomSheet_Preview() {
+    val contactInfo = ContactInfo(
+        email = "example@mail.com",
+        phone = "+41 21 123 45 67",
+        website = "https://www.example.com",
+        address = "Grande Place 1, Vevey 1800"
+    )
+    val entrance = EntranceAccessibility(
+        accessibilityStatus = PARTIALLY_ACCESSIBLE,
+        additionalInfo = "Entrance is fully accessible with automatic doors.",
+        stepCount = 1,
+        stepHeight = PARTIALLY_ACCESSIBLE,
+        ramp = PARTIALLY_ACCESSIBLE,
+        lift = null,
+        width = FULLY_ACCESSIBLE,
+        type = "Automatic"
+    )
+    val restroom = RestroomAccessibility(
+        accessibility = NOT_ACCESSIBLE,
+        doorWidth = FULLY_ACCESSIBLE,
+        roomManeuver = NOT_ACCESSIBLE,
+        grabRails = PARTIALLY_ACCESSIBLE,
+        toiletSeat = FULLY_ACCESSIBLE,
+        emergencyAlarm = NOT_ACCESSIBLE,
+        sink = FULLY_ACCESSIBLE,
+        euroKey = false,
+        accessibleVia = "Elevator",
+        additionalInfo = "Not accessible restroom on the ground floor."
+    )
+    val general = GeneralAccessibility(
+        accessibilityStatus = PARTIALLY_ACCESSIBLE,
+        indoorAccessibility = PARTIALLY_ACCESSIBLE,
+        additionalInfo = "This location is mostly accessible."
+    )
+    val place = Place(
+        id = "1",
+        name = "Example Cafe",
+        category = PlaceCategory.CAFE,
+        lat = 46.460071,
+        lon = 6.843391,
+        contact = contactInfo,
+        accessibility = AccessibilityInfo(
+            general = general,
+            entrance = entrance,
+            restroom = restroom
+        )
+    )
+    AccessibilityMapTheme {
+        PlaceDetailBottomSheet(
+            stateFlow = MutableStateFlow(PlaceDetailState(place))
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun PlaceDetailBottomSheetUnknownAccessibility_Preview() {
+    val contactInfo = ContactInfo(
+        email = "example@mail.com",
+        phone = "+41 21 123 45 67",
+        website = "https://www.example.com",
+        address = "Grande Place 1, Vevey 1800"
+    )
+    val place = Place(
+        id = "1",
+        name = "Example Cafe",
+        category = PlaceCategory.CAFE,
+        lat = 46.460071,
+        lon = 6.843391,
+        contact = contactInfo,
+        accessibility = AccessibilityInfo(
+            general = null,
+            entrance = null,
+            restroom = null
+        )
+    )
+
+    AccessibilityMapTheme {
+        PlaceDetailBottomSheet(
+            stateFlow = MutableStateFlow(PlaceDetailState(place))
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun GeneralAccessibilityUpdateDialog_Preview() {
+    val contactInfo = ContactInfo(
+        email = "example@mail.com",
+        phone = "+41 21 123 45 67",
+        website = "https://www.example.com",
+        address = "Grande Place 1, Vevey 1800"
+    )
+    val entrance = EntranceAccessibility(
+        accessibilityStatus = PARTIALLY_ACCESSIBLE,
+        additionalInfo = "Entrance is fully accessible with automatic doors.",
+        stepCount = 1,
+        stepHeight = PARTIALLY_ACCESSIBLE,
+        ramp = PARTIALLY_ACCESSIBLE,
+        lift = null,
+        width = FULLY_ACCESSIBLE,
+        type = "Automatic"
+    )
+    val restroom = RestroomAccessibility(
+        accessibility = NOT_ACCESSIBLE,
+        doorWidth = FULLY_ACCESSIBLE,
+        roomManeuver = NOT_ACCESSIBLE,
+        grabRails = PARTIALLY_ACCESSIBLE,
+        toiletSeat = FULLY_ACCESSIBLE,
+        emergencyAlarm = NOT_ACCESSIBLE,
+        sink = FULLY_ACCESSIBLE,
+        euroKey = false,
+        accessibleVia = "Elevator",
+        additionalInfo = "Not accessible restroom on the ground floor."
+    )
+    val general = GeneralAccessibility(
+        accessibilityStatus = PARTIALLY_ACCESSIBLE,
+        indoorAccessibility = PARTIALLY_ACCESSIBLE,
+        additionalInfo = "This location is mostly accessible."
+    )
+    val place = Place(
+        id = "1",
+        name = "Example Cafe",
+        category = PlaceCategory.CAFE,
+        lat = 46.460071,
+        lon = 6.843391,
+        contact = contactInfo,
+        accessibility = AccessibilityInfo(
+            general = general,
+            entrance = entrance,
+            restroom = restroom
+        )
+    )
+
+    AccessibilityMapTheme {
+        GeneralAccessibilityUpdateDialog(
+            place = place
+        )
+    }
+}

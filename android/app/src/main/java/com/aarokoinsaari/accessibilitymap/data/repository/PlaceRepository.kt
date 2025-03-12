@@ -86,8 +86,8 @@ class PlaceRepository(
     }
 
     suspend fun updatePlaceGeneralAccessibility(place: Place) = withContext(Dispatchers.IO) {
-//        dao.updatePlaceGeneralAccessibility(place.id, place.accessibility.accessibilityStatus.name)
-//        api.updatePlaceGeneralAccessibility(place.id, place.accessibility.accessibilityStatus.name)
+//        dao.updatePlaceGeneralAccessibility(place.id, place.accessibility.general?.accessibilityStatus?.name)
+        api.updatePlaceGeneralAccessibility(place.id, place.accessibility.general?.accessibilityStatus?.name)
     }
 
     /*
