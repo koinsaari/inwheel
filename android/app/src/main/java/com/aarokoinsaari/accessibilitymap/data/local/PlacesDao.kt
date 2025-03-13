@@ -43,8 +43,8 @@ interface PlacesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlaces(places: List<Place>)
 
-//    @Query("")
-//    suspend fun updatePlaceGeneralAccessibility(id: String, status: String)
+    @Query("UPDATE places SET generalAccessibility = :status WHERE id = :id")
+    suspend fun updatePlaceGeneralAccessibility(id: String, status: String)
 }
 
 @Dao

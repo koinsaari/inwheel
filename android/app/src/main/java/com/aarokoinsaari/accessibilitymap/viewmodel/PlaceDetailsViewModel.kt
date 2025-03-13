@@ -22,7 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.aarokoinsaari.accessibilitymap.data.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.domain.intent.PlaceDetailIntent
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.domain.state.PlaceDetailState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -63,18 +63,21 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
 
     @Suppress("TooGenericExceptionCaught")
     private fun updatePlaceGeneralAccessibility(place: Place, status: AccessibilityStatus) {
-        if (place.accessibility.general?.accessibilityStatus == null ||
-            place.accessibility.general.accessibilityStatus == AccessibilityStatus.UNKNOWN
-        ) {
+        if (place.generalAccessibility == AccessibilityStatus.UNKNOWN) {
             viewModelScope.launch {
                 try {
                     Log.d("PlaceDetailsViewModel", "Updating place general accessibility")
-                    repository.updatePlaceGeneralAccessibility(place)
+                    repository.updatePlaceGeneralAccessibility(place, status)
+                    _state.update {
+                        it.copy(
+                            place = place.copy(generalAccessibility = status)
+                        )
+                    }
                 } catch (e: Exception) {
                     Log.e("PlaceDetailsViewModel", "Error updating place general accessibility", e)
                 }
             }
-        } else if (place.accessibility.general.accessibilityStatus == status) {
+        } else if (place.generalAccessibility == status) {
             openGeneralAccessibilityUpdateDialog()
         }
     }

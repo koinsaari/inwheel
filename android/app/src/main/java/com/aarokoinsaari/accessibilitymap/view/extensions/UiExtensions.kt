@@ -17,10 +17,10 @@
 package com.aarokoinsaari.accessibilitymap.view.extensions
 
 import com.aarokoinsaari.accessibilitymap.R
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus.FULLY_ACCESSIBLE
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus.PARTIALLY_ACCESSIBLE
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus.NOT_ACCESSIBLE
+import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus.FULLY_ACCESSIBLE
+import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus.PARTIALLY_ACCESSIBLE
+import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus.NOT_ACCESSIBLE
 
 internal fun AccessibilityStatus?.getStringRes(): Int =
     when (this) {

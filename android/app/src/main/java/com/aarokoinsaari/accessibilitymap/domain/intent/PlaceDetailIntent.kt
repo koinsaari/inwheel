@@ -17,7 +17,7 @@
 package com.aarokoinsaari.accessibilitymap.domain.intent
 
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus
 
 sealed class PlaceDetailIntent {
     data class UpdateGeneralAccessibility(

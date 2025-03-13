@@ -19,20 +19,10 @@ package com.aarokoinsaari.accessibilitymap.data.local
 
 import androidx.room.ProvidedTypeConverter
 import androidx.room.TypeConverter
-import com.aarokoinsaari.accessibilitymap.domain.model.ContactInfo
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityInfo
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus
 
 @ProvidedTypeConverter
 class Converters {
-
-    private val jsonFormat = Json {
-        encodeDefaults = true
-        ignoreUnknownKeys = true
-    }
-
     // AccessibilityStatus
     @TypeConverter
     fun fromAccessibilityStatus(value: AccessibilityStatus?): String? = value?.name
@@ -40,31 +30,4 @@ class Converters {
     @TypeConverter
     fun toAccessibilityStatus(value: String?): AccessibilityStatus? =
         if (value == null) null else AccessibilityStatus.valueOf(value)
-
-    // AccessibilityInfo
-    @TypeConverter
-    fun fromAccessibilityInfo(value: AccessibilityInfo?): String? {
-        if (value == null) return null
-        return jsonFormat.encodeToString(value)
-    }
-
-    @TypeConverter
-    fun toAccessibilityInfo(value: String?): AccessibilityInfo? {
-        if (value == null) return null
-        return jsonFormat.decodeFromString(value)
-    }
-
-    // ContactInfo
-    @TypeConverter
-    fun fromContactInfo(info: ContactInfo?): String? {
-        if (info == null) return null
-        return jsonFormat.encodeToString(info)
-    }
-
-    @TypeConverter
-    fun toContactInfo(json: String?): ContactInfo? {
-        if (json == null) return null
-        return jsonFormat.decodeFromString(json)
-    }
-
 }

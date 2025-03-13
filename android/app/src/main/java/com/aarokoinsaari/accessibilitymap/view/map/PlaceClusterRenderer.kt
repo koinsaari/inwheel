@@ -40,7 +40,7 @@ class PlaceClusterRenderer(
     override fun onBeforeClusterItemRendered(item: PlaceClusterItem, markerOptions: MarkerOptions) {
         val bitmap = createMarkerBitmap(
             context = context,
-            backgroundRes = item.placeData.accessibility.general?.accessibilityStatus
+            backgroundRes = item.placeData.generalAccessibility
                 .getAccessibilityStatusMarkerBgDrawableRes(),
             iconRes = item.placeData.category.iconRes,
             size = clusterItemSize

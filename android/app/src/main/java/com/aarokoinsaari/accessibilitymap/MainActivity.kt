@@ -63,7 +63,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.aarokoinsaari.accessibilitymap.domain.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.view.map.MapScreen
 import com.aarokoinsaari.accessibilitymap.view.navigation.NavigationScreen
 import com.aarokoinsaari.accessibilitymap.view.placedetails.PlaceDetailBottomSheet
@@ -150,7 +150,7 @@ fun MainScreen() {
                                 text = stringResource(id = place.category.displayNameRes),
                                 style = MaterialTheme.typography.labelLarge
                             )
-                            val contactAddress = place.contact.address
+                            val contactAddress = place.address
                             if (contactAddress != null) {
                                 Row(
                                     horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -163,7 +163,7 @@ fun MainScreen() {
                                         modifier = Modifier.size(16.dp)
                                     )
                                     Text(
-                                        text = place.contact.address,
+                                        text = place.address,
                                         style = MaterialTheme.typography.labelSmall,
                                         fontStyle = FontStyle.Italic
                                     )
@@ -228,9 +228,8 @@ fun MainScreen() {
 private fun calculateBottomSheetPeekHeight(place: Place?): Dp =
     when {
         place == null -> 56.dp
-        place.contact.address != null -> 128.dp
-        place.accessibility.general?.accessibilityStatus != null &&
-                place.accessibility.general.accessibilityStatus != AccessibilityStatus.UNKNOWN -> 108.dp
+        place.address != null -> 128.dp
+        place.generalAccessibility != AccessibilityStatus.UNKNOWN -> 108.dp
 
         else -> 108.dp
     }

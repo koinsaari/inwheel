@@ -21,6 +21,7 @@ import androidx.annotation.VisibleForTesting
 import com.aarokoinsaari.accessibilitymap.data.local.PlacesDao
 import com.aarokoinsaari.accessibilitymap.data.remote.supabase.SupabaseApiService
 import com.aarokoinsaari.accessibilitymap.data.remote.supabase.toDomain
+import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -85,10 +86,25 @@ class PlaceRepository(
 //            Log.d("PlaceRepository", "Inserted ${ftsPlaces.size} places into FTS")
     }
 
-    suspend fun updatePlaceGeneralAccessibility(place: Place) = withContext(Dispatchers.IO) {
-//        dao.updatePlaceGeneralAccessibility(place.id, place.accessibility.general?.accessibilityStatus?.name)
-        api.updatePlaceGeneralAccessibility(place.id, place.accessibility.general?.accessibilityStatus?.name)
-    }
+    suspend fun updatePlaceGeneralAccessibility(place: Place, newStatus: AccessibilityStatus) =
+        withContext(Dispatchers.IO) {
+            dao.updatePlaceGeneralAccessibility(
+                place.id,
+                newStatus.name
+            )
+            Log.d(
+                "PlaceRepository",
+                "Updated place ${place.id} general accessibility to $newStatus"
+            )
+            api.updatePlaceGeneralAccessibility(
+                place.id,
+                newStatus.name
+            )
+            Log.d(
+                "PlaceRepository",
+                "Updated place ${place.id} general accessibility to $newStatus on Supabase"
+            )
+        }
 
     /*
      * Left this here for testing/illustration purposes to demonstrate the difference

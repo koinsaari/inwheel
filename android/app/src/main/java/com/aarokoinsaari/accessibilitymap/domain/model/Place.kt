@@ -20,10 +20,10 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Fts4
 import androidx.room.PrimaryKey
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityInfo
 import com.aarokoinsaari.accessibilitymap.view.models.PlaceClusterItem
 import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(tableName = "places")
 data class Place(
     @PrimaryKey val id: String,
@@ -31,16 +31,31 @@ data class Place(
     val category: PlaceCategory,
     val lat: Double,
     val lon: Double,
-    val contact: ContactInfo,
-    val accessibility: AccessibilityInfo
-)
-
-@Serializable
-data class ContactInfo(
     val email: String? = null,
     val phone: String? = null,
     val address: String? = null,
-    val website: String? = null
+    val website: String? = null,
+    val generalAccessibility: AccessibilityStatus,
+    val indoorAccessibility: AccessibilityStatus? = null,
+    val generalAdditionalInfo: String? = null,
+    val entranceAccessibility: AccessibilityStatus? = null,
+    val stepCount: Int? = null,
+    val stepHeight: AccessibilityStatus? = null,
+    val ramp: AccessibilityStatus? = null,
+    val lift: AccessibilityStatus? = null,
+    val width: AccessibilityStatus? = null,
+    val type: String? = null,
+    val entranceAdditionalInfo: String? = null,
+    val restroomAccessibility: AccessibilityStatus? = null,
+    val doorWidth: AccessibilityStatus? = null,
+    val roomManeuver: AccessibilityStatus? = null,
+    val grabRails: AccessibilityStatus? = null,
+    val toiletSeat: AccessibilityStatus? = null,
+    val emergencyAlarm: AccessibilityStatus? = null,
+    val sink: AccessibilityStatus? = null,
+    val euroKey: Boolean? = null,
+    val accessibleVia: String? = null,
+    val restroomAdditionalInfo: String? = null,
 )
 
 fun Place.toClusterItem(zIndex: Float? = null): PlaceClusterItem =

@@ -18,14 +18,9 @@ package com.aarokoinsaari.accessibilitymap.data.remote.supabase
 
 import android.util.Log
 import androidx.room.PrimaryKey
-import com.aarokoinsaari.accessibilitymap.domain.model.ContactInfo
+import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
 import com.aarokoinsaari.accessibilitymap.domain.model.PlaceCategory
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityInfo
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.AccessibilityStatus
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.EntranceAccessibility
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.GeneralAccessibility
-import com.aarokoinsaari.accessibilitymap.domain.model.accessibility.RestroomAccessibility
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -51,7 +46,7 @@ data class ContactDto(
     val phone: String? = null,
     val website: String? = null,
     val email: String? = null,
-    val address: String? = null
+    val address: String? = null,
 )
 
 @Serializable
@@ -59,7 +54,7 @@ data class GeneralAccessibilityDto(
     val accessibility: String?,
     @SerialName("indoor_accessibility") val indoorAccessibility: String?,
     @SerialName("additional_info") val additionalInfo: String?,
-    @SerialName("user_modified") val userModified: Boolean? = false
+    @SerialName("user_modified") val userModified: Boolean? = false,
 )
 
 @Serializable
@@ -72,7 +67,7 @@ data class EntranceAccessibilityDto(
     val width: String?,
     val type: String?,
     @SerialName("additional_info") val additionalInfo: String?,
-    @SerialName("user_modified") val userModified: Boolean? = false
+    @SerialName("user_modified") val userModified: Boolean? = false,
 )
 
 @Serializable
@@ -87,54 +82,32 @@ data class RestroomAccessibilityDto(
     @SerialName("accessible_via") val accessibleVia: String?,
     @SerialName("euro_key") val euroKey: Boolean?,
     @SerialName("additional_info") val additionalInfo: String?,
-    @SerialName("user_modified") val userModified: Boolean? = false
+    @SerialName("user_modified") val userModified: Boolean? = false,
 )
 
-fun PlaceDto.toDomain(): Place {
-    val contactInfo = ContactInfo(
-        email = contact?.email,
-        phone = contact?.phone,
-        address = contact?.address,
-        website = contact?.website
-    )
-    val accessibilityInfo = mergeAccessibility(
-        generalAccessibility = generalAccessibility,
-        entranceAccessibility = entranceAccessibility,
-        restroomAccessibility = restroomAccessibility
-    )
-    return Place(
+fun PlaceDto.toDomain(): Place =
+    Place(
         id = id,
         name = name,
         category = PlaceCategory.valueOf(category.uppercase()),
         lat = lat,
         lon = lon,
-        contact = contactInfo,
-        accessibility = accessibilityInfo
-    )
-}
-
-private fun mergeAccessibility(
-    generalAccessibility: GeneralAccessibilityDto?,
-    entranceAccessibility: EntranceAccessibilityDto?,
-    restroomAccessibility: RestroomAccessibilityDto?
-) : AccessibilityInfo {
-    val general = GeneralAccessibility(
-        accessibilityStatus = parseStatus(generalAccessibility?.accessibility),
+        email = contact?.email,
+        phone = contact?.phone,
+        address = contact?.address,
+        website = contact?.website,
+        generalAccessibility = parseStatus(generalAccessibility?.accessibility),
         indoorAccessibility = parseStatus(generalAccessibility?.indoorAccessibility),
-        additionalInfo = generalAccessibility?.additionalInfo
-    )
-    val entrance = EntranceAccessibility(
-        accessibilityStatus = parseStatus(entranceAccessibility?.accessibility),
+        generalAdditionalInfo = generalAccessibility?.additionalInfo,
+        entranceAccessibility = parseStatus(entranceAccessibility?.accessibility),
         stepCount = entranceAccessibility?.stepCount,
         stepHeight = parseStatus(entranceAccessibility?.stepHeight),
         ramp = parseStatus(entranceAccessibility?.ramp),
         lift = parseStatus(entranceAccessibility?.lift),
         width = parseStatus(entranceAccessibility?.width),
         type = entranceAccessibility?.type,
-        additionalInfo = entranceAccessibility?.additionalInfo
-    )
-    val restroom = RestroomAccessibility(
-        accessibility = parseStatus(restroomAccessibility?.accessibility),
+        entranceAdditionalInfo = entranceAccessibility?.additionalInfo,
+        restroomAccessibility = parseStatus(restroomAccessibility?.accessibility),
         doorWidth = parseStatus(restroomAccessibility?.doorWidth),
         roomManeuver = parseStatus(restroomAccessibility?.roomManeuver),
         grabRails = parseStatus(restroomAccessibility?.grabRails),
@@ -143,15 +116,8 @@ private fun mergeAccessibility(
         sink = parseStatus(restroomAccessibility?.sink),
         euroKey = restroomAccessibility?.euroKey,
         accessibleVia = restroomAccessibility?.accessibleVia,
-        additionalInfo = restroomAccessibility?.additionalInfo
+        restroomAdditionalInfo = restroomAccessibility?.additionalInfo
     )
-
-    return AccessibilityInfo(
-        general = general,
-        entrance = entrance,
-        restroom = restroom
-    )
-}
 
 private fun parseStatus(value: String?): AccessibilityStatus {
     if (value.isNullOrBlank()) {
