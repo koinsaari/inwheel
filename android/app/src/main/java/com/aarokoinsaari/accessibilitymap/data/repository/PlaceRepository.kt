@@ -23,6 +23,7 @@ import com.aarokoinsaari.accessibilitymap.data.remote.supabase.SupabaseApiServic
 import com.aarokoinsaari.accessibilitymap.data.remote.supabase.toDomain
 import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
+import com.aarokoinsaari.accessibilitymap.domain.model.PlaceDetailProperty
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import kotlinx.coroutines.Dispatchers
@@ -105,6 +106,41 @@ class PlaceRepository(
                 "Updated place ${place.id} general accessibility to $newStatus on Supabase"
             )
         }
+
+    suspend fun updatePlaceAccessibilityDetail(
+        place: Place,
+        detail: PlaceDetailProperty,
+        newValue: Any?
+    ) {
+        withContext(Dispatchers.IO) {
+            when (newValue) {
+                is AccessibilityStatus ->
+                    dao.updatePlaceAccessibilityDetailString(place.id, detail.dbColumnRoom, newValue.name)
+                is Boolean ->
+                    dao.updatePlaceAccessibilityDetailBoolean(place.id, detail.dbColumnRoom, newValue)
+                is Int ->
+                    dao.updatePlaceAccessibilityDetailInt(place.id, detail.dbColumnRoom, newValue)
+                is String ->
+                    dao.updatePlaceAccessibilityDetailString(place.id, detail.dbColumnRoom, newValue)
+                else -> {
+                    Log.e("PlaceRepository", "Unsupported type: ${newValue?.javaClass?.name}")
+                }
+            }
+            Log.d(
+                "PlaceRepository",
+                "Updated place ${place.id} accessibility detail ${detail.dbColumnRoom} to $newValue"
+            )
+            api.updatePlaceAccessibilityDetail(
+                place.id,
+                detail.dbColumnApi,
+                newValue
+            )
+            Log.d(
+                "PlaceRepository",
+                "Updated place ${place.id} accessibility detail ${detail.dbColumnApi} to $newValue on db"
+            )
+        }
+    }
 
     /*
      * Left this here for testing/illustration purposes to demonstrate the difference

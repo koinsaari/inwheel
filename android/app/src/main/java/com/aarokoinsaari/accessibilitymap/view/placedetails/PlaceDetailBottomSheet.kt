@@ -42,6 +42,8 @@ import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.QuestionMark
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -50,6 +52,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -68,6 +74,7 @@ import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus.PARTI
 import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus.UNKNOWN
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
 import com.aarokoinsaari.accessibilitymap.domain.model.PlaceCategory
+import com.aarokoinsaari.accessibilitymap.domain.model.PlaceDetailProperty
 import com.aarokoinsaari.accessibilitymap.domain.state.PlaceDetailState
 import com.aarokoinsaari.accessibilitymap.view.extensions.getAccessibilityStatusContentDescStringRes
 import com.aarokoinsaari.accessibilitymap.view.extensions.getAccessibilityStatusDrawableRes
@@ -105,23 +112,30 @@ fun PlaceDetailBottomSheet(
             }
             item {
                 Text(
-                    text = stringResource(id = R.string.details_title_entrance),
+                    text = stringResource(id = R.string.entrance),
                     style = MaterialTheme.typography.labelSmall
                 )
                 EntranceDetailsSection(
                     place = place,
+                    onIntent = onIntent,
                     modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp)
                 )
                 Spacer(Modifier.padding(vertical = 6.dp))
                 Text(
-                    text = stringResource(id = R.string.details_title_restroom),
+                    text = stringResource(id = R.string.restroom),
                     style = MaterialTheme.typography.labelSmall
                 )
                 RestroomDetailsSection(
                     place = place,
+                    onIntent = onIntent,
                     modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp)
                 )
                 Spacer(Modifier.padding(vertical = 6.dp))
+            }
+
+            item {
+                HorizontalDivider(Modifier.padding(bottom = 16.dp))
+                FooterNote(note = stringResource(id = R.string.choose_general_accessibility_note))
             }
         }
 
@@ -217,6 +231,8 @@ fun GeneralAccessibilityUpdateDialog(
                             )
                         }
                     }
+                    Spacer(Modifier.height(8.dp))
+                    FooterNote(note = stringResource(id = R.string.choose_general_accessibility_note))
                 }
             }
         }
@@ -460,116 +476,150 @@ fun ContactInfoSection(
 }
 
 @Composable
-fun EntranceDetailsSection(place: Place, modifier: Modifier) {
+fun EntranceDetailsSection(
+    place: Place,
+    modifier: Modifier,
+    onIntent: (PlaceDetailIntent) -> Unit = {},
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier
     ) {
         val stepCount = place.stepCount
         DetailItem(
-            label = stringResource(id = R.string.details_entrance_step_count),
-            value = stepCount?.toString() ?: stringResource(id = R.string.emoji_question)
+            detailProperty = PlaceDetailProperty.STEP_COUNT,
+            value = stepCount?.toString() ?: stringResource(id = R.string.emoji_question),
+            place = place,
+            onIntent = onIntent
         )
 
         if (stepCount != 0) {
             DetailItem(
-                label = stringResource(id = R.string.details_entrance_step_height),
+                detailProperty = PlaceDetailProperty.STEP_HEIGHT,
                 value = stringResource(
                     id = place.stepHeight.getAccessibilityStatusEmojiStringRes()
                 ),
+                place = place,
+                onIntent = onIntent
             )
-
             DetailItem(
-                label = stringResource(id = R.string.details_entrance_ramp),
+                detailProperty = PlaceDetailProperty.RAMP,
                 value = stringResource(
                     id = place.ramp.getAccessibilityStatusEmojiStringRes()
                 ),
+                place = place,
+                onIntent = onIntent
             )
-
             DetailItem(
-                label = stringResource(id = R.string.details_entrance_lift),
+                detailProperty = PlaceDetailProperty.LIFT,
                 value = stringResource(
                     id = place.lift.getAccessibilityStatusEmojiStringRes()
                 ),
+                place = place,
+                onIntent = onIntent
+            )
+            DetailItem(
+                detailProperty = PlaceDetailProperty.DOOR_TYPE,
+                value = place.doorType
+                    ?: stringResource(id = R.string.emoji_question),
+                place = place,
+                onIntent = onIntent
             )
         }
 
         val additionalInfo = place.entranceAdditionalInfo
         if (additionalInfo != null && additionalInfo.isNotEmpty()) {
             DetailItem(
-                label = stringResource(id = R.string.details_additional_info),
+                detailProperty = PlaceDetailProperty.ENTRANCE_ADDITIONAL_INFO,
                 value = additionalInfo,
-                isAdditionalInfo = true
+                isAdditionalInfo = true,
+                place = place,
+                onIntent = onIntent
             )
         }
     }
 }
 
 @Composable
-fun RestroomDetailsSection(place: Place, modifier: Modifier) {
+fun RestroomDetailsSection(
+    place: Place,
+    modifier: Modifier,
+    onIntent: (PlaceDetailIntent) -> Unit,
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         modifier = modifier
     ) {
         DetailItem(
-            label = stringResource(id = R.string.details_restroom_door_width),
+            detailProperty = PlaceDetailProperty.DOOR_WIDTH,
             value = stringResource(
                 id = place.doorWidth.getAccessibilityStatusEmojiStringRes()
-            )
+            ),
+            place = place,
+            onIntent = onIntent
         )
-
         DetailItem(
-            label = stringResource(id = R.string.details_restroom_room_maneuver),
+            detailProperty = PlaceDetailProperty.ROOM_MANEUVER,
             value = stringResource(
                 id = place.roomManeuver.getAccessibilityStatusEmojiStringRes()
-            )
+            ),
+            place = place,
+            onIntent = onIntent
         )
-
         DetailItem(
-            label = stringResource(id = R.string.details_restroom_grab_rails),
+            detailProperty = PlaceDetailProperty.GRAB_RAILS,
             value = stringResource(
                 id = place.grabRails.getAccessibilityStatusEmojiStringRes()
-            )
+            ),
+            place = place,
+            onIntent = onIntent
         )
-
         DetailItem(
-            label = stringResource(id = R.string.details_restroom_sink),
+            detailProperty = PlaceDetailProperty.SINK,
             value = stringResource(
                 id = place.sink.getAccessibilityStatusEmojiStringRes()
-            )
+            ),
+            place = place,
+            onIntent = onIntent
         )
-
         DetailItem(
-            label = stringResource(id = R.string.details_restroom_toilet_seat),
+            detailProperty = PlaceDetailProperty.TOILET_SEAT,
             value = stringResource(
                 id = place.toiletSeat.getAccessibilityStatusEmojiStringRes()
-            )
+            ),
+            place = place,
+            onIntent = onIntent
         )
-
         DetailItem(
-            label = stringResource(id = R.string.details_restroom_emergency_alarm),
+            detailProperty = PlaceDetailProperty.EMERGENCY_ALARM,
             value = stringResource(
                 id = place.emergencyAlarm.getAccessibilityStatusEmojiStringRes()
-            )
+            ),
+            place = place,
+            onIntent = onIntent
         )
-
         DetailItem(
-            label = stringResource(id = R.string.details_restroom_accessible_via),
+            detailProperty = PlaceDetailProperty.ACCESSIBLE_VIA,
             value = place.accessibleVia
-                ?: stringResource(id = R.string.emoji_question)
+                ?: stringResource(id = R.string.emoji_question),
+            place = place,
+            onIntent = onIntent
         )
-
         DetailItem(
-            label = stringResource(id = R.string.details_restroom_euro_key),
-            value = stringResource(id = place.euroKey.getBooleanEmojiStringRes())
+            detailProperty = PlaceDetailProperty.EURO_KEY,
+            value = stringResource(id = place.euroKey.getBooleanEmojiStringRes()),
+            place = place,
+            onIntent = onIntent
         )
 
         val additionalInfo = place.restroomAdditionalInfo
         if (additionalInfo != null && additionalInfo.isNotEmpty()) {
             DetailItem(
-                label = stringResource(id = R.string.details_additional_info),
+                detailProperty = PlaceDetailProperty.RESTROOM_ADDITIONAL_INFO,
                 value = additionalInfo,
-                isAdditionalInfo = true
+                isAdditionalInfo = true,
+                place = place,
+                onIntent = onIntent
             )
         }
     }
@@ -577,15 +627,24 @@ fun RestroomDetailsSection(place: Place, modifier: Modifier) {
 
 @Composable
 fun DetailItem(
-    label: String,
+    detailProperty: PlaceDetailProperty,
     value: String,
     modifier: Modifier = Modifier,
+    onIntent: (PlaceDetailIntent) -> Unit = {},
     isAdditionalInfo: Boolean = false,
+    place: Place,
 ) {
+    var expanded by remember { mutableStateOf(false) }
+    val accessibilityOptions = listOf(
+        R.string.accessibility_option_fully_accessible to FULLY_ACCESSIBLE,
+        R.string.accessibility_option_partially_accessible to PARTIALLY_ACCESSIBLE,
+        R.string.accessibility_option_not_accessible to NOT_ACCESSIBLE
+    )
+
     if (isAdditionalInfo) {
         Column(modifier) {
             Text(
-                text = label,
+                text = stringResource(id = detailProperty.labelRes),
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
@@ -601,15 +660,48 @@ fun DetailItem(
             modifier = modifier.fillMaxWidth(0.7f)
         ) {
             Text(
-                text = label,
+                text = stringResource(id = detailProperty.labelRes),
                 style = MaterialTheme.typography.bodyMedium
             )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Box {
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.clickable { expanded = true }
+                )
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    accessibilityOptions.forEach { (displayText, status) ->
+                        DropdownMenuItem(
+                            onClick = {
+                                onIntent(
+                                    PlaceDetailIntent.UpdateAccessibilityDetail(
+                                        place = place,
+                                        detailProperty = detailProperty,
+                                        status = status
+                                    )
+                                )
+                                expanded = false
+                            },
+                            text = { Text(text = stringResource(id = displayText)) }
+                        )
+                    }
+                }
+            }
         }
     }
+}
+
+@Composable
+fun FooterNote(note: String) {
+    Text(
+        text = note,
+        style = MaterialTheme.typography.labelSmall,
+        fontStyle = FontStyle.Italic,
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+    )
 }
 
 private fun AccessibilityStatus?.getAccessibilityStatusStringRes(): Int =
@@ -685,7 +777,7 @@ private fun PlaceDetailBottomSheet_Preview() {
         ramp = PARTIALLY_ACCESSIBLE,
         lift = null,
         width = FULLY_ACCESSIBLE,
-        type = "Automatic",
+        doorType = "Automatic",
         entranceAdditionalInfo = "Entrance is fully accessible with automatic doors.",
         restroomAccessibility = NOT_ACCESSIBLE,
         doorWidth = FULLY_ACCESSIBLE,

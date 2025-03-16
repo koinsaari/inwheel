@@ -16,10 +16,12 @@
 
 package com.aarokoinsaari.accessibilitymap.domain.model
 
+import androidx.annotation.StringRes
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Fts4
 import androidx.room.PrimaryKey
+import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.view.models.PlaceClusterItem
 import kotlinx.serialization.Serializable
 
@@ -35,7 +37,7 @@ data class Place(
     val phone: String? = null,
     val address: String? = null,
     val website: String? = null,
-    val generalAccessibility: AccessibilityStatus,
+    val generalAccessibility: AccessibilityStatus?,
     val indoorAccessibility: AccessibilityStatus? = null,
     val generalAdditionalInfo: String? = null,
     val entranceAccessibility: AccessibilityStatus? = null,
@@ -44,7 +46,7 @@ data class Place(
     val ramp: AccessibilityStatus? = null,
     val lift: AccessibilityStatus? = null,
     val width: AccessibilityStatus? = null,
-    val type: String? = null,
+    val doorType: String? = null,
     val entranceAdditionalInfo: String? = null,
     val restroomAccessibility: AccessibilityStatus? = null,
     val doorWidth: AccessibilityStatus? = null,
@@ -57,6 +59,33 @@ data class Place(
     val accessibleVia: String? = null,
     val restroomAdditionalInfo: String? = null,
 )
+
+enum class ValueType {
+    ACCESSIBILITY_STATUS, INT, BOOLEAN, STRING
+}
+
+enum class PlaceDetailProperty(
+    @StringRes val labelRes: Int,
+    val dbColumnRoom: String,
+    val dbColumnApi: String,
+    val valueType: ValueType
+) {
+    STEP_COUNT(R.string.step_count, "stepCount", "step_count", ValueType.INT),
+    STEP_HEIGHT(R.string.step_height, "stepHeight", "step_height", ValueType.ACCESSIBILITY_STATUS),
+    DOOR_WIDTH(R.string.door_width, "doorWidth", "door_width", ValueType.ACCESSIBILITY_STATUS),
+    RAMP(R.string.ramp, "ramp", "ramp", ValueType.ACCESSIBILITY_STATUS),
+    LIFT(R.string.lift, "lift", "lift", ValueType.ACCESSIBILITY_STATUS),
+    DOOR_TYPE(R.string.doorType, "type", "type", ValueType.STRING),
+    ENTRANCE_ADDITIONAL_INFO(R.string.additional_info, "entranceAdditionalInfo", "additional_info", ValueType.STRING),
+    ROOM_MANEUVER(R.string.room_maneuver, "roomManeuver", "room_maneuver", ValueType.ACCESSIBILITY_STATUS),
+    GRAB_RAILS(R.string.grab_rails, "grabRails", "grab_rails", ValueType.ACCESSIBILITY_STATUS),
+    TOILET_SEAT(R.string.toilet_seat, "toiletSeat", "toilet_seat", ValueType.ACCESSIBILITY_STATUS),
+    EMERGENCY_ALARM(R.string.emergency_alarm, "emergencyAlarm", "emergency_alarm", ValueType.ACCESSIBILITY_STATUS),
+    SINK(R.string.sink, "sink", "sink", ValueType.ACCESSIBILITY_STATUS),
+    EURO_KEY(R.string.euro_key, "euroKey", "euro_key", ValueType.BOOLEAN),
+    ACCESSIBLE_VIA(R.string.accessible_via, "accessibleVia", "accessible_via", ValueType.STRING),
+    RESTROOM_ADDITIONAL_INFO(R.string.additional_info, "restroomAdditionalInfo", "additional_info", ValueType.STRING)
+}
 
 fun Place.toClusterItem(zIndex: Float? = null): PlaceClusterItem =
     PlaceClusterItem(

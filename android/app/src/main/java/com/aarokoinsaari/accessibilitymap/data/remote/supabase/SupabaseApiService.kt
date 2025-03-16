@@ -93,4 +93,32 @@ class SupabaseApiService(
             Log.e("SupabaseApiService", "Error updating place: $e")
         }
     }
+
+    suspend fun updatePlaceAccessibilityDetail(placeId: String, columnApi: String, newValue: Any?) {
+        val table = when (columnApi) {
+            "indoor_accessibility", "additional_info", "user_modified" -> "general_accessibility"
+            "step_count", "step_height", "ramp", "lift", "width", "type" -> "entrance_accessibility"
+            "door_width", "room_maneuver", "grab_rails", "sink", "toilet_seat", "emergency_alarm", "accessible_via", "euro_key" -> "restroom_accessibility"
+            "phone", "website", "email", "address" -> "contact"
+            else -> "general_accessibility"
+        }
+        val url = "${BuildConfig.SUPABASE_URL}/rest/v1/$table?place_id=eq.$placeId"
+        try {
+            val response: HttpResponse = httpClient.patch(url) {
+                header("apikey", BuildConfig.SUPABASE_KEY)
+                header("Authorization", "Bearer ${BuildConfig.SUPABASE_KEY}")
+                contentType(ContentType.Application.Json)
+                setBody(mapOf(columnApi to newValue))
+            }
+            Log.d("SupabaseApiService", "Update response status: ${response.status}")
+            if (!response.status.isSuccess()) {
+                Log.e("SupabaseApiService", "Error updating place: ${response.status}")
+            }
+        } catch (e: CancellationException) {
+            Log.d("SupabaseApiService", "Request was cancelled $e")
+        } catch (e: Exception) {
+            Log.e("SupabaseApiService", "Error updating place: $e")
+        }
+    }
+
 }

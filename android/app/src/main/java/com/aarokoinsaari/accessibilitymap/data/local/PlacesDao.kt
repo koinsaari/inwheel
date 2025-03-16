@@ -20,6 +20,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.sqlite.db.SimpleSQLiteQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
 import com.aarokoinsaari.accessibilitymap.domain.model.PlaceFts
 import kotlinx.coroutines.flow.Flow
@@ -45,6 +48,30 @@ interface PlacesDao {
 
     @Query("UPDATE places SET generalAccessibility = :status WHERE id = :id")
     suspend fun updatePlaceGeneralAccessibility(id: String, status: String)
+
+    @RawQuery
+    suspend fun updateAccessibilityDetail(query: SupportSQLiteQuery): Int
+
+    suspend fun updatePlaceAccessibilityDetailString(id: String, columnName: String, newValue: String) {
+        val queryString = "UPDATE places SET $columnName = ? WHERE id = ?"
+        val args = arrayOf<Any>(newValue, id)
+        val query = SimpleSQLiteQuery(queryString, args)
+        updateAccessibilityDetail(query)
+    }
+
+    suspend fun updatePlaceAccessibilityDetailInt(id: String, columnName: String, newValue: Int) {
+        val queryString = "UPDATE places SET $columnName = ? WHERE id = ?"
+        val args = arrayOf<Any>(newValue, id)
+        val query = SimpleSQLiteQuery(queryString, args)
+        updateAccessibilityDetail(query)
+    }
+
+    suspend fun updatePlaceAccessibilityDetailBoolean(id: String, columnName: String, newValue: Boolean) {
+        val queryString = "UPDATE places SET $columnName = ? WHERE id = ?"
+        val args = arrayOf<Any>(newValue, id)
+        val query = SimpleSQLiteQuery(queryString, args)
+        updateAccessibilityDetail(query)
+    }
 }
 
 @Dao

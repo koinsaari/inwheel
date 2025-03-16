@@ -18,10 +18,16 @@ package com.aarokoinsaari.accessibilitymap.domain.intent
 
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
 import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.domain.model.PlaceDetailProperty
 
 sealed class PlaceDetailIntent {
     data class UpdateGeneralAccessibility(
         val place: Place,
+        val status: AccessibilityStatus
+    ) : PlaceDetailIntent()
+    data class UpdateAccessibilityDetail(
+        val place: Place,
+        val detailProperty: PlaceDetailProperty,
         val status: AccessibilityStatus
     ) : PlaceDetailIntent()
     data class OpenGeneralAccessibilityUpdateDialog(val place: Place) : PlaceDetailIntent()
