@@ -51,15 +51,35 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
                 }
 
                 is PlaceDetailIntent.UpdateAccessibilityDetail -> {
-                    updatePlaceAccessibilityDetail(intent.place, intent.detailProperty, intent.status)
+                    updatePlaceAccessibilityDetail(
+                        intent.place,
+                        intent.detailProperty,
+                        intent.status
+                    )
                 }
 
-                is PlaceDetailIntent.OpenGeneralAccessibilityUpdateDialog -> {
+                is PlaceDetailIntent.OpenAccessibilityUpdateDialog -> {
                     openGeneralAccessibilityUpdateDialog()
                 }
 
-                is PlaceDetailIntent.CloseGeneralAccessibilityUpdateDialog -> {
+                is PlaceDetailIntent.CloseAccessibilityUpdateDialog -> {
                     closeGeneralAccessibilityUpdateDialog()
+                }
+
+                is PlaceDetailIntent.UpdateAccessibilityDetailCustom -> {
+                    updatePlaceAccessibilityDetail(
+                        intent.place,
+                        intent.detailProperty,
+                        intent.value
+                    )
+                }
+
+                is PlaceDetailIntent.UpdateAccessibilityDetailBoolean -> {
+                    updatePlaceAccessibilityDetail(
+                        intent.place,
+                        intent.detailProperty,
+                        intent.value
+                    )
                 }
             }
         }
@@ -74,7 +94,8 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
                     repository.updatePlaceGeneralAccessibility(place, status)
                     _state.update {
                         it.copy(
-                            place = place.copy(generalAccessibility = status)
+                            place = place.copy(generalAccessibility = status),
+                            showUpdateDialog = false
                         )
                     }
                 } catch (e: Exception) {
@@ -89,7 +110,7 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
     private fun updatePlaceAccessibilityDetail(
         place: Place,
         detail: PlaceDetailProperty,
-        newValue: Any?
+        newValue: Any?,
     ) {
         viewModelScope.launch {
             Log.d("PlaceDetailsViewModel", "Updating place accessibility detail")
@@ -105,7 +126,7 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
                     )
                 }
                 Log.d("PlaceDetailsViewModel", "Updated place accessibility detail: $place")
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 Log.e("PlaceDetailsViewModel", "Error updating place accessibility detail", e)
             }
         }
@@ -114,24 +135,24 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
     private fun openGeneralAccessibilityUpdateDialog() {
         _state.update {
             it.copy(
-                showGeneralAccessibilityUpdateDialog = true
+                showUpdateDialog = true
             )
         }
         Log.d(
             "PlaceDetailsViewModel",
-            "Show dialog: ${_state.value.showGeneralAccessibilityUpdateDialog}"
+            "Show dialog: ${_state.value.showUpdateDialog}"
         )
     }
 
     private fun closeGeneralAccessibilityUpdateDialog() {
         _state.update {
             it.copy(
-                showGeneralAccessibilityUpdateDialog = false
+                showUpdateDialog = false
             )
         }
         Log.d(
             "PlaceDetailsViewModel",
-            "Show dialog: ${_state.value.showGeneralAccessibilityUpdateDialog}"
+            "Show dialog: ${_state.value.showUpdateDialog}"
         )
     }
 
@@ -142,7 +163,7 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
             PlaceDetailProperty.DOOR_WIDTH -> copy(doorWidth = newValue as? AccessibilityStatus)
             PlaceDetailProperty.RAMP -> copy(ramp = newValue as? AccessibilityStatus)
             PlaceDetailProperty.LIFT -> copy(lift = newValue as? AccessibilityStatus)
-            PlaceDetailProperty.DOOR_TYPE -> copy(doorType = newValue as? String)
+            PlaceDetailProperty.DOOR_TYPE -> copy(type = newValue as? String)
             PlaceDetailProperty.ENTRANCE_ADDITIONAL_INFO -> copy(entranceAdditionalInfo = newValue as? String)
             PlaceDetailProperty.ROOM_MANEUVER -> copy(roomManeuver = newValue as? AccessibilityStatus)
             PlaceDetailProperty.GRAB_RAILS -> copy(grabRails = newValue as? AccessibilityStatus)

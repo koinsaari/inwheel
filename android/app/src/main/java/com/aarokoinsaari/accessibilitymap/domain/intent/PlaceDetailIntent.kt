@@ -30,6 +30,16 @@ sealed class PlaceDetailIntent {
         val detailProperty: PlaceDetailProperty,
         val status: AccessibilityStatus
     ) : PlaceDetailIntent()
-    data class OpenGeneralAccessibilityUpdateDialog(val place: Place) : PlaceDetailIntent()
-    data class CloseGeneralAccessibilityUpdateDialog(val place: Place) : PlaceDetailIntent()
+    data class UpdateAccessibilityDetailCustom(
+        val place: Place,
+        val detailProperty: PlaceDetailProperty,
+        val value: String
+    ) : PlaceDetailIntent()
+    data class UpdateAccessibilityDetailBoolean(
+        val place: Place,
+        val detailProperty: PlaceDetailProperty,
+        val value: Boolean
+    ) : PlaceDetailIntent()
+    data class OpenAccessibilityUpdateDialog(val place: Place) : PlaceDetailIntent()
+    data class CloseAccessibilityUpdateDialog(val place: Place) : PlaceDetailIntent()
 }

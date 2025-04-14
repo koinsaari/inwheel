@@ -144,4 +144,18 @@
     <string name="accessibility_option_partially_accessible">⚠️ Partially Accessible</string>
     <string name="accessibility_option_not_accessible">❌ Not Accessible</string>
     <string name="doorType">"Door type:"</string>
+    <string name="additional_info_dialog_update_title">Explain the accessibility of the place</string>
+    <string name="step_count_dialog_update_title">How many steps there are on the entrance?</string>
+    <string name="additional_info_placeholder">What would you want other to know?</string>
+    <string name="step_count_placeholder">Write the number of steps…</string>
+
+    <string name="door_type_automatic_sliding">Automatic sliding door</string>
+    <string name="door_type_automatic_swing">Automatic swinging door</string>
+    <string name="door_type_manual_swing">Manual swinging door</string>
+    <string name="door_type_manual_sliding">Manual sliding door</string>
+    <string name="door_type_revolving">Revolving door</string>
+    <string name="door_type_double">Double door</string>
+    <string name="step_count_fully_accessible">✅ No steps</string>
+    <string name="step_count_partially_accessible">⚠️ One step</string>
+    <string name="step_count_not_accessible">❌ More than one step</string>
 </resources>

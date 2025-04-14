@@ -20,5 +20,5 @@ import com.aarokoinsaari.accessibilitymap.domain.model.Place
 
 data class PlaceDetailState(
     val place: Place? = null,
-    val showGeneralAccessibilityUpdateDialog: Boolean = false
+    val showUpdateDialog: Boolean = false,
 )

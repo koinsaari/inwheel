@@ -46,7 +46,7 @@ data class Place(
     val ramp: AccessibilityStatus? = null,
     val lift: AccessibilityStatus? = null,
     val width: AccessibilityStatus? = null,
-    val doorType: String? = null,
+    val type: String? = null,
     val entranceAdditionalInfo: String? = null,
     val restroomAccessibility: AccessibilityStatus? = null,
     val doorWidth: AccessibilityStatus? = null,
