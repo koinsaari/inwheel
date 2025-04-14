@@ -158,4 +158,7 @@
     <string name="step_count_fully_accessible">✅ No steps</string>
     <string name="step_count_partially_accessible">⚠️ One step</string>
     <string name="step_count_not_accessible">❌ More than one step</string>
+    <string name="more">More</string>
+    <string name="map">Map</string>
+    <string name="about_title">About this app</string>
 </resources>

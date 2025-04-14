@@ -16,10 +16,8 @@
 
 package com.aarokoinsaari.accessibilitymap.view.navigation
 
-import androidx.annotation.DrawableRes
-import com.aarokoinsaari.accessibilitymap.R
-
-enum class NavigationScreen(val route: String, @DrawableRes val iconResId: Int?) {
-    Map("map", R.drawable.ic_map),
-    PlaceDetails("place_details", null)
+object NavigationRoutes {
+    const val MAP = "map"
+    const val ABOUT = "about"
+    const val INFO = "info"
 }

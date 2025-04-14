@@ -26,16 +26,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -80,6 +84,7 @@ fun MapScreen(
     stateFlow: StateFlow<MapState>,
     modifier: Modifier = Modifier,
     onIntent: (MapIntent) -> Unit = {},
+    onOpenDrawer: () -> Unit = {},
 ) {
     val state by stateFlow.collectAsState()
     val scope = rememberCoroutineScope()
@@ -147,6 +152,24 @@ fun MapScreen(
                     .padding(horizontal = 12.dp, vertical = 4.dp)
                     .zIndex(1f)
             )
+
+            Box(Modifier.padding(start = 12.dp)) {
+                IconButton(
+                    onClick = onOpenDrawer,
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = CircleShape
+                        )
+                        .size(40.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "Open Navigation drawer",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
         }
 
         AnimatedVisibility(
