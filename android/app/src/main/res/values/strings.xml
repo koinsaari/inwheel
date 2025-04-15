@@ -160,5 +160,42 @@
     <string name="step_count_not_accessible">❌ More than one step</string>
     <string name="more">More</string>
     <string name="map">Map</string>
-    <string name="about_title">About this app</string>
+
+    <string name="about_title">ℹ️ About This App</string>
+    <string name="about_body">
+        Hi, I\'m Aaro — the developer of this app.\n\nI created this to make accessibility information for public places in Switzerland 🇨🇭 easier to find and understand.\n\nMost map services either ignore accessibility or simplify it to vague labels like “wheelchair accessible,” which often isn\'t enough. For anyone with mobility challenges, details matter — steps, ramps, door widths, restrooms. This app is built to show those details clearly.
+    </string>
+
+    <string name="the_goal_title">🎯 The Goal</string>
+    <string name="the_goal_body">
+        My goal is to offer highly detailed, accurate accessibility data for public places — starting in Switzerland.\n\nPlace data comes from OpenStreetMap (OSM), an open mapping platform. Since OSM data is often incomplete, I built and maintain an open-source database alongside it to capture more detailed accessibility information.\n\nThe idea is to go beyond yes-or-no labels, and show how accessible each place actually is.
+    </string>
+
+    <string name="a_work_in_progress_title">🛠️ A Work in Progress</string>
+    <string name="a_work_in_progress_body">
+        This app is still early in development and lacks many features. There may be bugs, missing data, and things that need improving — and I\'m working on it whenever I have the time.\n\nUpdates will come over time, especially based on feedback. The goal is to keep it free, open, and useful.
+    </string>
+
+    <string name="contributing_title">🤝 Contributing</string>
+    <string name="contributing_body">
+        The project is open source and available on GitHub, so if you have some improvement ideas or want to contribute feel free to open an issue or submit a pull requests. All help is appreciated.
+    </string>
+
+    <string name="disclaimer_title">📌 Disclaimer</string>
+    <string name="disclaimer_body">
+        This app uses Google Maps because of its stability and advanced features, which makes handling thousands of places in the map much more user friendly. Google Maps isn\'t free at scale though, so some usage limits may apply.\n\nThe backend and database are designed to work also within free tiers, as this project is built and maintained only by me for now. As long as there\'s no external funding, features and growth will be balanced with what\'s realistically sustainable.\n
+    </string>
+
+    <string name="data_note">
+        Please note that the accessibility data in this app is based on open sources and contributions from users. While every effort is made to keep the information useful, accuracy cannot be guaranteed. The reliability of the data ultimately depends on the community. If you notice something missing or incorrect, please consider updating it in the app.
+    </string>
+
+    <string name="footer_note_about">
+        Accessibility data may be incomplete or inaccurate. Help others by keeping it up to date.
+    </string>
+
+    <string name="contact_title">📬 Contact</string>
+    <string name="contact_body">
+        If you have feedback, want to contribute, or just have a question, feel free to reach out to me.
+    </string>
 </resources>

@@ -78,6 +78,7 @@ import com.aarokoinsaari.accessibilitymap.domain.model.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.domain.model.PlaceDetailProperty
 import com.aarokoinsaari.accessibilitymap.domain.model.ValueType
 import com.aarokoinsaari.accessibilitymap.domain.state.PlaceDetailState
+import com.aarokoinsaari.accessibilitymap.view.components.FooterNote
 import com.aarokoinsaari.accessibilitymap.view.extensions.getAccessibilityStatusContentDescStringRes
 import com.aarokoinsaari.accessibilitymap.view.extensions.getAccessibilityStatusDrawableRes
 import com.aarokoinsaari.accessibilitymap.view.theme.AccessibilityMapTheme
@@ -800,16 +801,6 @@ fun DetailItem(
             }
         }
     }
-}
-
-@Composable
-fun FooterNote(note: String) {
-    Text(
-        text = note,
-        style = MaterialTheme.typography.labelSmall,
-        fontStyle = FontStyle.Italic,
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-    )
 }
 
 private fun AccessibilityStatus?.getAccessibilityStatusStringRes(): Int =

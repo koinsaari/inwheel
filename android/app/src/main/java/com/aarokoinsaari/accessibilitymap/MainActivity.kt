@@ -122,6 +122,8 @@ fun MainScreen() {
     val currentRoute = navBackStackEntry.value?.destination?.route
 
     ModalNavigationDrawer(
+        // this has to be false when the map is visible or else cannot swipe right without opening the drawer
+        gesturesEnabled = currentRoute != NavigationRoutes.MAP,
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
