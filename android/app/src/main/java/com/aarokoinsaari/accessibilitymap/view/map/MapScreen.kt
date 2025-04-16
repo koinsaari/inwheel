@@ -16,6 +16,10 @@
 
 package com.aarokoinsaari.accessibilitymap.view.map
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Looper
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -27,7 +31,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -48,37 +51,47 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.core.content.ContextCompat
 import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.domain.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.domain.model.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.domain.state.MapState
-import com.aarokoinsaari.accessibilitymap.utils.extensions.getLastLocationSuspended
+import com.aarokoinsaari.accessibilitymap.view.components.FooterNote
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(
     stateFlow: StateFlow<MapState>,
@@ -86,6 +99,7 @@ fun MapScreen(
     onIntent: (MapIntent) -> Unit = {},
     onOpenDrawer: () -> Unit = {},
 ) {
+    val context = LocalContext.current
     val state by stateFlow.collectAsState()
     val scope = rememberCoroutineScope()
     val defaultLocation = LatLng(46.462, 6.841) // Vevey
@@ -94,80 +108,123 @@ fun MapScreen(
             state.center ?: defaultLocation, state.zoomLevel ?: 8f
         )
     }
+    val fusedLocationClient = remember {
+        LocationServices.getFusedLocationProviderClient(context)
+    }
+    val locationPermissionState = rememberPermissionState(
+        permission = Manifest.permission.ACCESS_FINE_LOCATION
+    )
 
     var searchExpanded by rememberSaveable { mutableStateOf(false) }
-    var showNotification by rememberSaveable { mutableStateOf(true) }
+    var showNotification by remember { mutableStateOf(false) }
 
-    Surface(
-        color = MaterialTheme.colorScheme.surface,
-        contentColor = MaterialTheme.colorScheme.onSurface,
-        modifier = modifier.fillMaxSize()
-    ) {
-        MapContent(
-            state = state,
-            cameraPositionState = cameraPositionState,
-            onIntent = onIntent
-        )
+    // Handle location permission state changes
+    LaunchedEffect(locationPermissionState.status.isGranted) {
+        if (locationPermissionState.status.isGranted) {
+            onIntent(MapIntent.LocationPermissionGranted(true))
 
-        Column(Modifier.fillMaxWidth()) {
-            PlaceSearchBar(
-                query = state.searchQuery,
-                onQueryChange = { text ->
-                    onIntent(MapIntent.UpdateQuery(text))
-                },
-                onSearch = {
-                    searchExpanded = false
-                    onIntent(MapIntent.SearchPlace(state.searchQuery))
-                },
-                expanded = searchExpanded,
-                onExpandedChange = { searchExpanded = it },
-                searchResults = state.filteredPlaces,
-                onPlaceSelected = { place ->
-                    onIntent(MapIntent.SelectPlace(place))
-                    searchExpanded = false
+            if (ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                try { // Try to get last known location first
+                    fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                        if (location != null) {
+                            val userLatLng = LatLng(location.latitude, location.longitude)
+                            handleUserLocation(userLatLng, onIntent, cameraPositionState, scope)
+                        } else {
+                            Log.d("MapScreen", "Last location is null, requesting current location")
+                            requestCurrentLocation(fusedLocationClient, onIntent, cameraPositionState, scope)
+                        }
+                    }
+                } catch (e: SecurityException) {
+                    Log.e("MapScreen", "Location permission not granted", e)
+                    onIntent(MapIntent.LocationPermissionGranted(false))
+                }
+            }
+        }
+    }
 
-                    // Moves map to the selected place
-                    scope.launch {
-                        cameraPositionState.animate(
-                            update = CameraUpdateFactory.newLatLngZoom(
-                                LatLng(place.lat, place.lon),
-                                20f
-                            ),
-                            durationMs = 1000
+    // Request permission on launch
+    LaunchedEffect(Unit) {
+        if (!locationPermissionState.status.isGranted) {
+            locationPermissionState.launchPermissionRequest()
+        }
+    }
+
+    Box(Modifier.fillMaxSize()) {
+        Surface(
+            color = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            modifier = modifier.fillMaxSize()
+        ) {
+            MapContent(
+                state = state,
+                cameraPositionState = cameraPositionState,
+                onIntent = onIntent
+            )
+
+            Column(Modifier.fillMaxWidth()) {
+                PlaceSearchBar(
+                    query = state.searchQuery,
+                    onQueryChange = { text ->
+                        onIntent(MapIntent.UpdateQuery(text))
+                    },
+                    onSearch = {
+                        searchExpanded = false
+                        onIntent(MapIntent.SearchPlace(state.searchQuery))
+                    },
+                    expanded = searchExpanded,
+                    onExpandedChange = { searchExpanded = it },
+                    searchResults = state.filteredPlaces,
+                    onPlaceSelected = { place ->
+                        onIntent(MapIntent.SelectPlace(place))
+                        searchExpanded = false
+
+                        // Moves map to the selected place
+                        scope.launch {
+                            cameraPositionState.animate(
+                                update = CameraUpdateFactory.newLatLngZoom(
+                                    LatLng(place.lat, place.lon),
+                                    20f
+                                ),
+                                durationMs = 1000
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .zIndex(1f)
+                )
+
+                FilterChipRow(
+                    categories = PlaceCategory.entries,
+                    selectedCategories = state.selectedCategories,
+                    onIntent = onIntent,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent)
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                        .zIndex(1f)
+                )
+
+                Box(Modifier.padding(start = 12.dp)) {
+                    IconButton(
+                        onClick = onOpenDrawer,
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.surface,
+                                shape = CircleShape
+                            )
+                            .size(40.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Open Navigation drawer",
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .zIndex(1f)
-            )
-
-            FilterChipRow(
-                categories = PlaceCategory.entries,
-                selectedCategories = state.selectedCategories,
-                onIntent = onIntent,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Transparent)
-                    .padding(horizontal = 12.dp, vertical = 4.dp)
-                    .zIndex(1f)
-            )
-
-            Box(Modifier.padding(start = 12.dp)) {
-                IconButton(
-                    onClick = onOpenDrawer,
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.surface,
-                            shape = CircleShape
-                        )
-                        .size(40.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = "Open Navigation drawer",
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
                 }
             }
         }
@@ -175,34 +232,25 @@ fun MapScreen(
         AnimatedVisibility(
             visible = showNotification,
             enter = fadeIn(),
-            exit = fadeOut()
+            exit = fadeOut(),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .zIndex(2f)
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                NotificationBar(
-                    message = stringResource(id = R.string.map_zoom_notification)
-                )
-            }
-        }
-    }
-
-    // Startup notification
-    LaunchedEffect(cameraPositionState, showNotification) {
-        val delayJob = launch {
-            delay(5000L)
-            showNotification = false
+            NotificationBar(
+                message = stringResource(R.string.location_permissions_not_granted),
+            )
         }
 
-        snapshotFlow { cameraPositionState.isMoving }
-            .filter { it }
-            .collect {
-                if (showNotification) {
-                    showNotification = false
-                    delayJob.cancel()
-                }
-            }
+        Box(
+            modifier = Modifier
+                .align(alignment = Alignment.BottomEnd)
+                .padding(8.dp)
+        ) {
+            FooterNote(
+                note = stringResource(R.string.footer_note_map)
+            )
+        }
     }
 }
 
@@ -266,8 +314,7 @@ fun NotificationBar(
                 color = Color.White.copy(alpha = 0.8f),
                 shape = RoundedCornerShape(8.dp)
             )
-            .padding(horizontal = 56.dp, vertical = 12.dp)
-            .widthIn(min = 200.dp, max = 300.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Text(
             text = message,
@@ -278,13 +325,66 @@ fun NotificationBar(
     }
 }
 
-private fun moveCameraToUserLocation(
-    fusedLocationProviderClient: FusedLocationProviderClient,
+/**
+ * Requests current location updates once. Stops after receiving first location.
+ * Used as fallback when last known location is unavailable.
+ */
+private fun requestCurrentLocation(
+    fusedLocationClient: FusedLocationProviderClient,
+    onIntent: (MapIntent) -> Unit,
     cameraPositionState: CameraPositionState,
+    scope: CoroutineScope
 ) {
-    val location = fusedLocationProviderClient.getLastLocationSuspended()
-    location?.let {
-        val userLatLng = LatLng(it.latitude, it.longitude)
-        cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(userLatLng, 15f))
+    val locationRequest = LocationRequest.Builder(10000)
+        .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+        .build()
+
+    val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(result: LocationResult) {
+            result.lastLocation?.let { location ->
+                val userLatLng = LatLng(location.latitude, location.longitude)
+                handleUserLocation(userLatLng, onIntent, cameraPositionState, scope)
+                
+                // Remove the callback after we get a location
+                fusedLocationClient.removeLocationUpdates(this)
+            }
+        }
+    }
+    try {
+        fusedLocationClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    } catch (e: SecurityException) {
+        Log.e("MapScreen", "Error requesting location updates", e)
+    }
+}
+
+/**
+ * Updates UI state and animates camera to user location.
+ * Handles all actions needed when user location is determined.
+ */
+private fun handleUserLocation(
+    userLatLng: LatLng,
+    onIntent: (MapIntent) -> Unit,
+    cameraPositionState: CameraPositionState,
+    scope: CoroutineScope
+) {
+    onIntent(MapIntent.UpdateUserLocation(userLatLng))
+    scope.launch {
+        cameraPositionState.animate(
+            update = CameraUpdateFactory.newLatLngZoom(userLatLng, 15f),
+            durationMs = 1000
+        )
+
+        delay(1100)
+        cameraPositionState.projection?.visibleRegion?.latLngBounds?.let { bounds ->
+            onIntent(MapIntent.MoveMap(
+                center = userLatLng,
+                zoomLevel = 15f,
+                bounds = bounds
+            ))
+        }
     }
 }

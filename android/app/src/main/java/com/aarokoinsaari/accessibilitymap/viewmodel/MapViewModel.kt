@@ -135,6 +135,16 @@ class MapViewModel(
                     _state.update { it.copy(selectedPlace = intent.place) }
                     sharedViewModel.selectPlace(intent.place)
                 }
+
+                is MapIntent.LocationPermissionGranted -> {
+                    _state.update { it.copy(locationPermissionGranted = intent.granted) }
+                    Log.d("MapViewModel", "Location permission granted: ${intent.granted}")
+                }
+
+                is MapIntent.UpdateUserLocation -> {
+                    _state.update { it.copy(userLocation = intent.latLng) }
+                    Log.d("MapViewModel", "Updated user location: ${intent.latLng}")
+                }
             }
         }
     }

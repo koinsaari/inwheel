@@ -31,4 +31,6 @@ sealed class MapIntent {
     data class SearchPlace(val query: String) : MapIntent()
     data class SelectPlace(val place: Place) : MapIntent()
     data class ToggleFilter(val category: PlaceCategory) : MapIntent()
+    data class LocationPermissionGranted(val granted: Boolean) : MapIntent()
+    data class UpdateUserLocation(val latLng: LatLng) : MapIntent()
 }

@@ -38,6 +38,9 @@ import com.google.maps.android.clustering.algo.NonHierarchicalViewBasedAlgorithm
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapEffect
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapType
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.clustering.Clustering
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -76,6 +79,15 @@ fun MapContent(
         googleMapOptionsFactory = {
             GoogleMapOptions().mapId(context.getString(R.string.google_map_id))
         },
+        properties = MapProperties(
+            mapType = MapType.NORMAL,
+            isMyLocationEnabled = state.locationPermissionGranted,
+        ),
+        uiSettings = MapUiSettings(
+            compassEnabled = false,
+            mapToolbarEnabled = false,
+            myLocationButtonEnabled = false, // TODO: Add custom location button
+        ),
         modifier = modifier.fillMaxSize()
     ) {
         val clusterManagerState =

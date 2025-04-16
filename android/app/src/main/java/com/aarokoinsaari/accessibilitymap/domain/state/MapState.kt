@@ -34,7 +34,9 @@ data class MapState(
     val filteredPlaces: List<Place> = emptyList(),
     val searchQuery: String = "",
     val isLoading: Boolean = false,
-    val errorState: ErrorState = ErrorState.None
+    val locationPermissionGranted: Boolean = false,
+    val errorState: ErrorState = ErrorState.None,
+    val userLocation: LatLng? = null
 ) {
     override fun toString(): String =
         """
@@ -51,7 +53,9 @@ data class MapState(
                 filteredPlaces=${filteredPlaces.size},
                 searchQuery='$searchQuery',
                 isLoading=$isLoading,
+                locationPermissionGranted=$locationPermissionGranted,
                 errorState=$errorState
+                userLocation=$userLocation
             )
         """.trimIndent()
 }

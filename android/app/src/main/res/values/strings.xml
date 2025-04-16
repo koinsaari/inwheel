@@ -198,4 +198,8 @@
     <string name="contact_body">
         If you have feedback, want to contribute, or just have a question, feel free to reach out to me.
     </string>
+
+    <string name="footer_note_map">Location data © OpenStreetMap contributors.</string>
+    <string name="location_permissions_not_granted">Enable location in your phone settings to see places near you.</string>
+
 </resources>
