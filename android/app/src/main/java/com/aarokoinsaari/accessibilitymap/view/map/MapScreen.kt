@@ -58,7 +58,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
@@ -157,7 +156,7 @@ fun MapScreen(
         Surface(
             color = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface,
-            modifier = modifier.fillMaxSize()
+            modifier = modifier
         ) {
             MapContent(
                 state = state,
@@ -271,7 +270,6 @@ fun FilterChipRow(
                 selected = isSelected,
                 onClick = {
                     onIntent(MapIntent.ToggleFilter(category))
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove) // TODO
                 },
                 label = {
                     Text(

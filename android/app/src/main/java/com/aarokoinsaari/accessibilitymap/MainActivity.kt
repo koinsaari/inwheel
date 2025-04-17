@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
@@ -201,6 +202,7 @@ fun MainScreen() {
         ) {
             val sheetPeek = calculateBottomSheetPeekHeight(selectedPlaceState.value)
             Scaffold(
+                contentWindowInsets = WindowInsets(0, 0, 0, 0), // needs to set explicitly to 0 to avoid top inset
                 topBar = {
                     if (currentRoute != NavigationRoutes.MAP && currentRoute != null) {
                         TopAppBar(
@@ -329,7 +331,8 @@ fun MainScreen() {
                                 },
                                 onOpenDrawer = {
                                     scope.launch { drawerState.open() }
-                                }
+                                },
+                                modifier = Modifier.fillMaxSize()
                             )
                         }
                         composable(NavigationRoutes.ABOUT) {
