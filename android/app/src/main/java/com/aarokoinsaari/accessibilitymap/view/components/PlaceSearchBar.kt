@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.aarokoinsaari.accessibilitymap.view.map
+package com.aarokoinsaari.accessibilitymap.view.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
@@ -46,7 +47,7 @@ fun PlaceSearchBar(
     onExpandedChange: (Boolean) -> Unit,
     searchResults: List<Place>,
     onPlaceSelected: (Place) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     SearchBar(
         inputField = {
@@ -59,9 +60,30 @@ fun PlaceSearchBar(
                 },
                 expanded = expanded,
                 onExpandedChange = onExpandedChange,
-                placeholder = { Text(text = stringResource(R.string.search_placeholder)) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) }
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.search_placeholder),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                },
+                leadingIcon = {
+                    if (!expanded) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null,
+                            modifier = Modifier.clickable {
+                                onExpandedChange(false)
+                            }
+                        )
+                    }
+                },
+                // TODO: comment out when some functionality implemented
+                // trailingIcon = { Icon(Icons.Default.MoreVert, contentDescription = null) }
             )
         },
         expanded = expanded,

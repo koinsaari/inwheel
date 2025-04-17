@@ -48,6 +48,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,7 +60,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -70,7 +70,8 @@ import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.domain.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.domain.model.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.domain.state.MapState
-import com.aarokoinsaari.accessibilitymap.view.components.FooterNote
+import com.aarokoinsaari.accessibilitymap.view.components.Footer
+import com.aarokoinsaari.accessibilitymap.view.components.PlaceSearchBar
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -113,13 +114,15 @@ fun MapScreen(
     val locationPermissionState = rememberPermissionState(
         permission = Manifest.permission.ACCESS_FINE_LOCATION
     )
+    // Remember if initial animation has been performed
+    val initialAnimationPerformed = rememberSaveable { mutableStateOf(false) }
 
     var searchExpanded by rememberSaveable { mutableStateOf(false) }
     var showNotification by remember { mutableStateOf(false) }
 
     // Handle location permission state changes
     LaunchedEffect(locationPermissionState.status.isGranted) {
-        if (locationPermissionState.status.isGranted) {
+        if (locationPermissionState.status.isGranted && !initialAnimationPerformed.value) {
             onIntent(MapIntent.LocationPermissionGranted(true))
 
             if (ContextCompat.checkSelfPermission(
@@ -127,27 +130,42 @@ fun MapScreen(
                     Manifest.permission.ACCESS_FINE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED
             ) {
-                try { // Try to get last known location first
+                try { // try to get last known location first
                     fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                         if (location != null) {
                             val userLatLng = LatLng(location.latitude, location.longitude)
-                            handleUserLocation(userLatLng, onIntent, cameraPositionState, scope)
+                            handleUserLocation(
+                                userLatLng = userLatLng,
+                                onIntent = onIntent,
+                                cameraPositionState = cameraPositionState,
+                                scope = scope,
+                                animate = !initialAnimationPerformed.value
+                            )
+                            initialAnimationPerformed.value = true
                         } else {
                             Log.d("MapScreen", "Last location is null, requesting current location")
-                            requestCurrentLocation(fusedLocationClient, onIntent, cameraPositionState, scope)
+                            requestCurrentLocation(
+                                fusedLocationClient = fusedLocationClient,
+                                onIntent = onIntent,
+                                cameraPositionState = cameraPositionState,
+                                scope = scope,
+                                initialAnimationPerformed = initialAnimationPerformed
+                            )
                         }
                     }
                 } catch (e: SecurityException) {
                     Log.e("MapScreen", "Location permission not granted", e)
                     onIntent(MapIntent.LocationPermissionGranted(false))
+                    // Set animation as performed since we can't do it
+                    initialAnimationPerformed.value = true
                 }
             }
         }
     }
 
-    // Request permission on launch
+    // Request permission on initial launch only
     LaunchedEffect(Unit) {
-        if (!locationPermissionState.status.isGranted) {
+        if (!locationPermissionState.status.isGranted && !initialAnimationPerformed.value) {
             locationPermissionState.launchPermissionRequest()
         }
     }
@@ -246,7 +264,7 @@ fun MapScreen(
                 .align(alignment = Alignment.BottomEnd)
                 .padding(8.dp)
         ) {
-            FooterNote(
+            Footer(
                 note = stringResource(R.string.footer_note_map)
             )
         }
@@ -264,7 +282,6 @@ fun FilterChipRow(
     LazyRow(modifier = modifier) {
         items(categories) { category ->
             val isSelected = selectedCategories.contains(category.rawValue)
-            val haptic = LocalHapticFeedback.current
 
             FilterChip(
                 selected = isSelected,
@@ -331,7 +348,8 @@ private fun requestCurrentLocation(
     fusedLocationClient: FusedLocationProviderClient,
     onIntent: (MapIntent) -> Unit,
     cameraPositionState: CameraPositionState,
-    scope: CoroutineScope
+    scope: CoroutineScope,
+    initialAnimationPerformed: MutableState<Boolean> = mutableStateOf(true),
 ) {
     val locationRequest = LocationRequest.Builder(10000)
         .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
@@ -341,8 +359,15 @@ private fun requestCurrentLocation(
         override fun onLocationResult(result: LocationResult) {
             result.lastLocation?.let { location ->
                 val userLatLng = LatLng(location.latitude, location.longitude)
-                handleUserLocation(userLatLng, onIntent, cameraPositionState, scope)
-                
+                handleUserLocation(
+                    userLatLng = userLatLng,
+                    onIntent = onIntent,
+                    cameraPositionState = cameraPositionState,
+                    scope = scope,
+                    animate = !initialAnimationPerformed.value
+                )
+                initialAnimationPerformed.value = true
+
                 // Remove the callback after we get a location
                 fusedLocationClient.removeLocationUpdates(this)
             }
@@ -360,29 +385,47 @@ private fun requestCurrentLocation(
 }
 
 /**
- * Updates UI state and animates camera to user location.
- * Handles all actions needed when user location is determined.
+ * Updates UI state and animates camera to user location if needed.
+ * Animation only happens on first launch, not when returning to map screen.
  */
 private fun handleUserLocation(
     userLatLng: LatLng,
     onIntent: (MapIntent) -> Unit,
     cameraPositionState: CameraPositionState,
-    scope: CoroutineScope
+    scope: CoroutineScope,
+    animate: Boolean = false,
 ) {
     onIntent(MapIntent.UpdateUserLocation(userLatLng))
-    scope.launch {
-        cameraPositionState.animate(
-            update = CameraUpdateFactory.newLatLngZoom(userLatLng, 15f),
-            durationMs = 1000
-        )
+    if (animate) {
+        scope.launch {
+            cameraPositionState.animate(
+                update = CameraUpdateFactory.newLatLngZoom(userLatLng, 15f),
+                durationMs = 1000
+            )
 
-        delay(1100)
-        cameraPositionState.projection?.visibleRegion?.latLngBounds?.let { bounds ->
-            onIntent(MapIntent.MoveMap(
-                center = userLatLng,
-                zoomLevel = 15f,
-                bounds = bounds
-            ))
+            delay(1100)
+            cameraPositionState.projection?.visibleRegion?.latLngBounds?.let { bounds ->
+                onIntent(
+                    MapIntent.MoveMap(
+                        center = userLatLng,
+                        zoomLevel = 15f,
+                        bounds = bounds
+                    )
+                )
+            }
+        }
+    } else {
+        // still update the state, but without animation
+        scope.launch {
+            cameraPositionState.projection?.visibleRegion?.latLngBounds?.let { bounds ->
+                onIntent(
+                    MapIntent.MoveMap(
+                        center = userLatLng,
+                        zoomLevel = cameraPositionState.position.zoom,
+                        bounds = bounds
+                    )
+                )
+            }
         }
     }
 }

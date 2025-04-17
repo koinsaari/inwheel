@@ -19,5 +19,5 @@ package com.aarokoinsaari.accessibilitymap.view.navigation
 object NavigationRoutes {
     const val MAP = "map"
     const val ABOUT = "about"
-    const val INFO = "info"
+    const val ACCESSIBILITY_GUIDELINES = "accessibility_guidelines"
 }

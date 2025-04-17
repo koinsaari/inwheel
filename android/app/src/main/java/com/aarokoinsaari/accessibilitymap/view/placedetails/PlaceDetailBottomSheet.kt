@@ -78,7 +78,7 @@ import com.aarokoinsaari.accessibilitymap.domain.model.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.domain.model.PlaceDetailProperty
 import com.aarokoinsaari.accessibilitymap.domain.model.ValueType
 import com.aarokoinsaari.accessibilitymap.domain.state.PlaceDetailState
-import com.aarokoinsaari.accessibilitymap.view.components.FooterNote
+import com.aarokoinsaari.accessibilitymap.view.components.Footer
 import com.aarokoinsaari.accessibilitymap.view.extensions.getAccessibilityStatusContentDescStringRes
 import com.aarokoinsaari.accessibilitymap.view.extensions.getAccessibilityStatusDrawableRes
 import com.aarokoinsaari.accessibilitymap.view.theme.AccessibilityMapTheme
@@ -105,10 +105,10 @@ fun PlaceDetailBottomSheet(
                     place = place,
                     onIntent = onIntent
                 )
+                HorizontalDivider(Modifier.padding(vertical = 16.dp))
             }
             if (place.category.rawValue != "toilets") {
                 item {
-                    HorizontalDivider(Modifier.padding(vertical = 16.dp))
                     ContactInfoSection(place)
                     HorizontalDivider(Modifier.padding(vertical = 16.dp))
                 }
@@ -138,7 +138,7 @@ fun PlaceDetailBottomSheet(
 
             item {
                 HorizontalDivider(Modifier.padding(bottom = 16.dp))
-                FooterNote(note = stringResource(id = R.string.choose_general_accessibility_note))
+                Footer(note = stringResource(id = R.string.place_detail_footer_note))
             }
         }
         if (state.value.showUpdateDialog) {
@@ -267,7 +267,7 @@ fun AccessibilityUpdateDialog(
                         }
                     }
                     Spacer(Modifier.height(8.dp))
-                    FooterNote(note = stringResource(id = R.string.choose_general_accessibility_note))
+                    Footer(note = stringResource(id = R.string.place_detail_footer_note))
                 }
             }
         }

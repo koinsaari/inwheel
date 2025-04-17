@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.aarokoinsaari.accessibilitymap.view.about
+package com.aarokoinsaari.accessibilitymap.view.info
 
 import android.content.Intent
 import androidx.compose.foundation.clickable
@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.aarokoinsaari.accessibilitymap.R
-import com.aarokoinsaari.accessibilitymap.view.components.FooterNote
+import com.aarokoinsaari.accessibilitymap.view.components.Footer
 
 @Composable
 fun AboutScreen() {
@@ -132,7 +132,7 @@ fun AboutScreen() {
             item {
                 Column {
                     HorizontalDivider(Modifier.padding(bottom = 8.dp))
-                    FooterNote(note = stringResource(R.string.footer_note_about))
+                    Footer(note = stringResource(R.string.footer_note_about))
                 }
             }
         }

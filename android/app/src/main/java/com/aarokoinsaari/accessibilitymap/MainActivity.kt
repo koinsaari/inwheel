@@ -16,11 +16,13 @@
 
 package com.aarokoinsaari.accessibilitymap
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +30,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -68,11 +71,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -80,8 +86,9 @@ import androidx.navigation.compose.rememberNavController
 import com.aarokoinsaari.accessibilitymap.domain.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
-import com.aarokoinsaari.accessibilitymap.view.about.AboutScreen
-import com.aarokoinsaari.accessibilitymap.view.info.InfoScreen
+import com.aarokoinsaari.accessibilitymap.view.components.Footer
+import com.aarokoinsaari.accessibilitymap.view.info.AboutScreen
+import com.aarokoinsaari.accessibilitymap.view.info.AccessibilityGuidelinesScreen
 import com.aarokoinsaari.accessibilitymap.view.map.MapScreen
 import com.aarokoinsaari.accessibilitymap.view.navigation.NavigationRoutes
 import com.aarokoinsaari.accessibilitymap.view.placedetails.PlaceDetailBottomSheet
@@ -123,73 +130,129 @@ fun MainScreen() {
     val currentRoute = navBackStackEntry.value?.destination?.route
 
     ModalNavigationDrawer(
-        // this has to be false when the map is visible or else cannot swipe right without opening the drawer
+        // this has to be false when the map is visible or cannot swipe right without opening the drawer
         gesturesEnabled = currentRoute != NavigationRoutes.MAP,
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                Text(
-                    text = stringResource(id = R.string.app_name),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(24.dp)
-                )
+                Column(Modifier.fillMaxHeight()) {
+                    Text(
+                        text = stringResource(id = R.string.app_name),
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(24.dp)
+                    )
 
-                Spacer(modifier = Modifier.height(12.dp))
-                HorizontalDivider()
+                    Spacer(modifier = Modifier.height(12.dp))
+                    HorizontalDivider()
 
-                NavigationDrawerItem(
-                    label = { Text("Map") },
-                    icon = { Icon(Icons.Default.Map, contentDescription = null) },
-                    selected = currentRoute == NavigationRoutes.MAP,
-                    onClick = {
-                        if (currentRoute != NavigationRoutes.MAP) {
-                            navController.navigate(NavigationRoutes.MAP) {
-                                popUpTo(NavigationRoutes.MAP)
-                                launchSingleTop = true
+                    NavigationDrawerItem(
+                        label = { Text(stringResource(id = R.string.map)) },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Map,
+                                contentDescription = stringResource(id = R.string.content_desc_navigation_map)
+                            )
+                        },
+                        selected = currentRoute == NavigationRoutes.MAP,
+                        onClick = {
+                            if (currentRoute != NavigationRoutes.MAP) {
+                                navController.navigate(NavigationRoutes.MAP) {
+                                    popUpTo(NavigationRoutes.MAP)
+                                    launchSingleTop = true
+                                }
                             }
-                        }
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    },
-                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                )
-
-                NavigationDrawerItem(
-                    label = { Text("About") },
-                    icon = { Icon(Icons.Outlined.Info, contentDescription = null) },
-                    selected = currentRoute == NavigationRoutes.ABOUT,
-                    onClick = {
-                        if (currentRoute != NavigationRoutes.ABOUT) {
-                            navController.navigate(NavigationRoutes.ABOUT) {
-                                popUpTo(NavigationRoutes.ABOUT)
-                                launchSingleTop = true
+                            scope.launch {
+                                drawerState.close()
                             }
-                        }
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    },
-                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                )
+                        },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
 
-                NavigationDrawerItem(
-                    label = { Text("Info") },
-                    icon = { Icon(Icons.Default.Accessibility, contentDescription = null) },
-                    selected = currentRoute == NavigationRoutes.INFO,
-                    onClick = {
-                        if (currentRoute != NavigationRoutes.INFO) {
-                            navController.navigate(NavigationRoutes.INFO) {
-                                popUpTo(NavigationRoutes.INFO)
-                                launchSingleTop = true
+                    NavigationDrawerItem(
+                        label = { Text(stringResource(id = R.string.about)) },
+                        icon = {
+                            Icon(
+                                Icons.Outlined.Info,
+                                contentDescription = stringResource(id = R.string.content_desc_navigation_about)
+                            )
+                        },
+                        selected = currentRoute == NavigationRoutes.ABOUT,
+                        onClick = {
+                            if (currentRoute != NavigationRoutes.ABOUT) {
+                                navController.navigate(NavigationRoutes.ABOUT) {
+                                    popUpTo(NavigationRoutes.ABOUT)
+                                    launchSingleTop = true
+                                }
                             }
-                        }
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    },
-                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                )
+                            scope.launch {
+                                drawerState.close()
+                            }
+                        },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
+
+                    NavigationDrawerItem(
+                        label = { Text(stringResource(id = R.string.accessibility_guidelines)) },
+                        icon = {
+                            Icon(
+                                Icons.Default.Accessibility,
+                                contentDescription = stringResource(id = R.string.content_desc_navigation_accessibility_guidelines)
+                            )
+                        },
+                        selected = currentRoute == NavigationRoutes.ACCESSIBILITY_GUIDELINES,
+                        onClick = {
+                            if (currentRoute != NavigationRoutes.ACCESSIBILITY_GUIDELINES) {
+                                navController.navigate(NavigationRoutes.ACCESSIBILITY_GUIDELINES) {
+                                    popUpTo(NavigationRoutes.ACCESSIBILITY_GUIDELINES)
+                                    launchSingleTop = true
+                                }
+                            }
+                            scope.launch {
+                                drawerState.close()
+                            }
+                        },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
+
+                    Spacer(Modifier.weight(1f))
+                    HorizontalDivider(Modifier.padding(bottom = 16.dp))
+
+                    Footer(
+                        leftContent = {
+                            Row {
+                                val context = LocalContext.current
+                                Text(
+                                    text = stringResource(id = R.string.made_by_footer),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Text(
+                                    text = "Aaro",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    textDecoration = TextDecoration.Underline,
+                                    modifier = Modifier
+                                        .clickable {
+                                            val intent = Intent(
+                                                Intent.ACTION_VIEW,
+                                                "https://www.linkedin.com/in/aarokoinsaari/".toUri()
+                                            )
+                                            context.startActivity(intent)
+                                        }
+                                )
+                            }
+                        },
+                        rightContent = {
+                            Text(
+                                text = "v${BuildConfig.VERSION_NAME}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                            )
+                        },
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+
             }
         }
     ) {
@@ -200,9 +263,14 @@ fun MainScreen() {
                 WindowInsets.systemBars.only(WindowInsetsSides.Bottom)
             )
         ) {
-            val sheetPeek = calculateBottomSheetPeekHeight(selectedPlaceState.value)
+            val sheetPeek = if (currentRoute != NavigationRoutes.MAP) {
+                0.dp
+            } else {
+                calculateBottomSheetPeekHeight(selectedPlaceState.value)
+            }
             Scaffold(
-                contentWindowInsets = WindowInsets(0, 0, 0, 0), // needs to set explicitly to 0 to avoid top inset
+                // need to set explicitly to 0 to avoid top inset
+                contentWindowInsets = WindowInsets(0, 0, 0, 0),
                 topBar = {
                     if (currentRoute != NavigationRoutes.MAP && currentRoute != null) {
                         TopAppBar(
@@ -338,8 +406,8 @@ fun MainScreen() {
                         composable(NavigationRoutes.ABOUT) {
                             AboutScreen()
                         }
-                        composable(NavigationRoutes.INFO) {
-                            InfoScreen()
+                        composable(NavigationRoutes.ACCESSIBILITY_GUIDELINES) {
+                            AccessibilityGuidelinesScreen()
                         }
                     }
                 }

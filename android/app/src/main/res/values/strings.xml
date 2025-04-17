@@ -30,7 +30,7 @@
     <string name="wheelchair_access_unknown">Unknown accessibility</string>
 
     <string name="map_zoom_notification">Zoom in to see more places</string>
-    <string name="search_placeholder">Search for a place</string>
+    <string name="search_placeholder">Search for a place in current area…</string>
 
     <string name="map_error_no_internet">You\'re offline. Please check your internet connection</string>
     <string name="map_error_timeout">Request timed out. Try again</string>
@@ -48,7 +48,7 @@
     <string name="unknown">Unknown</string>
     <string name="limited">limited</string>
     <string name="info_window_view_details">View details</string>
-    <string name="content_desc_navigation_map">Navigate to map</string>
+    <string name="content_desc_navigation_map">Open the map</string>
     <string name="content_desc_navigation_default">Navigate to other view</string>
     <string name="accessibility_status_limited">limited</string>
     <string name="emoji_checkmark">✅</string>
@@ -104,14 +104,14 @@
     <string name="content_desc_partially_accessible">Partially accessible</string>
     <string name="content_desc_not_accessible">Not accessible</string>
     <string name="content_desc_unknown_accessibility">Unknown accessibility</string>
-    <string name="how_accessible_question">How accessible is this place?</string>
+    <string name="how_accessible_question">How accessible is this place for a person with reduced mobility?</string>
     <string name="image_descript_fully_accessible">Fully accessible!</string>
     <string name="image_descript_partially_accessible">Requires an assistant!</string>
     <string name="image_descript_not_accessible">Not accessible at all!</string>
     <string name="no_contact_info_available">No contact info provided for this place. ☹️</string>
-    <string name="fully_accessible_status_title">This place is marked as fully accessible. \nPerson in a wheelchair should not need assistance</string>
-    <string name="limited_accessibility_status_title">This place is marked as partially accessible. \nPerson in a wheelchair might need assistance.</string>
-    <string name="not_accessible_status_title">This place is marked as not accessible.</string>
+    <string name="fully_accessible_status_title">This place is fully accessible. \nPerson with reduced mobility should not need assistance</string>
+    <string name="limited_accessibility_status_title">This place is partially accessible. \nPerson with reduced mobility might need assistance.</string>
+    <string name="not_accessible_status_title">This place is not accessible for a person with reduced mobility.</string>
     <string name="entrance_fully_accessible_label">No steps or has lift/ramp on entrance.</string>
     <string name="entrance_limited_accessibility_label">Max 1 step not too steep on entrance, or the door is not practical to open.</string>
     <string name="entrance_not_accessible_label">Multiple steps on entrance, or door is not wide enough.</string>
@@ -139,7 +139,7 @@
     <string name="accessible_via">Accessible via:</string>
     <string name="euro_key">EuroKey:</string>
     <string name="general_accessibility_update_dialog_title">How accessible is this place?</string>
-    <string name="choose_general_accessibility_note">⚠️ Your honest input helps the community and makes it easier for others to find accessible places.</string>
+    <string name="place_detail_footer_note">⚠️ Data accuracy is not guaranteed. Your honest input helps make accessibility better for everyone.</string>
     <string name="accessibility_option_fully_accessible">✅ Fully Accessible</string>
     <string name="accessibility_option_partially_accessible">⚠️ Partially Accessible</string>
     <string name="accessibility_option_not_accessible">❌ Not Accessible</string>
@@ -201,5 +201,10 @@
 
     <string name="footer_note_map">Location data © OpenStreetMap contributors.</string>
     <string name="location_permissions_not_granted">Enable location in your phone settings to see places near you.</string>
+    <string name="about">About</string>
+    <string name="content_desc_navigation_about">Open the About section</string>
+    <string name="accessibility_guidelines">Accessibility Guidelines</string>
+    <string name="content_desc_navigation_accessibility_guidelines">Open the Accessibility Guidelines section</string>
+    <string name="made_by_footer">"Made with 💚 by "</string>
 
 </resources>
