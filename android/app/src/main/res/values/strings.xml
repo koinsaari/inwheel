@@ -146,7 +146,7 @@
     <string name="doorType">"Door type:"</string>
     <string name="additional_info_dialog_title">Explain the accessibility of the place</string>
     <string name="step_count_dialog_update_title">How many steps there are on the entrance?</string>
-    <string name="additional_info_placeholder">What would you want other to know?</string>
+    <string name="additional_info_placeholder">What would you want other to know about this place\'s accessibility?</string>
     <string name="step_count_placeholder">Write the number of steps…</string>
 
     <string name="door_type_automatic_sliding">Automatic sliding door</string>

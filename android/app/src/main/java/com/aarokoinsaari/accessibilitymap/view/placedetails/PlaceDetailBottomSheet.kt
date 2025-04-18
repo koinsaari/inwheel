@@ -19,6 +19,7 @@ package com.aarokoinsaari.accessibilitymap.view.placedetails
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -149,16 +150,40 @@ fun PlaceDetailBottomSheet(
                         ?: stringResource(id = R.string.additional_info_label),
                     style = MaterialTheme.typography.bodyMedium,
                     fontStyle = FontStyle.Italic,
-                    modifier = Modifier
-                        .padding(vertical = 6.dp, horizontal = 8.dp)
-                        .clickable {
-                            onIntent(
-                                PlaceDetailIntent.OpenDialog(
-                                    place = place,
-                                    property = PlaceDetailProperty.ADDITIONAL_INFO
-                                )
+                    color = if (place.additionalInfo.isNullOrEmpty())
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    else
+                        MaterialTheme.colorScheme.onSurface,
+                    modifier = if (place.additionalInfo.isNullOrEmpty()) {
+                        Modifier
+                            .padding(vertical = 6.dp, horizontal = 8.dp)
+                            .fillMaxWidth()
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                shape = RoundedCornerShape(8.dp)
                             )
-                        }
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                            .clickable {
+                                onIntent(
+                                    PlaceDetailIntent.OpenDialog(
+                                        place = place,
+                                        property = PlaceDetailProperty.ADDITIONAL_INFO
+                                    )
+                                )
+                            }
+                    } else {
+                        Modifier
+                            .padding(vertical = 6.dp, horizontal = 20.dp)
+                            .fillMaxWidth()
+                            .clickable {
+                                onIntent(
+                                    PlaceDetailIntent.OpenDialog(
+                                        place = place,
+                                        property = PlaceDetailProperty.ADDITIONAL_INFO
+                                    )
+                                )
+                            }
+                    }
                 )
             }
 
@@ -270,11 +295,31 @@ fun PropertyUpdateDialog(
 
                         PlaceDetailProperty.ADDITIONAL_INFO -> {
                             var inputText by remember { mutableStateOf(place.additionalInfo ?: "") }
+                            val maxChars = 1000
+                            val currentChars = inputText.length
 
                             OutlinedTextField(
                                 value = inputText,
-                                onValueChange = { inputText = it },
-                                placeholder = { Text(stringResource(id = R.string.additional_info_placeholder)) },
+                                onValueChange = {
+                                    if (it.length <= maxChars) {
+                                        inputText = it
+                                    }
+                                },
+                                label = {
+                                    Text(
+                                        text = stringResource(id = R.string.additional_info),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                },
+                                placeholder = {
+                                    Text(
+                                        text = stringResource(id = R.string.additional_info_placeholder),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                            alpha = 0.6f
+                                        )
+                                    )
+                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .heightIn(min = 120.dp),
@@ -282,8 +327,22 @@ fun PropertyUpdateDialog(
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = MaterialTheme.colorScheme.primary,
                                     unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                 ),
-                                maxLines = 5
+                                maxLines = 5,
+                                supportingText = {
+                                    Text(
+                                        text = "$currentChars/$maxChars",
+                                        modifier = Modifier.fillMaxWidth(),
+                                        textAlign = TextAlign.End,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = if (currentChars >= maxChars * 0.9)
+                                            MaterialTheme.colorScheme.error
+                                        else
+                                            MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             )
 
                             Row(
