@@ -32,7 +32,6 @@ CREATE TABLE public.entrance_accessibility (
   lift ACCESSIBILITY_STATUS,
   width ACCESSIBILITY_STATUS,
   type VARCHAR(50),
-  additional_info TEXT CHECK (char_length(additional_info) <= 1000),
   user_modified BOOLEAN DEFAULT FALSE
 );
 
@@ -43,11 +42,9 @@ CREATE TABLE public.restroom_accessibility (
   room_maneuver ACCESSIBILITY_STATUS,
   grab_rails ACCESSIBILITY_STATUS,
   sink ACCESSIBILITY_STATUS,
-  toilet_seat ACCESSIBILITY_STATUS,
+  toilet_seat ACCESSIBILITY STATUS,
   emergency_alarm ACCESSIBILITY_STATUS,
-  accessible_via VARCHAR(100),
   euro_key BOOLEAN,
-  additional_info TEXT CHECK (char_length(additional_info) <= 1000),
   user_modified BOOLEAN DEFAULT FALSE
 );
 

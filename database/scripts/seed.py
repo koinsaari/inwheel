@@ -118,9 +118,9 @@ def seed_places(places: List[Place], limit: int = None):
         cur.execute(
             """
             INSERT INTO public.entrance_accessibility (
-              place_id, accessibility, step_count, step_height, ramp, lift, width, type, additional_info
+              place_id, accessibility, step_count, step_height, ramp, lift, width, type
             )
-            SELECT id, %s, %s, %s, %s, %s, %s, %s, %s FROM public.places WHERE osm_id = %s
+            SELECT id, %s, %s, %s, %s, %s, %s, %s FROM public.places WHERE osm_id = %s
             ON CONFLICT (place_id) DO UPDATE SET
               accessibility = EXCLUDED.accessibility,
               step_count = EXCLUDED.step_count,
@@ -128,8 +128,7 @@ def seed_places(places: List[Place], limit: int = None):
               ramp = EXCLUDED.ramp,
               lift = EXCLUDED.lift,
               width = EXCLUDED.width,
-              type = EXCLUDED.type,
-              additional_info = EXCLUDED.additional_info
+              type = EXCLUDED.type
             """,
             (
                 ea.get("accessibility"),
@@ -139,7 +138,6 @@ def seed_places(places: List[Place], limit: int = None):
                 ea.get("lift"),
                 ea.get("width"),
                 ea.get("type"),
-                ea.get("additional_info")[:1000] if ea.get("additional_info") else None,
                 p.osm_id
             )
         )
@@ -149,9 +147,9 @@ def seed_places(places: List[Place], limit: int = None):
             """
             INSERT INTO public.restroom_accessibility (
               place_id, accessibility, door_width, room_maneuver, grab_rails,
-              sink, toilet_seat, emergency_alarm, accessible_via, euro_key, additional_info
+              sink, toilet_seat, emergency_alarm, euro_key
             )
-            SELECT id, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s FROM public.places WHERE osm_id = %s
+            SELECT id, %s, %s, %s, %s, %s, %s, %s, %s FROM public.places WHERE osm_id = %s
             ON CONFLICT (place_id) DO UPDATE SET
               accessibility = EXCLUDED.accessibility,
               door_width = EXCLUDED.door_width,
@@ -160,9 +158,7 @@ def seed_places(places: List[Place], limit: int = None):
               sink = EXCLUDED.sink,
               toilet_seat = EXCLUDED.toilet_seat,
               emergency_alarm = EXCLUDED.emergency_alarm,
-              accessible_via = EXCLUDED.accessible_via,
-              euro_key = EXCLUDED.euro_key,
-              additional_info = EXCLUDED.additional_info
+              euro_key = EXCLUDED.euro_key
             """,
             (
                 ra.get("accessibility"),
@@ -172,9 +168,7 @@ def seed_places(places: List[Place], limit: int = None):
                 ra.get("sink"),
                 ra.get("toilet_seat"),
                 ra.get("emergency_alarm"),
-                ra.get("accessible_via"),
                 ra.get("euro_key"),
-                ra.get("additional_info")[:1000] if ra.get("additional_info") else None,
                 p.osm_id
             )
         )

@@ -16,8 +16,8 @@
 
 package com.aarokoinsaari.accessibilitymap.domain.intent
 
-import com.aarokoinsaari.accessibilitymap.domain.model.Place
 import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.domain.model.Place
 import com.aarokoinsaari.accessibilitymap.domain.model.PlaceDetailProperty
 
 sealed class PlaceDetailIntent {
@@ -30,7 +30,7 @@ sealed class PlaceDetailIntent {
         val detailProperty: PlaceDetailProperty,
         val status: AccessibilityStatus
     ) : PlaceDetailIntent()
-    data class UpdateAccessibilityDetailCustom(
+    data class UpdateAccessibilityDetailString(
         val place: Place,
         val detailProperty: PlaceDetailProperty,
         val value: String
@@ -40,6 +40,12 @@ sealed class PlaceDetailIntent {
         val detailProperty: PlaceDetailProperty,
         val value: Boolean
     ) : PlaceDetailIntent()
-    data class OpenAccessibilityUpdateDialog(val place: Place) : PlaceDetailIntent()
-    data class CloseAccessibilityUpdateDialog(val place: Place) : PlaceDetailIntent()
+    data class OpenDialog(
+        val place: Place,
+        val property: PlaceDetailProperty
+    ) : PlaceDetailIntent()
+    data class CloseDialog(
+        val place: Place,
+        val property: PlaceDetailProperty
+    ) : PlaceDetailIntent()
 }

@@ -133,8 +133,7 @@ def parse_accessibility_info(tags: Dict[str, str]):
         "ramp": parse_yes_no(tags.get("entrance:ramp") or tags.get("ramp") or tags.get("wheelchair:ramp")),
         "lift": None,
         "width": parse_width(tags.get("door:width") or tags.get("entrance:width")),
-        "type": "automatic" if tags.get("entrance:automatic_door", "").strip().lower() == "yes" else (tags.get("entrance:door")[:50] if tags.get("entrance:door") else None),
-        "additional_info": None
+        "type": "automatic" if tags.get("entrance:automatic_door", "").strip().lower() == "yes" else (tags.get("entrance:door")[:50] if tags.get("entrance:door") else None)
     }
     restroom = {
         "accessibility": None,
@@ -144,9 +143,7 @@ def parse_accessibility_info(tags: Dict[str, str]):
         "grab_rails": None,
         "sink": None,
         "emergency_alarm": None,
-        "accessible_via": tags.get("toilets:wheelchair:accessible_via")[:100] if tags.get("toilets:wheelchair:accessible_via") else None,
-        "euro_key": tags.get("centralkey") == "eurokey" if "centralkey" in tags else None,
-        "additional_info": None
+        "euro_key": tags.get("centralkey") == "eurokey" if "centralkey" in tags else None
     }
     
     return general, entrance, restroom

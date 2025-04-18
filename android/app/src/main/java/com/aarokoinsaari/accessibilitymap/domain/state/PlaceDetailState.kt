@@ -17,8 +17,9 @@
 package com.aarokoinsaari.accessibilitymap.domain.state
 
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
+import com.aarokoinsaari.accessibilitymap.domain.model.PlaceDetailProperty
 
 data class PlaceDetailState(
     val place: Place? = null,
-    val showUpdateDialog: Boolean = false,
+    val activeDialog: PlaceDetailProperty? = null,
 )

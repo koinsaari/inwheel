@@ -55,7 +55,7 @@
     <string name="emoji_warning">⚠️</string>
     <string name="emoji_cross">❌</string>
     <string name="emoji_question">❔</string>
-    <string name="additional_info">Additional info:</string>
+    <string name="additional_info">Additional info</string>
     <string name="content_desc_phone">Phone number</string>
     <string name="content_desc_email">Email address</string>
     <string name="content_desc_website">Website</string>
@@ -138,13 +138,13 @@
     <string name="emergency_alarm">Emergency alarm:</string>
     <string name="accessible_via">Accessible via:</string>
     <string name="euro_key">EuroKey:</string>
-    <string name="general_accessibility_update_dialog_title">How accessible is this place?</string>
+    <string name="general_accessibility_dialog_title">How accessible is this place?</string>
     <string name="place_detail_footer_note">⚠️ Data accuracy is not guaranteed. Your honest input helps make accessibility better for everyone.</string>
     <string name="accessibility_option_fully_accessible">✅ Fully Accessible</string>
     <string name="accessibility_option_partially_accessible">⚠️ Partially Accessible</string>
     <string name="accessibility_option_not_accessible">❌ Not Accessible</string>
     <string name="doorType">"Door type:"</string>
-    <string name="additional_info_dialog_update_title">Explain the accessibility of the place</string>
+    <string name="additional_info_dialog_title">Explain the accessibility of the place</string>
     <string name="step_count_dialog_update_title">How many steps there are on the entrance?</string>
     <string name="additional_info_placeholder">What would you want other to know?</string>
     <string name="step_count_placeholder">Write the number of steps…</string>
@@ -206,5 +206,26 @@
     <string name="accessibility_guidelines">Accessibility Guidelines</string>
     <string name="content_desc_navigation_accessibility_guidelines">Open the Accessibility Guidelines section</string>
     <string name="made_by_footer">"Made with 💚 by "</string>
+    <string name="dialog_footer">⚠️ Your honest input helps make accessibility better for everyone.</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="step_count_dialog_title">About step count</string>
+    <string name="step_height_dialog_title">About step height</string>
+    <string name="door_width_dialog_title">About door width</string>
+    <string name="ramp_dialog_title">About ramps</string>
+    <string name="lift_dialog_title">About lifts</string>
+    <string name="door_type_dialog_title">About door types</string>
+    <string name="room_maneuver_dialog_title">About room maneuver</string>
+    <string name="grab_rails_dialog_title">About grab rails in toilets</string>
+    <string name="toilet_seat_dialog_title">About toilet seats</string>
+    <string name="emergency_alarm_dialog_title">About emergency alarms in toilets</string>
+    <string name="sink_dialog_title">About sink in toilet</string>
+    <string name="euro_key_dialog_title">About EuroKey</string>
+    <string name="general_accessibility">General accessibility level</string>
+    <string name="indoor_accessibility">Indoor accessibility</string>
+    <string name="indoor_accessibility_dialog_title">About indoor accessibility</string>
+    <string name="entrance_accessibility">Entrance accessibility</string>
+    <string name="entrance_accessibility_dialog_title">About entrance accessibility</string>
+    <string name="additional_info_label">Add text here…</string>
 
 </resources>

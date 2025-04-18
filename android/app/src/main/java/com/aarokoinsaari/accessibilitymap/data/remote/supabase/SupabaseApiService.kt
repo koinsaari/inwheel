@@ -98,7 +98,7 @@ class SupabaseApiService(
         val table = when (columnApi) {
             "indoor_accessibility", "additional_info", "user_modified" -> "general_accessibility"
             "step_count", "step_height", "ramp", "lift", "width", "type" -> "entrance_accessibility"
-            "door_width", "room_maneuver", "grab_rails", "sink", "toilet_seat", "emergency_alarm", "accessible_via", "euro_key" -> "restroom_accessibility"
+            "door_width", "room_maneuver", "grab_rails", "sink", "toilet_seat", "emergency_alarm", "euro_key" -> "restroom_accessibility"
             "phone", "website", "email", "address" -> "contact"
             else -> "general_accessibility"
         }

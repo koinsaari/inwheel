@@ -196,7 +196,9 @@ fun MainScreen() {
                         icon = {
                             Icon(
                                 Icons.Default.Accessibility,
-                                contentDescription = stringResource(id = R.string.content_desc_navigation_accessibility_guidelines)
+                                contentDescription = stringResource(
+                                    id = R.string.content_desc_navigation_accessibility_guidelines
+                                )
                             )
                         },
                         selected = currentRoute == NavigationRoutes.ACCESSIBILITY_GUIDELINES,

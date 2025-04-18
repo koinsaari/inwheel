@@ -66,7 +66,6 @@ data class EntranceAccessibilityDto(
     val lift: String?,
     val width: String?,
     val type: String?,
-    @SerialName("additional_info") val additionalInfo: String?,
     @SerialName("user_modified") val userModified: Boolean? = false,
 )
 
@@ -79,9 +78,7 @@ data class RestroomAccessibilityDto(
     val sink: String?,
     @SerialName("toilet_seat") val toiletSeat: String?,
     @SerialName("emergency_alarm") val emergencyAlarm: String?,
-    @SerialName("accessible_via") val accessibleVia: String?,
     @SerialName("euro_key") val euroKey: Boolean?,
-    @SerialName("additional_info") val additionalInfo: String?,
     @SerialName("user_modified") val userModified: Boolean? = false,
 )
 
@@ -98,7 +95,7 @@ fun PlaceDto.toDomain(): Place =
         website = contact?.website,
         generalAccessibility = parseStatus(generalAccessibility?.accessibility),
         indoorAccessibility = parseStatus(generalAccessibility?.indoorAccessibility),
-        generalAdditionalInfo = generalAccessibility?.additionalInfo,
+        additionalInfo = generalAccessibility?.additionalInfo,
         entranceAccessibility = parseStatus(entranceAccessibility?.accessibility),
         stepCount = entranceAccessibility?.stepCount,
         stepHeight = parseStatus(entranceAccessibility?.stepHeight),
@@ -106,7 +103,6 @@ fun PlaceDto.toDomain(): Place =
         lift = parseStatus(entranceAccessibility?.lift),
         width = parseStatus(entranceAccessibility?.width),
         type = entranceAccessibility?.type,
-        entranceAdditionalInfo = entranceAccessibility?.additionalInfo,
         restroomAccessibility = parseStatus(restroomAccessibility?.accessibility),
         doorWidth = parseStatus(restroomAccessibility?.doorWidth),
         roomManeuver = parseStatus(restroomAccessibility?.roomManeuver),
@@ -114,9 +110,7 @@ fun PlaceDto.toDomain(): Place =
         toiletSeat = parseStatus(restroomAccessibility?.toiletSeat),
         emergencyAlarm = parseStatus(restroomAccessibility?.emergencyAlarm),
         sink = parseStatus(restroomAccessibility?.sink),
-        euroKey = restroomAccessibility?.euroKey,
-        accessibleVia = restroomAccessibility?.accessibleVia,
-        restroomAdditionalInfo = restroomAccessibility?.additionalInfo
+        euroKey = restroomAccessibility?.euroKey
     )
 
 private fun parseStatus(value: String?): AccessibilityStatus {
