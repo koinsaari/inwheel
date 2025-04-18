@@ -40,6 +40,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.QuestionMark
@@ -111,7 +112,7 @@ fun PlaceDetailBottomSheet(
                 .padding(16.dp)
         ) {
             item {
-                AccessibilityStatusDisplaySection(
+                GeneralAccessibilityStatusDisplaySection(
                     place = place,
                     onIntent = onIntent,
                 )
@@ -390,7 +391,7 @@ fun PropertyUpdateDialog(
 }
 
 @Composable
-fun AccessibilityStatusDisplaySection(
+fun GeneralAccessibilityStatusDisplaySection(
     place: Place,
     modifier: Modifier = Modifier,
     onIntent: (PlaceDetailIntent) -> Unit = {},
@@ -488,21 +489,27 @@ fun AccessibilityStatusDisplaySection(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     val alpha = 0.7f
-
                     listOf(
-                        place.entranceAccessibility to
-                                place.entranceAccessibility
-                                    .getEntranceAccessibilityLabelStringRes(),
-                        place.indoorAccessibility to
-                                place.indoorAccessibility
-                                    .getIndoorAccessibilityStringRes(),
-                        place.restroomAccessibility to
-                                place.restroomAccessibility
-                                    .getRestroomAccessibilityStringRes()
-                    ).forEach { (status, labelRes) ->
+                        Triple(
+                            place.entranceAccessibility,
+                            place.entranceAccessibility.getEntranceAccessibilityLabelStringRes(),
+                            PlaceDetailProperty.ENTRANCE_ACCESSIBILITY
+                        ),
+                        Triple(
+                            place.indoorAccessibility,
+                            place.indoorAccessibility.getIndoorAccessibilityStringRes(),
+                            PlaceDetailProperty.INDOOR_ACCESSIBILITY
+                        ),
+                        Triple(
+                            place.restroomAccessibility,
+                            place.restroomAccessibility.getRestroomAccessibilityStringRes(),
+                            PlaceDetailProperty.RESTROOM_ACCESSIBILITY
+                        )
+                    ).forEach { (status, labelRes, property) ->
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             Icon(
                                 imageVector = when (status) {
@@ -511,17 +518,322 @@ fun AccessibilityStatusDisplaySection(
                                     NOT_ACCESSIBLE -> Icons.Outlined.Close
                                     UNKNOWN, null -> Icons.Outlined.QuestionMark
                                 },
-                                contentDescription = null, // TODO
+                                contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
                                 modifier = Modifier.size(16.dp)
                             )
+
                             Text(
                                 text = stringResource(id = labelRes),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontStyle = FontStyle.Italic,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.weight(1f)
                             )
+
+                            Box {
+                                var expanded by remember { mutableStateOf(false) }
+
+                                Icon(
+                                    imageVector = Icons.Outlined.KeyboardArrowDown,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
+                                    modifier = Modifier
+                                        .size(16.dp)
+                                        .clickable { expanded = true }
+                                )
+
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false }
+                                ) {
+                                    // Property-specific menu options
+                                    when (property) {
+                                        PlaceDetailProperty.ENTRANCE_ACCESSIBILITY -> {
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    onIntent(
+                                                        PlaceDetailIntent.UpdateAccessibilityDetail(
+                                                            place = place,
+                                                            detailProperty = property,
+                                                            status = FULLY_ACCESSIBLE
+                                                        )
+                                                    )
+                                                    expanded = false
+                                                },
+                                                text = {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = stringResource(id = R.string.emoji_checkmark),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                        Text(
+                                                            text = stringResource(id = R.string.entrance_fully_accessible_label),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                    }
+                                                }
+                                            )
+
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    onIntent(
+                                                        PlaceDetailIntent.UpdateAccessibilityDetail(
+                                                            place = place,
+                                                            detailProperty = property,
+                                                            status = PARTIALLY_ACCESSIBLE
+                                                        )
+                                                    )
+                                                    expanded = false
+                                                },
+                                                text = {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = stringResource(id = R.string.emoji_warning),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                        Text(
+                                                            text = stringResource(id = R.string.entrance_partially_accessible_label),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                    }
+                                                }
+                                            )
+
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    onIntent(
+                                                        PlaceDetailIntent.UpdateAccessibilityDetail(
+                                                            place = place,
+                                                            detailProperty = property,
+                                                            status = NOT_ACCESSIBLE
+                                                        )
+                                                    )
+                                                    expanded = false
+                                                },
+                                                text = {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = stringResource(id = R.string.emoji_cross),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                        Text(
+                                                            text = stringResource(id = R.string.entrance_not_accessible_label),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                    }
+                                                }
+                                            )
+                                        }
+
+                                        PlaceDetailProperty.INDOOR_ACCESSIBILITY -> {
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    onIntent(
+                                                        PlaceDetailIntent.UpdateAccessibilityDetail(
+                                                            place = place,
+                                                            detailProperty = property,
+                                                            status = FULLY_ACCESSIBLE
+                                                        )
+                                                    )
+                                                    expanded = false
+                                                },
+                                                text = {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = stringResource(id = R.string.emoji_checkmark),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                        Text(
+                                                            text = stringResource(id = R.string.indoor_fully_accessible_status_label),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                    }
+                                                }
+                                            )
+
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    onIntent(
+                                                        PlaceDetailIntent.UpdateAccessibilityDetail(
+                                                            place = place,
+                                                            detailProperty = property,
+                                                            status = PARTIALLY_ACCESSIBLE
+                                                        )
+                                                    )
+                                                    expanded = false
+                                                },
+                                                text = {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = stringResource(id = R.string.emoji_warning),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                        Text(
+                                                            text = stringResource(id = R.string.indoor_partially_accessible_status_label),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                    }
+                                                }
+                                            )
+
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    onIntent(
+                                                        PlaceDetailIntent.UpdateAccessibilityDetail(
+                                                            place = place,
+                                                            detailProperty = property,
+                                                            status = NOT_ACCESSIBLE
+                                                        )
+                                                    )
+                                                    expanded = false
+                                                },
+                                                text = {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = stringResource(id = R.string.emoji_cross),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                        Text(
+                                                            text = stringResource(id = R.string.indoor_not_accessible_status_label),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                    }
+                                                }
+                                            )
+                                        }
+
+                                        PlaceDetailProperty.RESTROOM_ACCESSIBILITY -> {
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    onIntent(
+                                                        PlaceDetailIntent.UpdateAccessibilityDetail(
+                                                            place = place,
+                                                            detailProperty = property,
+                                                            status = FULLY_ACCESSIBLE
+                                                        )
+                                                    )
+                                                    expanded = false
+                                                },
+                                                text = {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = stringResource(id = R.string.emoji_checkmark),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                        Text(
+                                                            text = stringResource(id = R.string.restroom_fully_accessible_status_label),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                    }
+                                                }
+                                            )
+
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    onIntent(
+                                                        PlaceDetailIntent.UpdateAccessibilityDetail(
+                                                            place = place,
+                                                            detailProperty = property,
+                                                            status = PARTIALLY_ACCESSIBLE
+                                                        )
+                                                    )
+                                                    expanded = false
+                                                },
+                                                text = {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = stringResource(id = R.string.emoji_warning),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                        Text(
+                                                            text = stringResource(
+                                                                id = R.string.restroom_partially_accessible_status_label
+                                                            ),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                    }
+                                                }
+                                            )
+
+                                            DropdownMenuItem(
+                                                onClick = {
+                                                    onIntent(
+                                                        PlaceDetailIntent.UpdateAccessibilityDetail(
+                                                            place = place,
+                                                            detailProperty = property,
+                                                            status = NOT_ACCESSIBLE
+                                                        )
+                                                    )
+                                                    expanded = false
+                                                },
+                                                text = {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = stringResource(id = R.string.emoji_cross),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                        Text(
+                                                            text = stringResource(id = R.string.restroom_not_accessible_status_label),
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                        )
+                                                    }
+                                                }
+                                            )
+                                        }
+
+                                        else -> {
+                                            // Fallback for other property types though shouldn't need
+                                            listOf(
+                                                R.string.accessibility_option_fully_accessible to FULLY_ACCESSIBLE,
+                                                R.string.accessibility_option_partially_accessible to PARTIALLY_ACCESSIBLE,
+                                                R.string.accessibility_option_not_accessible to NOT_ACCESSIBLE
+                                            ).forEach { (displayText, accessibilityStatus) ->
+                                                DropdownMenuItem(
+                                                    onClick = {
+                                                        onIntent(
+                                                            PlaceDetailIntent.UpdateAccessibilityDetail(
+                                                                place = place,
+                                                                detailProperty = property,
+                                                                status = accessibilityStatus
+                                                            )
+                                                        )
+                                                        expanded = false
+                                                    },
+                                                    text = { Text(text = stringResource(id = displayText)) }
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -937,7 +1249,7 @@ private fun Boolean?.getBooleanEmojiStringRes(): Int =
 private fun AccessibilityStatus?.getEntranceAccessibilityLabelStringRes(): Int =
     when (this) {
         FULLY_ACCESSIBLE -> R.string.entrance_fully_accessible_label
-        PARTIALLY_ACCESSIBLE -> R.string.entrance_limited_accessibility_label
+        PARTIALLY_ACCESSIBLE -> R.string.entrance_partially_accessible_label
         NOT_ACCESSIBLE -> R.string.entrance_not_accessible_label
         UNKNOWN -> R.string.entrance_unknown_label
         null -> R.string.entrance_unknown_label
@@ -945,8 +1257,8 @@ private fun AccessibilityStatus?.getEntranceAccessibilityLabelStringRes(): Int =
 
 private fun AccessibilityStatus?.getIndoorAccessibilityStringRes(): Int =
     when (this) {
-        FULLY_ACCESSIBLE -> R.string.indoor_accessible_status_label
-        PARTIALLY_ACCESSIBLE -> R.string.indoor_limited_accessibility_status_label
+        FULLY_ACCESSIBLE -> R.string.indoor_fully_accessible_status_label
+        PARTIALLY_ACCESSIBLE -> R.string.indoor_partially_accessible_status_label
         NOT_ACCESSIBLE -> R.string.indoor_not_accessible_status_label
         UNKNOWN -> R.string.indoor_unknown_label
         null -> R.string.indoor_unknown_label
@@ -954,8 +1266,8 @@ private fun AccessibilityStatus?.getIndoorAccessibilityStringRes(): Int =
 
 private fun AccessibilityStatus?.getRestroomAccessibilityStringRes(): Int =
     when (this) {
-        FULLY_ACCESSIBLE -> R.string.restroom_accessibility_status_label
-        PARTIALLY_ACCESSIBLE -> R.string.restroom_limited_accessibility_status_label
+        FULLY_ACCESSIBLE -> R.string.restroom_fully_accessible_status_label
+        PARTIALLY_ACCESSIBLE -> R.string.restroom_partially_accessible_status_label
         NOT_ACCESSIBLE -> R.string.restroom_not_accessible_status_label
         UNKNOWN -> R.string.restroom_unknown_label
         null -> R.string.restroom_unknown_label

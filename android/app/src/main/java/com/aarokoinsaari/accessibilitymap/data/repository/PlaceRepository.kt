@@ -109,35 +109,35 @@ class PlaceRepository(
 
     suspend fun updatePlaceAccessibilityDetail(
         place: Place,
-        detail: PlaceDetailProperty,
+        property: PlaceDetailProperty,
         newValue: Any?
     ) {
         withContext(Dispatchers.IO) {
             when (newValue) {
                 is AccessibilityStatus ->
-                    dao.updatePlaceAccessibilityDetailString(place.id, detail.dbColumnRoom, newValue.name)
+                    dao.updatePlaceAccessibilityDetailString(place.id, property.dbColumnRoom, newValue.name)
                 is Boolean ->
-                    dao.updatePlaceAccessibilityDetailBoolean(place.id, detail.dbColumnRoom, newValue)
+                    dao.updatePlaceAccessibilityDetailBoolean(place.id, property.dbColumnRoom, newValue)
                 is Int ->
-                    dao.updatePlaceAccessibilityDetailInt(place.id, detail.dbColumnRoom, newValue)
+                    dao.updatePlaceAccessibilityDetailInt(place.id, property.dbColumnRoom, newValue)
                 is String ->
-                    dao.updatePlaceAccessibilityDetailString(place.id, detail.dbColumnRoom, newValue)
+                    dao.updatePlaceAccessibilityDetailString(place.id, property.dbColumnRoom, newValue)
                 else -> {
                     Log.e("PlaceRepository", "Unsupported type: ${newValue?.javaClass?.name}")
                 }
             }
             Log.d(
                 "PlaceRepository",
-                "Updated place ${place.id} accessibility detail ${detail.dbColumnRoom} to $newValue"
+                "Updated place ${place.id} accessibility detail ${property.dbColumnRoom} to $newValue"
             )
             api.updatePlaceAccessibilityDetail(
-                place.id,
-                detail.dbColumnApi,
-                newValue
+                placeId = place.id,
+                property = property,
+                newValue = newValue
             )
             Log.d(
                 "PlaceRepository",
-                "Updated place ${place.id} accessibility detail ${detail.dbColumnApi} to $newValue on db"
+                "Updated place ${place.id} accessibility detail ${property.dbColumnApi} to $newValue on db"
             )
         }
     }

@@ -113,13 +113,13 @@
     <string name="limited_accessibility_status_title">This place is partially accessible. \nPerson with reduced mobility might need assistance.</string>
     <string name="not_accessible_status_title">This place is not accessible for a person with reduced mobility.</string>
     <string name="entrance_fully_accessible_label">No steps or has lift/ramp on entrance.</string>
-    <string name="entrance_limited_accessibility_label">Max 1 step not too steep on entrance, or the door is not practical to open.</string>
+    <string name="entrance_partially_accessible_label">Max 1 step not too steep on entrance, or the door is not practical to open.</string>
     <string name="entrance_not_accessible_label">Multiple steps on entrance, or door is not wide enough.</string>
-    <string name="indoor_accessible_status_label">Inside spacious enough to move with a wheelchair.</string>
-    <string name="indoor_limited_accessibility_status_label">Inside some areas may be difficult to access with a wheelchair.</string>
+    <string name="indoor_fully_accessible_status_label">Inside spacious enough to move with a wheelchair.</string>
+    <string name="indoor_partially_accessible_status_label">Inside some areas may be difficult to access with a wheelchair.</string>
     <string name="indoor_not_accessible_status_label">Not enough space to move with a wheelchair.</string>
-    <string name="restroom_accessibility_status_label">The restroom is spacious and fully wheelchair accessible.</string>
-    <string name="restroom_limited_accessibility_status_label">The restroom is partially accessible and may require assistance.</string>
+    <string name="restroom_fully_accessible_status_label">The restroom is spacious and fully wheelchair accessible.</string>
+    <string name="restroom_partially_accessible_status_label">The restroom is partially accessible and may require assistance.</string>
     <string name="restroom_not_accessible_status_label">The restroom is not accessible for wheelchair users.</string>
     <string name="entrance_unknown_label">No detailed information given about entrance.</string>
     <string name="indoor_unknown_label">No detailed information given about indoor accessibility.</string>
@@ -227,5 +227,9 @@
     <string name="entrance_accessibility">Entrance accessibility</string>
     <string name="entrance_accessibility_dialog_title">About entrance accessibility</string>
     <string name="additional_info_label">Add text here…</string>
+    <string name="restroom_accessibility">Restroom accessibility</string>
+    <string name="restroom_accessibility_dialog_title">About restroom accessibility</string>
+    <string name="entrance_width">Entrance width:</string>
+    <string name="entrance_width_dialog_title">About entrance width</string>
 
 </resources>

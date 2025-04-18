@@ -42,7 +42,7 @@ CREATE TABLE public.restroom_accessibility (
   room_maneuver ACCESSIBILITY_STATUS,
   grab_rails ACCESSIBILITY_STATUS,
   sink ACCESSIBILITY_STATUS,
-  toilet_seat ACCESSIBILITY STATUS,
+  toilet_seat ACCESSIBILITY_STATUS,
   emergency_alarm ACCESSIBILITY_STATUS,
   euro_key BOOLEAN,
   user_modified BOOLEAN DEFAULT FALSE

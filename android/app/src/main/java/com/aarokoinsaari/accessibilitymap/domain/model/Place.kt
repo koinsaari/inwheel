@@ -81,6 +81,12 @@ enum class PlaceDetailProperty(
         dbColumnRoom = "entranceAccessibility",
         dbColumnApi = "entrance_accessibility"
     ),
+    RESTROOM_ACCESSIBILITY(
+        labelRes = R.string.restroom_accessibility,
+        dialogTitleRes = R.string.restroom_accessibility_dialog_title,
+        dbColumnRoom = "restroomAccessibility",
+        dbColumnApi = "restroom_accessibility"
+    ),
     ADDITIONAL_INFO(
         labelRes = R.string.additional_info,
         dialogTitleRes = R.string.additional_info_dialog_title,
@@ -99,12 +105,6 @@ enum class PlaceDetailProperty(
         dbColumnRoom = "stepHeight",
         dbColumnApi = "step_height"
     ),
-    DOOR_WIDTH(
-        labelRes = R.string.door_width,
-        dialogTitleRes = R.string.door_width_dialog_title,
-        dbColumnRoom = "doorWidth",
-        dbColumnApi = "door_width"
-    ),
     RAMP(
         labelRes = R.string.ramp,
         dialogTitleRes = R.string.ramp_dialog_title,
@@ -117,11 +117,23 @@ enum class PlaceDetailProperty(
         dbColumnRoom = "lift",
         dbColumnApi = "lift"
     ),
+    ENTRANCE_WIDTH( // Note this is entrance width related to entrance table
+        labelRes = R.string.entrance_width,
+        dialogTitleRes = R.string.entrance_width_dialog_title,
+        dbColumnRoom = "width",
+        dbColumnApi = "width"
+    ),
     DOOR_TYPE(
         labelRes = R.string.doorType,
         dialogTitleRes = R.string.door_type_dialog_title,
         dbColumnRoom = "type",
         dbColumnApi = "type"
+    ),
+    DOOR_WIDTH( // Note this is restroom door width related to restroom table
+        labelRes = R.string.door_width,
+        dialogTitleRes = R.string.door_width_dialog_title,
+        dbColumnRoom = "doorWidth",
+        dbColumnApi = "door_width"
     ),
     ROOM_MANEUVER(
         labelRes = R.string.room_maneuver,

@@ -18,6 +18,7 @@ package com.aarokoinsaari.accessibilitymap.data.remote.supabase
 
 import android.util.Log
 import com.aarokoinsaari.accessibilitymap.BuildConfig
+import com.aarokoinsaari.accessibilitymap.domain.model.PlaceDetailProperty
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.header
@@ -94,21 +95,44 @@ class SupabaseApiService(
         }
     }
 
-    suspend fun updatePlaceAccessibilityDetail(placeId: String, columnApi: String, newValue: Any?) {
-        val table = when (columnApi) {
-            "indoor_accessibility", "additional_info", "user_modified" -> "general_accessibility"
-            "step_count", "step_height", "ramp", "lift", "width", "type" -> "entrance_accessibility"
-            "door_width", "room_maneuver", "grab_rails", "sink", "toilet_seat", "emergency_alarm", "euro_key" -> "restroom_accessibility"
-            "phone", "website", "email", "address" -> "contact"
-            else -> "general_accessibility"
+    suspend fun updatePlaceAccessibilityDetail(
+        placeId: String,
+        property: PlaceDetailProperty,
+        newValue: Any?,
+    ) {
+        val (table, column) = when (property) {
+            // General accessibility table
+            PlaceDetailProperty.GENERAL_ACCESSIBILITY -> "general_accessibility" to "accessibility"
+            PlaceDetailProperty.INDOOR_ACCESSIBILITY -> "general_accessibility" to "indoor_accessibility"
+            PlaceDetailProperty.ADDITIONAL_INFO -> "general_accessibility" to "additional_info"
+
+            // Entrance accessibility table
+            PlaceDetailProperty.ENTRANCE_ACCESSIBILITY -> "entrance_accessibility" to "accessibility"
+            PlaceDetailProperty.STEP_COUNT -> "entrance_accessibility" to "step_count"
+            PlaceDetailProperty.STEP_HEIGHT -> "entrance_accessibility" to "step_height"
+            PlaceDetailProperty.RAMP -> "entrance_accessibility" to "ramp"
+            PlaceDetailProperty.LIFT -> "entrance_accessibility" to "lift"
+            PlaceDetailProperty.DOOR_TYPE -> "entrance_accessibility" to "type"
+            PlaceDetailProperty.ENTRANCE_WIDTH -> "entrance_accessibility" to "width"
+
+            // Restroom accessibility table
+            PlaceDetailProperty.RESTROOM_ACCESSIBILITY -> "restroom_accessibility" to "accessibility"
+            PlaceDetailProperty.DOOR_WIDTH -> "restroom_accessibility" to "door_width"
+            PlaceDetailProperty.ROOM_MANEUVER -> "restroom_accessibility" to "room_maneuver"
+            PlaceDetailProperty.GRAB_RAILS -> "restroom_accessibility" to "grab_rails"
+            PlaceDetailProperty.SINK -> "restroom_accessibility" to "sink"
+            PlaceDetailProperty.TOILET_SEAT -> "restroom_accessibility" to "toilet_seat"
+            PlaceDetailProperty.EMERGENCY_ALARM -> "restroom_accessibility" to "emergency_alarm"
+            PlaceDetailProperty.EURO_KEY -> "restroom_accessibility" to "euro_key"
         }
+
         val url = "${BuildConfig.SUPABASE_URL}/rest/v1/$table?place_id=eq.$placeId"
         try {
             val response: HttpResponse = httpClient.patch(url) {
                 header("apikey", BuildConfig.SUPABASE_KEY)
                 header("Authorization", "Bearer ${BuildConfig.SUPABASE_KEY}")
                 contentType(ContentType.Application.Json)
-                setBody(mapOf(columnApi to newValue))
+                setBody(mapOf(column to newValue))
             }
             Log.d("SupabaseApiService", "Update response status: ${response.status}")
             if (!response.status.isSuccess()) {

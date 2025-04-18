@@ -117,7 +117,7 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
             try {
                 repository.updatePlaceAccessibilityDetail(
                     place = place,
-                    detail = detail,
+                    property = detail,
                     newValue = newValue
                 )
                 _state.update {
@@ -138,13 +138,15 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
             PlaceDetailProperty.GENERAL_ACCESSIBILITY -> copy(generalAccessibility = newValue as? AccessibilityStatus)
             PlaceDetailProperty.INDOOR_ACCESSIBILITY -> copy(indoorAccessibility = newValue as? AccessibilityStatus)
             PlaceDetailProperty.ENTRANCE_ACCESSIBILITY -> copy(entranceAccessibility = newValue as? AccessibilityStatus)
+            PlaceDetailProperty.RESTROOM_ACCESSIBILITY -> copy(restroomAccessibility = newValue as? AccessibilityStatus)
             PlaceDetailProperty.ADDITIONAL_INFO -> copy(additionalInfo = newValue as? String)
             PlaceDetailProperty.STEP_COUNT -> copy(stepCount = newValue as? Int)
             PlaceDetailProperty.STEP_HEIGHT -> copy(stepHeight = newValue as? AccessibilityStatus)
-            PlaceDetailProperty.DOOR_WIDTH -> copy(doorWidth = newValue as? AccessibilityStatus)
             PlaceDetailProperty.RAMP -> copy(ramp = newValue as? AccessibilityStatus)
             PlaceDetailProperty.LIFT -> copy(lift = newValue as? AccessibilityStatus)
+            PlaceDetailProperty.ENTRANCE_WIDTH -> copy(width = newValue as? AccessibilityStatus)
             PlaceDetailProperty.DOOR_TYPE -> copy(type = newValue as? String)
+            PlaceDetailProperty.DOOR_WIDTH -> copy(doorWidth = newValue as? AccessibilityStatus)
             PlaceDetailProperty.ROOM_MANEUVER -> copy(roomManeuver = newValue as? AccessibilityStatus)
             PlaceDetailProperty.GRAB_RAILS -> copy(grabRails = newValue as? AccessibilityStatus)
             PlaceDetailProperty.TOILET_SEAT -> copy(toiletSeat = newValue as? AccessibilityStatus)
