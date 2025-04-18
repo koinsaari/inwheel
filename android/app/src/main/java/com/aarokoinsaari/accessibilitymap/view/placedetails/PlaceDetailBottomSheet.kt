@@ -16,6 +16,7 @@
 
 package com.aarokoinsaari.accessibilitymap.view.placedetails
 
+import android.content.Intent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -39,23 +40,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Email
-import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Phone
+import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.QuestionMark
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -64,6 +65,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -72,6 +74,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.domain.intent.PlaceDetailIntent
 import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus
@@ -572,24 +575,42 @@ fun ContactInfoSection(
     place: Place,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val contactItems = listOfNotNull(
-        place.phone?.let {
-            it to Pair(
+        place.phone?.let { phone ->
+            Triple(
+                phone,
                 Icons.Outlined.Phone,
                 stringResource(id = R.string.content_desc_phone)
-            )
+            ) to {
+                val intent = Intent(Intent.ACTION_DIAL).apply {
+                    data = "tel:$phone".toUri()
+                }
+                context.startActivity(intent)
+            }
         },
-        place.email?.let {
-            it to Pair(
+        place.email?.let { email ->
+            Triple(
+                email,
                 Icons.Outlined.Email,
                 stringResource(id = R.string.content_desc_email)
-            )
+            ) to {
+                val intent = Intent(Intent.ACTION_SENDTO).apply {
+                    data = "mailto:$email".toUri()
+                }
+                context.startActivity(intent)
+            }
         },
-        place.website?.let {
-            it to Pair(
-                Icons.Outlined.Language,
+        place.website?.let { website ->
+            Triple(
+                website,
+                Icons.Outlined.Public,
                 stringResource(id = R.string.content_desc_website)
-            )
+            ) to {
+                val normalized = if (website.startsWith("http")) website else "https://$website"
+                val intent = Intent(Intent.ACTION_VIEW, normalized.toUri())
+                context.startActivity(intent)
+            }
         }
     )
 
@@ -598,19 +619,21 @@ fun ContactInfoSection(
         modifier = modifier
     ) {
         if (contactItems.isNotEmpty()) {
-            contactItems.forEach { (info, icon) ->
+            contactItems.forEach { (info, action) ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = action)
                 ) {
                     Icon(
-                        imageVector = icon.first,
-                        contentDescription = icon.second,
+                        imageVector = info.second,
+                        contentDescription = info.third,
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
-                        text = info,
+                        text = info.first,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
