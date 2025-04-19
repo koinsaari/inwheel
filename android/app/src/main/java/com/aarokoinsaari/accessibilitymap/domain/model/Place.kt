@@ -41,7 +41,7 @@ data class Place(
     val indoorAccessibility: AccessibilityStatus? = null,
     val entranceAccessibility: AccessibilityStatus? = null,
     val additionalInfo: String? = null,
-    val stepCount: Int? = null,
+    val stepCount: AccessibilityStatus? = null,
     val stepHeight: AccessibilityStatus? = null,
     val ramp: AccessibilityStatus? = null,
     val lift: AccessibilityStatus? = null,

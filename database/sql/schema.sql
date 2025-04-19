@@ -26,7 +26,7 @@ CREATE TABLE public.general_accessibility (
 CREATE TABLE public.entrance_accessibility (
   place_id UUID PRIMARY KEY REFERENCES public.places(id) ON DELETE CASCADE,
   accessibility ACCESSIBILITY_STATUS,
-  step_count INTEGER CHECK (step_count >= 0 AND step_count <= 100),
+  step_count ACCESSIBILITY_STATUS,
   step_height ACCESSIBILITY_STATUS,
   ramp ACCESSIBILITY_STATUS,
   lift ACCESSIBILITY_STATUS,

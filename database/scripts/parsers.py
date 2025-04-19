@@ -63,13 +63,17 @@ def parse_width(value: Optional[str]) -> Optional[str]:
     return None
 
 
-def parse_count(value: Optional[str]) -> Optional[int]:
+def parse_count(value: Optional[str]) -> Optional[str]:
     if not value:
         return None
     try:
         step_count = int(value)
-        if 0 <= step_count <= 100:
-            return step_count
+        if step_count == 0:
+            return AccessibilityStatus.FULLY_ACCESSIBLE.value
+        elif step_count == 1:
+            return AccessibilityStatus.PARTIALLY_ACCESSIBLE.value
+        elif step_count > 1:
+            return AccessibilityStatus.NOT_ACCESSIBLE.value
         return None
     except ValueError:
         return None

@@ -60,7 +60,7 @@ data class GeneralAccessibilityDto(
 @Serializable
 data class EntranceAccessibilityDto(
     val accessibility: String?,
-    @SerialName("step_count") val stepCount: Int?,
+    @SerialName("step_count") val stepCount: String?,
     @SerialName("step_height") val stepHeight: String?,
     val ramp: String?,
     val lift: String?,
@@ -97,7 +97,7 @@ fun PlaceDto.toDomain(): Place =
         indoorAccessibility = parseStatus(generalAccessibility?.indoorAccessibility),
         additionalInfo = generalAccessibility?.additionalInfo,
         entranceAccessibility = parseStatus(entranceAccessibility?.accessibility),
-        stepCount = entranceAccessibility?.stepCount,
+        stepCount = parseStatus(entranceAccessibility?.stepCount),
         stepHeight = parseStatus(entranceAccessibility?.stepHeight),
         ramp = parseStatus(entranceAccessibility?.ramp),
         lift = parseStatus(entranceAccessibility?.lift),

@@ -25,6 +25,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -72,6 +73,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -810,7 +812,7 @@ fun GeneralAccessibilityStatusDisplaySection(
                                         }
 
                                         else -> {
-                                            // Fallback for other property types though shouldn't need
+                                            // Fallback for other property types, though shouldn't need
                                             listOf(
                                                 R.string.accessibility_option_fully_accessible to FULLY_ACCESSIBLE,
                                                 R.string.accessibility_option_partially_accessible to PARTIALLY_ACCESSIBLE,
@@ -973,44 +975,37 @@ fun EntranceDetailsSection(
         val stepCount = place.stepCount
         DetailItem(
             detailProperty = PlaceDetailProperty.STEP_COUNT,
-            value = stepCount?.toString() ?: stringResource(id = R.string.emoji_question),
+            value = stringResource(id = stepCount.getStepCountValueStringRes()),
             place = place,
             onIntent = onIntent
         )
 
-        if (stepCount != 0) {
+        if (stepCount != FULLY_ACCESSIBLE && stepCount != UNKNOWN && stepCount != null) {
             DetailItem(
                 detailProperty = PlaceDetailProperty.STEP_HEIGHT,
-                value = stringResource(
-                    id = place.stepHeight.getAccessibilityStatusEmojiStringRes()
-                ),
-                place = place,
-                onIntent = onIntent
-            )
-            DetailItem(
-                detailProperty = PlaceDetailProperty.RAMP,
-                value = stringResource(
-                    id = place.ramp.getAccessibilityStatusEmojiStringRes()
-                ),
-                place = place,
-                onIntent = onIntent
-            )
-            DetailItem(
-                detailProperty = PlaceDetailProperty.LIFT,
-                value = stringResource(
-                    id = place.lift.getAccessibilityStatusEmojiStringRes()
-                ),
-                place = place,
-                onIntent = onIntent
-            )
-            DetailItem(
-                detailProperty = PlaceDetailProperty.DOOR_TYPE,
-                value = place.type
-                    ?: stringResource(id = R.string.emoji_question),
+                value = stringResource(id = place.stepHeight.getStepHeightValueStringRes()),
                 place = place,
                 onIntent = onIntent
             )
         }
+        DetailItem(
+            detailProperty = PlaceDetailProperty.RAMP,
+            value = stringResource(id = place.ramp.getRampValueStringRes()),
+            place = place,
+            onIntent = onIntent
+        )
+        DetailItem(
+            detailProperty = PlaceDetailProperty.LIFT,
+            value = stringResource(id = place.lift.getAccessibilityStringRes()),
+            place = place,
+            onIntent = onIntent
+        )
+        DetailItem(
+            detailProperty = PlaceDetailProperty.DOOR_TYPE,
+            value = place.type ?: stringResource(id = R.string.emoji_question),
+            place = place,
+            onIntent = onIntent
+        )
     }
 }
 
@@ -1026,49 +1021,37 @@ fun RestroomDetailsSection(
     ) {
         DetailItem(
             detailProperty = PlaceDetailProperty.DOOR_WIDTH,
-            value = stringResource(
-                id = place.doorWidth.getAccessibilityStatusEmojiStringRes()
-            ),
+            value = stringResource(id = place.doorWidth.getDoorWidthValueStringRes()),
             place = place,
             onIntent = onIntent
         )
         DetailItem(
             detailProperty = PlaceDetailProperty.ROOM_MANEUVER,
-            value = stringResource(
-                id = place.roomManeuver.getAccessibilityStatusEmojiStringRes()
-            ),
+            value = stringResource(id = place.roomManeuver.getRoomManeuverValueStringRes()),
             place = place,
             onIntent = onIntent
         )
         DetailItem(
             detailProperty = PlaceDetailProperty.GRAB_RAILS,
-            value = stringResource(
-                id = place.grabRails.getAccessibilityStatusEmojiStringRes()
-            ),
+            value = stringResource(id = place.grabRails.getGrabRailsValueStringRes()),
             place = place,
             onIntent = onIntent
         )
         DetailItem(
             detailProperty = PlaceDetailProperty.SINK,
-            value = stringResource(
-                id = place.sink.getAccessibilityStatusEmojiStringRes()
-            ),
+            value = stringResource(id = place.sink.getAccessibilityStringRes()),
             place = place,
             onIntent = onIntent
         )
         DetailItem(
             detailProperty = PlaceDetailProperty.TOILET_SEAT,
-            value = stringResource(
-                id = place.toiletSeat.getAccessibilityStatusEmojiStringRes()
-            ),
+            value = stringResource(id = place.toiletSeat.getAccessibilityStringRes()),
             place = place,
             onIntent = onIntent
         )
         DetailItem(
             detailProperty = PlaceDetailProperty.EMERGENCY_ALARM,
-            value = stringResource(
-                id = place.emergencyAlarm.getAccessibilityStatusEmojiStringRes()
-            ),
+            value = stringResource(id = place.emergencyAlarm.getEmergencyAlarmValueStringRes()),
             place = place,
             onIntent = onIntent
         )
@@ -1088,14 +1071,173 @@ fun DetailItem(
     value: String,
     modifier: Modifier = Modifier,
     onIntent: (PlaceDetailIntent) -> Unit = {},
-    isAdditionalInfo: Boolean = false,
 ) {
-    val accessibilityOptions = listOf(
-        R.string.accessibility_option_fully_accessible to FULLY_ACCESSIBLE,
-        R.string.accessibility_option_partially_accessible to PARTIALLY_ACCESSIBLE,
-        R.string.accessibility_option_not_accessible to NOT_ACCESSIBLE
-    )
-    val doorTypeOptionIds = setOf<Int>(
+    var expanded by remember { mutableStateOf(false) }
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Text(
+            text = stringResource(id = detailProperty.labelRes),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.width(120.dp)
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .weight(1f)
+                .clickable { expanded = true }
+        ) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+
+            Icon(
+                imageVector = Icons.Outlined.KeyboardArrowDown,
+                contentDescription = stringResource(
+                    id = R.string.content_desc_show_options,
+                    stringResource(id = detailProperty.labelRes)
+                ),
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                modifier = Modifier.size(16.dp)
+            )
+        }
+        
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.width(IntrinsicSize.Max)
+        ) {
+            DetailItemDropdownOptions(
+                place = place,
+                detailProperty = detailProperty,
+                onOptionSelected = { intent ->
+                    onIntent(intent)
+                    expanded = false
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun DetailItemDropdownOptions(
+    place: Place,
+    detailProperty: PlaceDetailProperty,
+    onOptionSelected: (PlaceDetailIntent) -> Unit,
+) {
+    when (detailProperty) {
+        PlaceDetailProperty.DOOR_TYPE -> {
+            DoorTypeOptions(
+                place = place,
+                detailProperty = detailProperty,
+                onOptionSelected = onOptionSelected
+            )
+        }
+
+        PlaceDetailProperty.EURO_KEY -> {
+            BooleanOptions(
+                place = place,
+                detailProperty = detailProperty,
+                onOptionSelected = onOptionSelected
+            )
+        }
+
+        PlaceDetailProperty.LIFT,
+        PlaceDetailProperty.SINK,
+        PlaceDetailProperty.TOILET_SEAT,
+            -> {
+            StandardAccessibilityOptions(
+                place = place,
+                detailProperty = detailProperty,
+                onOptionSelected = onOptionSelected
+            )
+        }
+
+        PlaceDetailProperty.STEP_COUNT -> {
+            StepCountOptions(
+                place = place,
+                detailProperty = detailProperty,
+                onOptionSelected = onOptionSelected
+            )
+        }
+
+        PlaceDetailProperty.STEP_HEIGHT -> {
+            StepHeightOptions(
+                place = place,
+                detailProperty = detailProperty,
+                onOptionSelected = onOptionSelected
+            )
+        }
+
+        PlaceDetailProperty.RAMP -> {
+            RampOptions(
+                place = place,
+                detailProperty = detailProperty,
+                onOptionSelected = onOptionSelected
+            )
+        }
+
+        PlaceDetailProperty.DOOR_WIDTH -> {
+            DoorWidthOptions(
+                place = place,
+                detailProperty = detailProperty,
+                onOptionSelected = onOptionSelected
+            )
+        }
+
+        PlaceDetailProperty.ROOM_MANEUVER -> {
+            RoomManeuverOptions(
+                place = place,
+                detailProperty = detailProperty,
+                onOptionSelected = onOptionSelected
+            )
+        }
+
+        PlaceDetailProperty.GRAB_RAILS -> {
+            GrabRailsOptions(
+                place = place,
+                detailProperty = detailProperty,
+                onOptionSelected = onOptionSelected
+            )
+        }
+
+        PlaceDetailProperty.EMERGENCY_ALARM -> {
+            EmergencyAlarmOptions(
+                place = place,
+                detailProperty = detailProperty,
+                onOptionSelected = onOptionSelected
+            )
+        }
+
+        else -> {
+            StandardAccessibilityOptions(
+                place = place,
+                detailProperty = detailProperty,
+                onOptionSelected = onOptionSelected
+            )
+        }
+    }
+}
+
+@Composable
+private fun DoorTypeOptions(
+    place: Place,
+    detailProperty: PlaceDetailProperty,
+    onOptionSelected: (PlaceDetailIntent) -> Unit,
+) {
+    val doorTypeOptionIds = setOf(
         R.string.door_type_automatic_sliding,
         R.string.door_type_automatic_swing,
         R.string.door_type_manual_swing,
@@ -1103,123 +1245,322 @@ fun DetailItem(
         R.string.door_type_revolving,
         R.string.door_type_double
     )
-    val booleanOptions = listOf(
-        R.string.emoji_checkmark to true,
-        R.string.emoji_cross to false,
-    )
-    val stepsOptions = listOf(
-        R.string.step_count_fully_accessible to FULLY_ACCESSIBLE,
-        R.string.step_count_partially_accessible to PARTIALLY_ACCESSIBLE,
-        R.string.step_count_not_accessible to NOT_ACCESSIBLE
-    )
-
-    var expanded by remember { mutableStateOf(false) }
-
-    if (isAdditionalInfo) {
-        Column(modifier) {
-            Text(
-                text = stringResource(id = detailProperty.labelRes),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyMedium,
-                fontStyle = FontStyle.Italic,
-                modifier = Modifier.clickable {
-                    PlaceDetailIntent.OpenDialog(place = place, property = detailProperty)
-                }
-            )
-        }
-    } else {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier.fillMaxWidth(0.7f)
-        ) {
-            Text(
-                text = stringResource(id = detailProperty.labelRes),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Box {
-                Text(
-                    text = value,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.clickable { expanded = true }
+    doorTypeOptionIds.forEach { doorTypeId ->
+        val doorType = stringResource(id = doorTypeId)
+        DropdownMenuItem(
+            onClick = {
+                onOptionSelected(
+                    PlaceDetailIntent.UpdateAccessibilityDetailString(
+                        place = place,
+                        detailProperty = detailProperty,
+                        value = doorType
+                    )
                 )
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    if (detailProperty == PlaceDetailProperty.DOOR_TYPE) {
-                        doorTypeOptionIds.forEach { doorTypeId ->
-                            val doorType = stringResource(id = doorTypeId)
-                            DropdownMenuItem(
-                                onClick = {
-                                    onIntent(
-                                        PlaceDetailIntent.UpdateAccessibilityDetailString(
-                                            place = place,
-                                            detailProperty = detailProperty,
-                                            value = doorType
-                                        )
-                                    )
-                                    expanded = false
-                                },
-                                text = { Text(text = doorType) }
-                            )
-                        }
-                    } else if (detailProperty == PlaceDetailProperty.EURO_KEY) {
-                        booleanOptions.forEach { (displayText, status) ->
-                            DropdownMenuItem(
-                                onClick = {
-                                    onIntent(
-                                        PlaceDetailIntent.UpdateAccessibilityDetailBoolean(
-                                            place = place,
-                                            detailProperty = detailProperty,
-                                            value = status
-                                        )
-                                    )
-                                    expanded = false
-                                },
-                                text = { Text(text = stringResource(id = displayText)) }
-                            )
-                        }
-                    } else if (detailProperty == PlaceDetailProperty.STEP_COUNT) {
-                        stepsOptions.forEach { (displayText, status) ->
-                            DropdownMenuItem(
-                                onClick = {
-                                    onIntent(
-                                        PlaceDetailIntent.UpdateAccessibilityDetail(
-                                            place = place,
-                                            detailProperty = detailProperty,
-                                            status = status
-                                        )
-                                    )
-                                    expanded = false
-                                },
-                                text = { Text(text = stringResource(id = displayText)) }
-                            )
-                        }
-                    } else {
-                        accessibilityOptions.forEach { (displayText, status) ->
-                            DropdownMenuItem(
-                                onClick = {
-                                    onIntent(
-                                        PlaceDetailIntent.UpdateAccessibilityDetail(
-                                            place = place,
-                                            detailProperty = detailProperty,
-                                            status = status
-                                        )
-                                    )
-                                    expanded = false
-                                },
-                                text = { Text(text = stringResource(id = displayText)) }
-                            )
-                        }
-                    }
-                }
+            },
+            text = {
+                Text(
+                    text = doorType,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal
+                )
             }
-        }
+        )
+    }
+}
+
+@Composable
+private fun BooleanOptions(
+    place: Place,
+    detailProperty: PlaceDetailProperty,
+    onOptionSelected: (PlaceDetailIntent) -> Unit,
+) {
+    val booleanOptions = listOf(
+        R.string.checkmark_yes to true,
+        R.string.cross_no to false,
+    )
+    booleanOptions.forEach { (displayText, value) ->
+        DropdownMenuItem(
+            onClick = {
+                onOptionSelected(
+                    PlaceDetailIntent.UpdateAccessibilityDetailBoolean(
+                        place = place,
+                        detailProperty = detailProperty,
+                        value = value
+                    )
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = displayText),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun StandardAccessibilityOptions(
+    place: Place,
+    detailProperty: PlaceDetailProperty,
+    onOptionSelected: (PlaceDetailIntent) -> Unit,
+) {
+    val accessibilityOptions = listOf(
+        R.string.accessibility_option_fully_accessible to FULLY_ACCESSIBLE,
+        R.string.accessibility_option_partially_accessible to PARTIALLY_ACCESSIBLE,
+        R.string.accessibility_option_not_accessible to NOT_ACCESSIBLE
+    )
+    accessibilityOptions.forEach { (displayText, status) ->
+        DropdownMenuItem(
+            onClick = {
+                onOptionSelected(
+                    PlaceDetailIntent.UpdateAccessibilityDetail(
+                        place = place,
+                        detailProperty = detailProperty,
+                        status = status
+                    )
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = displayText),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun StepCountOptions(
+    place: Place,
+    detailProperty: PlaceDetailProperty,
+    onOptionSelected: (PlaceDetailIntent) -> Unit,
+) {
+    val options = listOf(
+        R.string.step_count_option_none to FULLY_ACCESSIBLE,
+        R.string.step_count_option_one to PARTIALLY_ACCESSIBLE,
+        R.string.step_count_option_multiple to NOT_ACCESSIBLE
+    )
+    options.forEach { (displayText, status) ->
+        DropdownMenuItem(
+            onClick = {
+                onOptionSelected(
+                    PlaceDetailIntent.UpdateAccessibilityDetail(
+                        place = place,
+                        detailProperty = detailProperty,
+                        status = status
+                    )
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = displayText),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun StepHeightOptions(
+    place: Place,
+    detailProperty: PlaceDetailProperty,
+    onOptionSelected: (PlaceDetailIntent) -> Unit,
+) {
+    val options = listOf(
+        R.string.step_height_option_low to FULLY_ACCESSIBLE,
+        R.string.step_height_option_medium to PARTIALLY_ACCESSIBLE,
+        R.string.step_height_option_high to NOT_ACCESSIBLE
+    )
+    options.forEach { (displayText, status) ->
+        DropdownMenuItem(
+            onClick = {
+                onOptionSelected(
+                    PlaceDetailIntent.UpdateAccessibilityDetail(
+                        place = place,
+                        detailProperty = detailProperty,
+                        status = status
+                    )
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = displayText),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun RampOptions(
+    place: Place,
+    detailProperty: PlaceDetailProperty,
+    onOptionSelected: (PlaceDetailIntent) -> Unit,
+) {
+    val options = listOf(
+        R.string.ramp_option_accessible to FULLY_ACCESSIBLE,
+        R.string.ramp_option_partial to PARTIALLY_ACCESSIBLE,
+        R.string.ramp_option_none to NOT_ACCESSIBLE
+    )
+    options.forEach { (displayText, status) ->
+        DropdownMenuItem(
+            onClick = {
+                onOptionSelected(
+                    PlaceDetailIntent.UpdateAccessibilityDetail(
+                        place = place,
+                        detailProperty = detailProperty,
+                        status = status
+                    )
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = displayText),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun DoorWidthOptions(
+    place: Place,
+    detailProperty: PlaceDetailProperty,
+    onOptionSelected: (PlaceDetailIntent) -> Unit,
+) {
+    val options = listOf(
+        R.string.door_width_option_wide to FULLY_ACCESSIBLE,
+        R.string.door_width_option_standard to PARTIALLY_ACCESSIBLE,
+        R.string.door_width_option_narrow to NOT_ACCESSIBLE
+    )
+    options.forEach { (displayText, status) ->
+        DropdownMenuItem(
+            onClick = {
+                onOptionSelected(
+                    PlaceDetailIntent.UpdateAccessibilityDetail(
+                        place = place,
+                        detailProperty = detailProperty,
+                        status = status
+                    )
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = displayText),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun RoomManeuverOptions(
+    place: Place,
+    detailProperty: PlaceDetailProperty,
+    onOptionSelected: (PlaceDetailIntent) -> Unit,
+) {
+    val options = listOf(
+        R.string.room_maneuver_option_spacious to FULLY_ACCESSIBLE,
+        R.string.room_maneuver_option_limited to PARTIALLY_ACCESSIBLE,
+        R.string.room_maneuver_option_tight to NOT_ACCESSIBLE
+    )
+    options.forEach { (displayText, status) ->
+        DropdownMenuItem(
+            onClick = {
+                onOptionSelected(
+                    PlaceDetailIntent.UpdateAccessibilityDetail(
+                        place = place,
+                        detailProperty = detailProperty,
+                        status = status
+                    )
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = displayText),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun GrabRailsOptions(
+    place: Place,
+    detailProperty: PlaceDetailProperty,
+    onOptionSelected: (PlaceDetailIntent) -> Unit,
+) {
+    val options = listOf(
+        R.string.grab_rails_option_both_sides to FULLY_ACCESSIBLE,
+        R.string.grab_rails_option_one_side to PARTIALLY_ACCESSIBLE,
+        R.string.grab_rails_option_none to NOT_ACCESSIBLE
+    )
+    options.forEach { (displayText, status) ->
+        DropdownMenuItem(
+            onClick = {
+                onOptionSelected(
+                    PlaceDetailIntent.UpdateAccessibilityDetail(
+                        place = place,
+                        detailProperty = detailProperty,
+                        status = status
+                    )
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = displayText),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun EmergencyAlarmOptions(
+    place: Place,
+    detailProperty: PlaceDetailProperty,
+    onOptionSelected: (PlaceDetailIntent) -> Unit,
+) {
+    val options = listOf(
+        R.string.emergency_alarm_option_available to FULLY_ACCESSIBLE,
+        R.string.emergency_alarm_option_limited to PARTIALLY_ACCESSIBLE,
+        R.string.emergency_alarm_option_none to NOT_ACCESSIBLE
+    )
+    options.forEach { (displayText, status) ->
+        DropdownMenuItem(
+            onClick = {
+                onOptionSelected(
+                    PlaceDetailIntent.UpdateAccessibilityDetail(
+                        place = place,
+                        detailProperty = detailProperty,
+                        status = status
+                    )
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = displayText),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Normal
+                )
+            }
+        )
     }
 }
 
@@ -1241,9 +1582,33 @@ private fun AccessibilityStatus?.getAccessibilityStatusEmojiStringRes(): Int =
 
 private fun Boolean?.getBooleanEmojiStringRes(): Int =
     when (this) {
-        true -> R.string.emoji_checkmark
-        false -> R.string.emoji_cross
+        true -> R.string.checkmark_yes
+        false -> R.string.cross_no
         null -> R.string.emoji_question
+    }
+
+private fun AccessibilityStatus?.getStepCountValueStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.step_count_option_none
+        PARTIALLY_ACCESSIBLE -> R.string.step_count_option_one
+        NOT_ACCESSIBLE -> R.string.step_count_option_multiple
+        else -> R.string.emoji_question
+    }
+
+private fun AccessibilityStatus?.getStepHeightValueStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.step_height_option_low
+        PARTIALLY_ACCESSIBLE -> R.string.step_height_option_medium
+        NOT_ACCESSIBLE -> R.string.step_height_option_high
+        else -> R.string.emoji_question
+    }
+
+private fun AccessibilityStatus?.getDoorWidthValueStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.door_width_option_wide
+        PARTIALLY_ACCESSIBLE -> R.string.door_width_option_standard
+        NOT_ACCESSIBLE -> R.string.door_width_option_narrow
+        else -> R.string.emoji_question
     }
 
 private fun AccessibilityStatus?.getEntranceAccessibilityLabelStringRes(): Int =
@@ -1251,8 +1616,7 @@ private fun AccessibilityStatus?.getEntranceAccessibilityLabelStringRes(): Int =
         FULLY_ACCESSIBLE -> R.string.entrance_fully_accessible_label
         PARTIALLY_ACCESSIBLE -> R.string.entrance_partially_accessible_label
         NOT_ACCESSIBLE -> R.string.entrance_not_accessible_label
-        UNKNOWN -> R.string.entrance_unknown_label
-        null -> R.string.entrance_unknown_label
+        else -> R.string.entrance_unknown_label
     }
 
 private fun AccessibilityStatus?.getIndoorAccessibilityStringRes(): Int =
@@ -1260,8 +1624,7 @@ private fun AccessibilityStatus?.getIndoorAccessibilityStringRes(): Int =
         FULLY_ACCESSIBLE -> R.string.indoor_fully_accessible_status_label
         PARTIALLY_ACCESSIBLE -> R.string.indoor_partially_accessible_status_label
         NOT_ACCESSIBLE -> R.string.indoor_not_accessible_status_label
-        UNKNOWN -> R.string.indoor_unknown_label
-        null -> R.string.indoor_unknown_label
+        else -> R.string.indoor_unknown_label
     }
 
 private fun AccessibilityStatus?.getRestroomAccessibilityStringRes(): Int =
@@ -1269,8 +1632,47 @@ private fun AccessibilityStatus?.getRestroomAccessibilityStringRes(): Int =
         FULLY_ACCESSIBLE -> R.string.restroom_fully_accessible_status_label
         PARTIALLY_ACCESSIBLE -> R.string.restroom_partially_accessible_status_label
         NOT_ACCESSIBLE -> R.string.restroom_not_accessible_status_label
-        UNKNOWN -> R.string.restroom_unknown_label
-        null -> R.string.restroom_unknown_label
+        else -> R.string.restroom_unknown_label
+    }
+
+private fun AccessibilityStatus?.getRampValueStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.ramp_option_accessible
+        PARTIALLY_ACCESSIBLE -> R.string.ramp_option_partial
+        NOT_ACCESSIBLE -> R.string.ramp_option_none
+        else -> R.string.emoji_question
+    }
+
+private fun AccessibilityStatus?.getRoomManeuverValueStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.room_maneuver_option_spacious
+        PARTIALLY_ACCESSIBLE -> R.string.room_maneuver_option_limited
+        NOT_ACCESSIBLE -> R.string.room_maneuver_option_tight
+        else -> R.string.emoji_question
+    }
+
+private fun AccessibilityStatus?.getGrabRailsValueStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.grab_rails_option_both_sides
+        PARTIALLY_ACCESSIBLE -> R.string.grab_rails_option_one_side
+        NOT_ACCESSIBLE -> R.string.grab_rails_option_none
+        else -> R.string.emoji_question
+    }
+
+private fun AccessibilityStatus?.getEmergencyAlarmValueStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.emergency_alarm_option_available
+        PARTIALLY_ACCESSIBLE -> R.string.emergency_alarm_option_limited
+        NOT_ACCESSIBLE -> R.string.emergency_alarm_option_none
+        else -> R.string.emoji_question
+    }
+
+private fun AccessibilityStatus?.getAccessibilityStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.accessibility_option_fully_accessible
+        PARTIALLY_ACCESSIBLE -> R.string.accessibility_option_partially_accessible
+        NOT_ACCESSIBLE -> R.string.accessibility_option_not_accessible
+        else -> R.string.emoji_question
     }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1291,7 +1693,7 @@ private fun PlaceDetailBottomSheet_Preview() {
         indoorAccessibility = PARTIALLY_ACCESSIBLE,
         additionalInfo = "This location is mostly accessible.",
         entranceAccessibility = PARTIALLY_ACCESSIBLE,
-        stepCount = 1,
+        stepCount = PARTIALLY_ACCESSIBLE,
         stepHeight = PARTIALLY_ACCESSIBLE,
         ramp = PARTIALLY_ACCESSIBLE,
         lift = null,

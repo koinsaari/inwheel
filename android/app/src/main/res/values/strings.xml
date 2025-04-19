@@ -149,17 +149,15 @@
     <string name="additional_info_placeholder">What would you want other to know about this place\'s accessibility?</string>
     <string name="step_count_placeholder">Write the number of steps…</string>
 
-    <string name="door_type_automatic_sliding">Automatic sliding door</string>
-    <string name="door_type_automatic_swing">Automatic swinging door</string>
-    <string name="door_type_manual_swing">Manual swinging door</string>
-    <string name="door_type_manual_sliding">Manual sliding door</string>
-    <string name="door_type_revolving">Revolving door</string>
-    <string name="door_type_double">Double door</string>
-    <string name="step_count_fully_accessible">✅ No steps</string>
-    <string name="step_count_partially_accessible">⚠️ One step</string>
-    <string name="step_count_not_accessible">❌ More than one step</string>
+    <string name="door_type_automatic_sliding">✅ Automatic sliding door</string>
+    <string name="door_type_automatic_swing">✅ Automatic swinging door</string>
+    <string name="door_type_manual_swing">⚠️ Manual swinging door</string>
+    <string name="door_type_manual_sliding">⚠️ Manual sliding door</string>
+    <string name="door_type_revolving">⚠️ Revolving door</string>
+    <string name="door_type_double">⚠️ Double door</string>
     <string name="more">More</string>
     <string name="map">Map</string>
+    <string name="content_desc_show_options">Show options for %1$s</string>
 
     <string name="about_title">ℹ️ About This App</string>
     <string name="about_body">
@@ -231,5 +229,27 @@
     <string name="restroom_accessibility_dialog_title">About restroom accessibility</string>
     <string name="entrance_width">Entrance width:</string>
     <string name="entrance_width_dialog_title">About entrance width</string>
-
+    <string name="checkmark_yes">✅ Yes</string>
+    <string name="cross_no">❌ No</string>
+    <string name="step_count_option_none">✅ None (level access)</string>
+    <string name="step_count_option_one">⚠️ One step</string>
+    <string name="step_count_option_multiple">❌ Multiple steps</string>
+    <string name="step_height_option_low">✅ Low (less than 3 cm)</string>
+    <string name="step_height_option_medium">⚠️ Medium (3–7 cm)</string>
+    <string name="step_height_option_high">❌ High (more than 7 cm)</string>
+    <string name="ramp_option_accessible">✅ Proper ramp available</string>
+    <string name="ramp_option_partial">⚠️ Steep or narrow ramp</string>
+    <string name="ramp_option_none">❌ No ramp available</string>
+    <string name="door_width_option_wide">✅ Wide (90+ cm)</string>
+    <string name="door_width_option_standard">⚠️ Standard (75–90 cm)</string>
+    <string name="door_width_option_narrow">❌ Narrow (&lt; 75 cm)</string>
+    <string name="room_maneuver_option_spacious">✅ Spacious turning space</string>
+    <string name="room_maneuver_option_limited">⚠️ Limited turning space</string>
+    <string name="room_maneuver_option_tight">❌ Too tight for wheelchair</string>
+    <string name="grab_rails_option_both_sides">✅ Rails on both sides</string>
+    <string name="grab_rails_option_one_side">⚠️ Rails on one side only</string>
+    <string name="grab_rails_option_none">❌ No grab rails</string>
+    <string name="emergency_alarm_option_available">✅ Alarm available and accessible</string>
+    <string name="emergency_alarm_option_limited">⚠️ Limited access to alarm</string>
+    <string name="emergency_alarm_option_none">❌ No emergency alarm</string>
 </resources>

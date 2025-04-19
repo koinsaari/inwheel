@@ -140,7 +140,7 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
             PlaceDetailProperty.ENTRANCE_ACCESSIBILITY -> copy(entranceAccessibility = newValue as? AccessibilityStatus)
             PlaceDetailProperty.RESTROOM_ACCESSIBILITY -> copy(restroomAccessibility = newValue as? AccessibilityStatus)
             PlaceDetailProperty.ADDITIONAL_INFO -> copy(additionalInfo = newValue as? String)
-            PlaceDetailProperty.STEP_COUNT -> copy(stepCount = newValue as? Int)
+            PlaceDetailProperty.STEP_COUNT -> copy(stepCount = newValue as? AccessibilityStatus)
             PlaceDetailProperty.STEP_HEIGHT -> copy(stepHeight = newValue as? AccessibilityStatus)
             PlaceDetailProperty.RAMP -> copy(ramp = newValue as? AccessibilityStatus)
             PlaceDetailProperty.LIFT -> copy(lift = newValue as? AccessibilityStatus)
