@@ -47,7 +47,7 @@ interface PlacesDao {
     suspend fun insertPlaces(places: List<Place>)
 
     @Query("UPDATE places SET generalAccessibility = :status WHERE id = :id")
-    suspend fun updatePlaceGeneralAccessibility(id: String, status: String)
+    suspend fun updatePlaceGeneralAccessibility(id: String, status: String?)
 
     @RawQuery
     suspend fun updateAccessibilityDetail(query: SupportSQLiteQuery): Int

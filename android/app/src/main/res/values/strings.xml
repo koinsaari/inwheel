@@ -10,7 +10,7 @@
 
     <!-- Wheelchair Access Descriptions -->
     <string name="unknown_accessibility">Unknown accessibility</string>
-    
+
     <!-- Content Descriptions -->
     <string name="content_desc_navigation_map">Open the map</string>
     <string name="content_desc_fully_accessible">Fully accessible</string>
@@ -24,7 +24,8 @@
     <string name="content_desc_show_options">Show options for %1$s</string>
     <string name="content_desc_navigation_about">Open the About section</string>
     <string name="content_desc_navigation_accessibility_guidelines">Open the Accessibility Guidelines section</string>
-    
+    <string name="content_desc_property_info">Information about %1$s</string>
+
     <!-- Map Related -->
     <string name="map">Map</string>
     <string name="place_search_bar_placeholder">Search for a place in current area…</string>
@@ -35,7 +36,7 @@
     <string name="no_contact_info_available">No contact info provided for this place. ☹️</string>
     <string name="close_detail_sheet_button">Close detail sheet</string>
     <string name="place_detail_footer_note">⚠️ Data accuracy is not guaranteed. Your honest input helps make accessibility better for everyone.</string>
-    
+
     <!-- Accessibility Status Titles -->
     <string name="general_status_title_fully_accessible">This place is fully accessible. \nPerson with reduced mobility should not need assistance</string>
     <string name="general_status_title_partially_accessible">This place is partially accessible. \nPerson with reduced mobility might need assistance.</string>
@@ -44,7 +45,7 @@
     <string name="image_desc_fully_accessible">Fully accessible!</string>
     <string name="image_desc_partially_accessible">Requires an assistant!</string>
     <string name="image_desc_not_accessible">Not accessible at all!</string>
-    
+
     <!-- Entrance Accessibility -->
     <string name="entrance">Entrance</string>
     <string name="entrance_accessibility">Entrance accessibility</string>
@@ -53,7 +54,7 @@
     <string name="entrance_partially_accessible_label">Max 1 step not too steep on entrance, or the door is not practical to open.</string>
     <string name="entrance_not_accessible_label">Multiple steps on entrance, or door is not wide enough.</string>
     <string name="entrance_unknown_label">No detailed information given about entrance.</string>
-    
+
     <!-- Indoor Accessibility -->
     <string name="indoor_accessibility">Indoor accessibility</string>
     <string name="indoor_accessibility_dialog_title">About indoor accessibility</string>
@@ -61,7 +62,7 @@
     <string name="indoor_partially_accessible_status_label">Inside some areas may be difficult to access with a wheelchair.</string>
     <string name="indoor_not_accessible_status_label">Not enough space to move with a wheelchair.</string>
     <string name="indoor_unknown_label">No detailed information given about indoor accessibility.</string>
-    
+
     <!-- Restroom Accessibility -->
     <string name="restroom">Restroom</string>
     <string name="restroom_accessibility">Restroom accessibility</string>
@@ -70,7 +71,7 @@
     <string name="restroom_partially_accessible_status_label">The restroom is partially accessible and may require assistance.</string>
     <string name="restroom_not_accessible_status_label">The restroom is not accessible for wheelchair users.</string>
     <string name="restroom_unknown_label">No information given about toilets inside.</string>
-    
+
     <!-- Entrance Details -->
     <string name="step_count">Step count:</string>
     <string name="step_height">Step height:</string>
@@ -79,7 +80,7 @@
     <string name="door_width">Door width:</string>
     <string name="doorType">"Door type:"</string>
     <string name="entrance_width">Entrance width:</string>
-    
+
     <!-- Restroom Details -->
     <string name="room_maneuver">Room maneuver:</string>
     <string name="grab_rails">Grab rails:</string>
@@ -87,7 +88,7 @@
     <string name="toilet_seat">Toilet seat:</string>
     <string name="emergency_alarm">Emergency alarm:</string>
     <string name="euro_key">EuroKey:</string>
-    
+
     <!-- Additional Information -->
     <string name="additional_info">Additional info</string>
     <string name="additional_info_dialog_title">Explain the accessibility of the place</string>
@@ -114,7 +115,9 @@
     <!-- Dialog Actions -->
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
-    <string name="dialog_footer">⚠️ Your honest input helps make accessibility better for everyone.</string>
+    <string name="ok">OK</string>
+    <string name="update_dialog_footer">⚠️ Your honest input helps make accessibility better for everyone.</string>
+    <string name="info_dialog_footer">⚠️ These definitions are for general guidance only. Refer to official standards for regulatory details.</string>
 
     <!-- Options -->
     <string name="accessibility_option_fully_accessible">✅ Fully Accessible</string>
@@ -127,7 +130,7 @@
     <string name="door_type_manual_sliding">⚠️ Manual sliding door</string>
     <string name="door_type_revolving">⚠️ Revolving door</string>
     <string name="door_type_double">⚠️ Double door</string>
-    
+
     <string name="step_count_option_none">✅ None (level access)</string>
     <string name="step_count_option_one">⚠️ One step</string>
     <string name="step_count_option_multiple">❌ Multiple steps</string>
@@ -135,27 +138,27 @@
     <string name="step_height_option_low">✅ Low (less than 3 cm)</string>
     <string name="step_height_option_medium">⚠️ Medium (3–7 cm)</string>
     <string name="step_height_option_high">❌ High (more than 7 cm)</string>
-    
+
     <string name="door_width_option_wide">✅ Wide (90+ cm)</string>
     <string name="door_width_option_standard">⚠️ Standard (75–90 cm)</string>
     <string name="door_width_option_narrow">❌ Narrow (less than 75 cm)</string>
-    
+
     <string name="ramp_option_accessible">✅ Proper ramp available</string>
     <string name="ramp_option_partial">⚠️ Steep or narrow ramp</string>
     <string name="ramp_option_none">❌ No ramp available</string>
-    
+
     <string name="room_maneuver_option_spacious">✅ Spacious</string>
     <string name="room_maneuver_option_limited">⚠️ Limited</string>
     <string name="room_maneuver_option_tight">❌ Tight</string>
-    
+
     <string name="grab_rails_option_both_sides">✅ Rails on both sides</string>
     <string name="grab_rails_option_one_side">⚠️ Rails on one side only</string>
     <string name="grab_rails_option_none">❌ No grab rails</string>
-    
+
     <string name="emergency_alarm_option_available">✅ Alarm available and accessible</string>
     <string name="emergency_alarm_option_limited">⚠️ Limited access to alarm</string>
     <string name="emergency_alarm_option_none">❌ No emergency alarm</string>
-    
+
     <!-- About/Info Screen -->
     <string name="about">About</string>
     <string name="about_title">ℹ️ About This App</string>
@@ -190,11 +193,84 @@
     </string>
     <string name="made_by_footer">"Made with 💚 by "</string>
     <string name="accessibility_guidelines">Accessibility Guidelines</string>
-    
+
+    <!-- Info Dialogs -->
+    <string name="info_general_accessibility">
+        A fully accessible place should have step-free access, wide doors, and enough space to move around independently. The entrance, indoor areas, and restroom all play a role in how usable a place is. Even if one of these works well, missing accessibility elsewhere can still make a visit difficult.
+    </string>
+
+    <string name="info_indoor_accessibility">
+        Indoor areas should be step-free and wide enough for a wheelchair to move and turn. Hallways should allow easy passage, and any changes in level should be covered with ramps or lifts. Narrow passages, internal stairs, or tight spaces can limit access even when the entrance is accessible.
+    </string>
+
+    <string name="info_entrance_accessibility">
+        The entrance should be level or have a ramp, with a door wide enough for wheelchair access. A minimum width of 90 cm is recommended. Small thresholds under 3 cm are generally fine, but anything higher may require a ramp. Automatic or easy-to-open doors improve access significantly.
+    </string>
+
+    <string name="info_additional_info">
+        In this field, you can add any extra details here that don\'t fit the standard categories.\n\nNote things like temporary obstacles, staff assistance, nearby parking, surface quality, or anything else that might help others understand the accessibility better.
+    </string>
+
+    <string name="info_restroom_accessibility">
+        An accessible restroom should have enough space to enter and move with a wheelchair, secure grab rails for support, and a toilet and sink that are easy to reach. The door should be wide enough, and features like an emergency alarm or Euro key access can also make a big difference. Even if a place is accessible overall, the lack of a usable restroom can still be a major barrier.
+    </string>
+
+    <string name="info_step_count">
+        Step count refers to the number of steps at the entrance.\n\nZero steps usually means the entrance is fully accessible. A very small step under 3 cm is often still manageable with a wheelchair or walker.\n\nOne or two steps may be partially accessible, depending on height and context. Three or more steps typically make the entrance not accessible unless there is a ramp or lift.
+    </string>
+
+    <string name="info_step_height">
+        Step height indicates how tall the highest step is at the entrance.\n\nA threshold or step under 3 cm is generally still considered accessible. Steps between 3–10 cm may be manageable with help or a small ramp.\n\nAnything above 10 cm is usually a barrier without a proper ramp or lift.
+    </string>
+
+    <string name="info_ramp">
+        This indicates whether a ramp is available to bypass any steps.\n\nTo be accessible, a ramp should have a gentle slope (ideally 1:12), be wide enough for a wheelchair, have handrails, and a non-slip surface.\n\nEven if a ramp exists, it may still be hard to use if it\'s too steep or narrow.
+    </string>
+
+    <string name="info_lift">
+        This tells whether a lift or platform lift is available to overcome vertical barriers like stairs.\n\nLifts are essential for accessibility in multi-level buildings.\n\nIt\'s helpful to know if the lift can be used independently or if it requires assistance or a key.
+    </string>
+
+    <string name="info_entrance_width">
+        Entrance width refers to the width of the main access point or door into the building.\n\nAn accessible entrance typically has a clear width of at least 90 cm. Anything below 75 cm is usually too narrow for wheelchairs.\n\nThis helps determine if someone using mobility aids can get through the entrance comfortably.
+    </string>
+
+    <string name="info_door_type">
+        Door type refers to how the door opens and whether it\'s easy to use for someone with limited mobility.\n\nAutomatic or sliding doors are typically the most accessible. Swing doors that are light and have a handle that\'s easy to grip can also be accessible.\n\nHeavy doors, revolving doors, or doors that require strong pulling force may be difficult or impossible to use without assistance.
+    </string>
+
+    <string name="info_door_width">
+        Door width determines whether a person using a wheelchair or walker can pass through comfortably.\n\nA width of at least 90 cm is considered fully accessible. Widths between 75–89 cm may be manageable with smaller wheelchairs or with difficulty.\n\nAnything below 75 cm is typically too narrow for safe access with mobility aids.
+    </string>
+
+    <string name="info_room_maneuver">
+        Room maneuver refers to the space inside a restroom or other accessible area to move and turn a wheelchair.\n\nTo be fully accessible, there should be enough space for a full 360-degree turn — usually a diameter of at least 150 cm.\n\nLimited space can make it very difficult to use the room independently.
+    </string>
+
+    <string name="info_grab_rails">
+        Grab rails provide support for transferring to and from the toilet or for general stability.\n\nAccessible restrooms should have secure, horizontal and/or vertical rails placed next to the toilet and sometimes near the sink or door.\n\nMissing or improperly placed rails can make the restroom difficult or dangerous to use.
+    </string>
+
+    <string name="info_sink">
+        The sink should be accessible from a seated position.\n\nThere should be clear space underneath for a wheelchair, and the faucet should be reachable and usable with limited hand strength.\n\nVery high, deep, or obstructed sinks may not be accessible even if the rest of the restroom is.
+    </string>
+
+    <string name="info_toilet_seat">
+        The toilet seat height should be comfortable and safe for people transferring from a wheelchair.\n\nTypically, a seat height of 45–50 cm is considered accessible. Seats that are too low or too high can make transfers difficult or risky.\n\nSome accessible toilets may also include support backrests or additional features.
+    </string>
+
+    <string name="info_emergency_alarm">
+        Emergency alarms allow users to call for help in case of an incident inside the restroom.\n\nAccessible restrooms should have clearly marked alarm cords or buttons that are reachable from the toilet or floor level.\n\nIf no alarm is present or it\'s out of reach, it may not be safe for independent use.
+    </string>
+
+    <string name="info_euro_key">
+        A Euro key system is used across many European countries to allow access to locked accessible toilets.\n\nIf a place uses the Euro key system, users with a registered key can unlock and use the facility independently.\n\nThis can help ensure accessibility while keeping the facilities secure and clean.
+    </string>
+
     <!-- Common Boolean Options -->
     <string name="checkmark_yes">✅ Yes</string>
     <string name="cross_no">❌ No</string>
-    
+
     <!-- Place Categories -->
     <string name="category_cafe">Cafe</string>
     <string name="category_restaurant">Restaurant</string>

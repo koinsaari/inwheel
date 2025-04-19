@@ -89,20 +89,25 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
 
     @Suppress("TooGenericExceptionCaught")
     private fun updatePlaceGeneralAccessibility(place: Place, status: AccessibilityStatus) {
-        if (place.generalAccessibility != status) {
-            viewModelScope.launch {
-                try {
-                    Log.d("PlaceDetailsViewModel", "Updating place general accessibility")
-                    repository.updatePlaceGeneralAccessibility(place, status)
-                    _state.update {
-                        it.copy(
-                            place = place.copy(generalAccessibility = status),
-                            activeDialog = null
-                        )
-                    }
-                } catch (e: Exception) {
-                    Log.e("PlaceDetailsViewModel", "Error updating place general accessibility", e)
+        viewModelScope.launch {
+            try {
+                // if the status is the same as the current one, we reset it to null
+                val newStatus =
+                    if (place.generalAccessibility == status) null
+                    else status
+                repository.updatePlaceGeneralAccessibility(place, newStatus)
+                _state.update {
+                    it.copy(
+                        place = place.copy(generalAccessibility = newStatus),
+                        activeDialog = null
+                    )
                 }
+                Log.d(
+                    "PlaceDetailsViewModel",
+                    "Updated place general accessibility to: $newStatus"
+                )
+            } catch (e: Exception) {
+                Log.e("PlaceDetailsViewModel", "Error updating place general accessibility", e)
             }
         }
     }
@@ -115,14 +120,17 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
         viewModelScope.launch {
             Log.d("PlaceDetailsViewModel", "Updating place accessibility detail")
             try {
+                val currentValue = getCurrentValue(place, detail)
+                val valueToUpdate = if (currentValue == newValue) null else newValue
+                
                 repository.updatePlaceAccessibilityDetail(
                     place = place,
                     property = detail,
-                    newValue = newValue
+                    newValue = valueToUpdate
                 )
                 _state.update {
                     it.copy(
-                        place = place.update(detail, newValue),
+                        place = place.update(detail, valueToUpdate),
                         activeDialog = null
                     )
                 }
@@ -133,7 +141,30 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
         }
     }
 
-    fun Place.update(detail: PlaceDetailProperty, newValue: Any?): Place =
+    // Helper to get the current value of a property
+    private fun getCurrentValue(place: Place, detail: PlaceDetailProperty): Any? =
+        when (detail) {
+            PlaceDetailProperty.GENERAL_ACCESSIBILITY -> place.generalAccessibility
+            PlaceDetailProperty.INDOOR_ACCESSIBILITY -> place.indoorAccessibility
+            PlaceDetailProperty.ENTRANCE_ACCESSIBILITY -> place.entranceAccessibility
+            PlaceDetailProperty.RESTROOM_ACCESSIBILITY -> place.restroomAccessibility
+            PlaceDetailProperty.ADDITIONAL_INFO -> place.additionalInfo
+            PlaceDetailProperty.STEP_COUNT -> place.stepCount
+            PlaceDetailProperty.STEP_HEIGHT -> place.stepHeight
+            PlaceDetailProperty.RAMP -> place.ramp
+            PlaceDetailProperty.LIFT -> place.lift
+            PlaceDetailProperty.ENTRANCE_WIDTH -> place.width
+            PlaceDetailProperty.DOOR_TYPE -> place.type
+            PlaceDetailProperty.DOOR_WIDTH -> place.doorWidth
+            PlaceDetailProperty.ROOM_MANEUVER -> place.roomManeuver
+            PlaceDetailProperty.GRAB_RAILS -> place.grabRails
+            PlaceDetailProperty.TOILET_SEAT -> place.toiletSeat
+            PlaceDetailProperty.EMERGENCY_ALARM -> place.emergencyAlarm
+            PlaceDetailProperty.SINK -> place.sink
+            PlaceDetailProperty.EURO_KEY -> place.euroKey
+        }
+
+    private fun Place.update(detail: PlaceDetailProperty, newValue: Any?): Place =
         when (detail) {
             PlaceDetailProperty.GENERAL_ACCESSIBILITY -> copy(generalAccessibility = newValue as? AccessibilityStatus)
             PlaceDetailProperty.INDOOR_ACCESSIBILITY -> copy(indoorAccessibility = newValue as? AccessibilityStatus)

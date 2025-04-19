@@ -18,6 +18,7 @@ package com.aarokoinsaari.accessibilitymap.view.placedetails
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -68,11 +70,36 @@ fun PlaceDetailItem(
             .fillMaxWidth()
             .padding(vertical = 4.dp)
     ) {
-        Text(
-            text = stringResource(id = detailProperty.labelRes),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.width(120.dp)
-        )
+        Box(Modifier.width(130.dp)) {
+            Row(
+                verticalAlignment = Alignment.Top,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(id = detailProperty.labelRes),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Icon(
+                    imageVector = Icons.Outlined.Info,
+                    contentDescription = stringResource(
+                        id = R.string.content_desc_property_info,
+                        stringResource(id = detailProperty.labelRes)
+                    ),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    modifier = Modifier
+                        .size(12.dp)
+                        .padding(top = 1.dp, start = 1.dp)
+                        .clickable { 
+                            onIntent(
+                                PlaceDetailIntent.OpenDialog(
+                                    place = place,
+                                    property = detailProperty
+                                )
+                            )
+                        }
+                )
+            }
+        }
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -269,7 +296,7 @@ private fun PlaceDetailProperty.getAccessibilityOptions(): List<Pair<Int, Access
             R.string.ramp_option_none to NOT_ACCESSIBLE
         )
 
-        PlaceDetailProperty.DOOR_WIDTH -> listOf(
+        PlaceDetailProperty.DOOR_WIDTH, PlaceDetailProperty.ENTRANCE_WIDTH -> listOf(
             R.string.door_width_option_wide to FULLY_ACCESSIBLE,
             R.string.door_width_option_standard to PARTIALLY_ACCESSIBLE,
             R.string.door_width_option_narrow to NOT_ACCESSIBLE

@@ -68,7 +68,7 @@ fun PlaceDetailsGeneralAccessibilitySection(
     onIntent: (PlaceDetailIntent) -> Unit = {},
 ) {
     val accessibilityStatus = place.generalAccessibility
-    if (accessibilityStatus == UNKNOWN) {
+    if (accessibilityStatus == UNKNOWN || accessibilityStatus == null) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = modifier
@@ -177,10 +177,13 @@ fun PlaceDetailsGeneralAccessibilitySection(
                             PlaceDetailProperty.RESTROOM_ACCESSIBILITY
                         )
                     ).forEach { (status, labelRes, property) ->
+                        var expanded by remember { mutableStateOf(false) }
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { expanded = true }
                         ) {
                             Icon(
                                 imageVector = when (status) {
@@ -203,15 +206,11 @@ fun PlaceDetailsGeneralAccessibilitySection(
                             )
 
                             Box {
-                                var expanded by remember { mutableStateOf(false) }
-
                                 Icon(
                                     imageVector = Icons.Outlined.KeyboardArrowDown,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
-                                    modifier = Modifier
-                                        .size(16.dp)
-                                        .clickable { expanded = true }
+                                    modifier = Modifier.size(16.dp)
                                 )
 
                                 DropdownMenu(

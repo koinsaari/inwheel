@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
@@ -172,7 +171,7 @@ fun PlaceDetailsBottomSheet(
             }
         }
         activeDialog?.let { property ->
-            PlaceDetailPropertyUpdateDialog(
+            PlaceDetailPropertyDialog(
                 place = place,
                 property = property,
                 onIntent = onIntent,
@@ -184,7 +183,7 @@ fun PlaceDetailsBottomSheet(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlaceDetailPropertyUpdateDialog(
+fun PlaceDetailPropertyDialog(
     place: Place,
     property: PlaceDetailProperty,
     modifier: Modifier = Modifier,
@@ -195,9 +194,7 @@ fun PlaceDetailPropertyUpdateDialog(
         onDismissRequest = onDismiss,
         modifier = modifier
     ) {
-        Box(
-            modifier = Modifier.widthIn(max = 500.dp)
-        ) {
+        Box {
             Surface(
                 shape = RoundedCornerShape(16.dp),
                 color = MaterialTheme.colorScheme.surface,
@@ -209,12 +206,13 @@ fun PlaceDetailPropertyUpdateDialog(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
                 ) {
                     Text(
                         text = stringResource(id = property.dialogTitleRes),
                         style = MaterialTheme.typography.titleLarge
                     )
+
                     Spacer(Modifier.height(8.dp))
 
                     when (property) {
@@ -354,40 +352,67 @@ fun PlaceDetailPropertyUpdateDialog(
                         }
 
                         else -> {
-                            TODO()
-//                            Text(
-//                                text = stringResource(id = property.getPropertyInfoStringRes()),
-//                            )
+                            // Property info dialog
+                            Column(
+                                horizontalAlignment = Alignment.Start,
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(id = property.getPropertyInfoStringRes()),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(bottom = 16.dp)
+                                )
+                                
+                                Row(
+                                    horizontalArrangement = Arrangement.End,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Button(
+                                        onClick = { onDismiss() }
+                                    ) {
+                                        Text(stringResource(id = R.string.ok))
+                                    }
+                                }
+                            }
                         }
                     }
                     HorizontalDivider()
-                    Footer(note = stringResource(id = R.string.dialog_footer))
+
+                    val footerMessage = if (property == PlaceDetailProperty.GENERAL_ACCESSIBILITY ||
+                        property == PlaceDetailProperty.ADDITIONAL_INFO) {
+                        stringResource(id = R.string.update_dialog_footer)
+                    } else {
+                        stringResource(id = R.string.info_dialog_footer)
+                    }
+                    Footer(note = footerMessage)
                 }
             }
         }
     }
 }
 
-//private fun PlaceDetailProperty.getPropertyInfoStringRes(): Int {
-//    return when (this) {
-//        PlaceDetailProperty.GENERAL_ACCESSIBILITY -> R.string.info_general_accessibility
-//        PlaceDetailProperty.INDOOR_ACCESSIBILITY -> R.string.info_indoor_accessibility
-//        PlaceDetailProperty.ADDITIONAL_INFO -> R.string.info_additional_info
-//        PlaceDetailProperty.ENTRANCE_ACCESSIBILITY -> R.string.info_entrance_accessibility
-//        PlaceDetailProperty.STEP_COUNT -> R.string.info_step_count
-//        PlaceDetailProperty.STEP_HEIGHT -> R.string.info_step_height
-//        PlaceDetailProperty.RAMP -> R.string.info_ramp
-//        PlaceDetailProperty.LIFT -> R.string.info_lift
-//        PlaceDetailProperty.DOOR_TYPE -> R.string.info_door_type
-//        PlaceDetailProperty.DOOR_WIDTH -> R.string.info_door_width
-//        PlaceDetailProperty.ROOM_MANEUVER -> R.string.info_room_maneuver
-//        PlaceDetailProperty.GRAB_RAILS -> R.string.info_grab_rails
-//        PlaceDetailProperty.SINK -> R.string.info_sink
-//        PlaceDetailProperty.TOILET_SEAT -> R.string.info_toilet_seat
-//        PlaceDetailProperty.EMERGENCY_ALARM -> R.string.info_emergency_alarm
-//        PlaceDetailProperty.EURO_KEY -> R.string.info_euro_key
-//    }
-//}
+private fun PlaceDetailProperty.getPropertyInfoStringRes(): Int {
+    return when (this) {
+        PlaceDetailProperty.GENERAL_ACCESSIBILITY -> R.string.info_general_accessibility
+        PlaceDetailProperty.INDOOR_ACCESSIBILITY -> R.string.info_indoor_accessibility
+        PlaceDetailProperty.ENTRANCE_ACCESSIBILITY -> R.string.info_entrance_accessibility
+        PlaceDetailProperty.RESTROOM_ACCESSIBILITY -> R.string.info_restroom_accessibility
+        PlaceDetailProperty.ADDITIONAL_INFO -> R.string.info_additional_info
+        PlaceDetailProperty.STEP_COUNT -> R.string.info_step_count
+        PlaceDetailProperty.STEP_HEIGHT -> R.string.info_step_height
+        PlaceDetailProperty.RAMP -> R.string.info_ramp
+        PlaceDetailProperty.LIFT -> R.string.info_lift
+        PlaceDetailProperty.ENTRANCE_WIDTH -> R.string.info_entrance_width
+        PlaceDetailProperty.DOOR_TYPE -> R.string.info_door_type
+        PlaceDetailProperty.DOOR_WIDTH -> R.string.info_door_width
+        PlaceDetailProperty.ROOM_MANEUVER -> R.string.info_room_maneuver
+        PlaceDetailProperty.GRAB_RAILS -> R.string.info_grab_rails
+        PlaceDetailProperty.SINK -> R.string.info_sink
+        PlaceDetailProperty.TOILET_SEAT -> R.string.info_toilet_seat
+        PlaceDetailProperty.EMERGENCY_ALARM -> R.string.info_emergency_alarm
+        PlaceDetailProperty.EURO_KEY -> R.string.info_euro_key
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
@@ -462,7 +487,7 @@ private fun PropertyUpdateDialogPreview() {
     )
 
     AccessibilityMapTheme {
-        PlaceDetailPropertyUpdateDialog(
+        PlaceDetailPropertyDialog(
             place = place,
             property = PlaceDetailProperty.ADDITIONAL_INFO,
         )

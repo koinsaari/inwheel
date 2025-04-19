@@ -87,11 +87,11 @@ class PlaceRepository(
 //            Log.d("PlaceRepository", "Inserted ${ftsPlaces.size} places into FTS")
     }
 
-    suspend fun updatePlaceGeneralAccessibility(place: Place, newStatus: AccessibilityStatus) =
+    suspend fun updatePlaceGeneralAccessibility(place: Place, newStatus: AccessibilityStatus?) =
         withContext(Dispatchers.IO) {
             dao.updatePlaceGeneralAccessibility(
                 place.id,
-                newStatus.name
+                newStatus?.name
             )
             Log.d(
                 "PlaceRepository",
@@ -99,7 +99,7 @@ class PlaceRepository(
             )
             api.updatePlaceGeneralAccessibility(
                 place.id,
-                newStatus.name
+                newStatus?.name
             )
             Log.d(
                 "PlaceRepository",
