@@ -22,50 +22,12 @@ import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus.FULLY
 import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus.PARTIALLY_ACCESSIBLE
 import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus.NOT_ACCESSIBLE
 
-internal fun AccessibilityStatus?.getStringRes(): Int =
-    when (this) {
-        FULLY_ACCESSIBLE -> R.string.yes
-        PARTIALLY_ACCESSIBLE -> R.string.limited
-        NOT_ACCESSIBLE -> R.string.no
-        else -> R.string.unknown
-    }
-
-internal fun AccessibilityStatus?.getFullStringRes(): Int =
-    when (this) {
-        FULLY_ACCESSIBLE -> R.string.wheelchair_access_fully_accessible
-        PARTIALLY_ACCESSIBLE -> R.string.wheelchair_access_limited_accessibility
-        NOT_ACCESSIBLE -> R.string.wheelchair_access_not_accessible
-        else -> R.string.wheelchair_access_unknown
-    }
-
-internal fun Boolean?.getStringRes(): Int =
-    when (this) {
-        true -> R.string.accessibility_status_yes
-        false -> R.string.accessibility_status_no
-        null -> R.string.accessibility_status_unknown
-    }
-
-internal fun Boolean?.getEmojiStringRes(): Int =
-    when (this) {
-        true -> R.string.emoji_checkmark
-        false -> R.string.emoji_cross
-        null -> R.string.emoji_question
-    }
-
 internal fun AccessibilityStatus?.getAccessibilityStatusMarkerBgDrawableRes(): Int =
     when (this) {
         FULLY_ACCESSIBLE -> R.drawable.bg_marker_green
         PARTIALLY_ACCESSIBLE -> R.drawable.bg_marker_yellow
         NOT_ACCESSIBLE -> R.drawable.bg_marker_red
         else -> R.drawable.bg_marker_grey
-    }
-
-internal fun AccessibilityStatus?.getAccessibilityStatusIconRes(): Int =
-    when (this) {
-        FULLY_ACCESSIBLE -> R.drawable.ic_accessible_general
-        PARTIALLY_ACCESSIBLE -> R.drawable.ic_accessible_limited
-        NOT_ACCESSIBLE -> R.drawable.ic_not_accessible
-        else -> R.drawable.ic_accessible_general
     }
 
 internal fun AccessibilityStatus?.getAccessibilityStatusContentDescStringRes(): Int =

@@ -62,7 +62,7 @@ fun PlaceSearchBar(
                 onExpandedChange = onExpandedChange,
                 placeholder = {
                     Text(
-                        text = stringResource(R.string.search_placeholder),
+                        text = stringResource(R.string.place_search_bar_placeholder),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 },

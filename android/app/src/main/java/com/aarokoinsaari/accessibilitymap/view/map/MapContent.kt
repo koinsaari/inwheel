@@ -77,7 +77,7 @@ fun MapContent(
     GoogleMap(
         cameraPositionState = cameraPositionState,
         googleMapOptionsFactory = {
-            GoogleMapOptions().mapId(context.getString(R.string.google_map_id))
+            GoogleMapOptions().mapId("e030cf9b88fce692")
         },
         properties = MapProperties(
             mapType = MapType.NORMAL,

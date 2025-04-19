@@ -255,7 +255,7 @@ fun PropertyUpdateDialog(
                                     AccessibilityStatusItem(
                                         imageRes = R.drawable.accessibility_status_green,
                                         contentDescription = R.string.content_desc_fully_accessible,
-                                        imageText = R.string.image_descript_fully_accessible,
+                                        imageText = R.string.image_desc_fully_accessible,
                                         onClick = {
                                             onIntent(
                                                 PlaceDetailIntent.UpdateGeneralAccessibility(
@@ -270,7 +270,7 @@ fun PropertyUpdateDialog(
                                     AccessibilityStatusItem(
                                         imageRes = R.drawable.accessibility_status_yellow,
                                         contentDescription = R.string.content_desc_partially_accessible,
-                                        imageText = R.string.image_descript_partially_accessible,
+                                        imageText = R.string.image_desc_partially_accessible,
                                         onClick = {
                                             onIntent(
                                                 PlaceDetailIntent.UpdateGeneralAccessibility(
@@ -285,7 +285,7 @@ fun PropertyUpdateDialog(
                                     AccessibilityStatusItem(
                                         imageRes = R.drawable.accessibility_status_red,
                                         contentDescription = R.string.content_desc_not_accessible,
-                                        imageText = R.string.image_descript_not_accessible,
+                                        imageText = R.string.image_desc_not_accessible,
                                         onClick = {
                                             onIntent(
                                                 PlaceDetailIntent.UpdateGeneralAccessibility(
@@ -415,7 +415,7 @@ fun GeneralAccessibilityStatusDisplaySection(
                 AccessibilityStatusItem(
                     imageRes = R.drawable.accessibility_status_green,
                     contentDescription = R.string.content_desc_fully_accessible,
-                    imageText = R.string.image_descript_fully_accessible,
+                    imageText = R.string.image_desc_fully_accessible,
                     onClick = {
                         onIntent(
                             PlaceDetailIntent.UpdateGeneralAccessibility(
@@ -428,7 +428,7 @@ fun GeneralAccessibilityStatusDisplaySection(
                 AccessibilityStatusItem(
                     imageRes = R.drawable.accessibility_status_yellow,
                     contentDescription = R.string.content_desc_partially_accessible,
-                    imageText = R.string.image_descript_partially_accessible,
+                    imageText = R.string.image_desc_partially_accessible,
                     onClick = {
                         onIntent(
                             PlaceDetailIntent.UpdateGeneralAccessibility(
@@ -441,7 +441,7 @@ fun GeneralAccessibilityStatusDisplaySection(
                 AccessibilityStatusItem(
                     imageRes = R.drawable.accessibility_status_red,
                     contentDescription = R.string.content_desc_not_accessible,
-                    imageText = R.string.image_descript_not_accessible,
+                    imageText = R.string.image_desc_not_accessible,
                     onClick = {
                         onIntent(
                             PlaceDetailIntent.UpdateGeneralAccessibility(
@@ -1566,18 +1566,10 @@ private fun EmergencyAlarmOptions(
 
 private fun AccessibilityStatus?.getAccessibilityStatusStringRes(): Int =
     when (this) {
-        FULLY_ACCESSIBLE -> R.string.fully_accessible_status_title
-        PARTIALLY_ACCESSIBLE -> R.string.limited_accessibility_status_title
-        NOT_ACCESSIBLE -> R.string.not_accessible_status_title
-        else -> R.string.wheelchair_access_unknown
-    }
-
-private fun AccessibilityStatus?.getAccessibilityStatusEmojiStringRes(): Int =
-    when (this) {
-        FULLY_ACCESSIBLE -> R.string.emoji_checkmark
-        PARTIALLY_ACCESSIBLE -> R.string.emoji_warning
-        NOT_ACCESSIBLE -> R.string.emoji_cross
-        else -> R.string.emoji_question
+        FULLY_ACCESSIBLE -> R.string.general_status_title_fully_accessible
+        PARTIALLY_ACCESSIBLE -> R.string.general_status_title_partially_accessible
+        NOT_ACCESSIBLE -> R.string.general_status_title_not_accessible
+        else -> R.string.unknown_accessibility
     }
 
 private fun Boolean?.getBooleanEmojiStringRes(): Int =

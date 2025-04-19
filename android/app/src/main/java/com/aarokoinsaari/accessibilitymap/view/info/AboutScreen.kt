@@ -99,7 +99,7 @@ fun AboutScreen() {
                         body = stringResource(R.string.disclaimer_body),
                     )
                     Text(
-                        text = stringResource(R.string.data_note),
+                        text = stringResource(R.string.disclaimer_data_note),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -132,7 +132,7 @@ fun AboutScreen() {
             item {
                 Column {
                     HorizontalDivider(Modifier.padding(bottom = 8.dp))
-                    Footer(note = stringResource(R.string.footer_note_about))
+                    Footer(note = stringResource(R.string.about_footer_note))
                 }
             }
         }

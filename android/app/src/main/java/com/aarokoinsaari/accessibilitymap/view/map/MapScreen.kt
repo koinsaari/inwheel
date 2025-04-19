@@ -265,7 +265,7 @@ fun MapScreen(
                 .padding(8.dp)
         ) {
             Footer(
-                note = stringResource(R.string.footer_note_map)
+                note = stringResource(R.string.map_footer_note)
             )
         }
     }
