@@ -23,7 +23,6 @@ import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,21 +30,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -60,9 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
@@ -71,6 +61,7 @@ import com.aarokoinsaari.accessibilitymap.domain.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.domain.model.PlaceCategory
 import com.aarokoinsaari.accessibilitymap.domain.state.MapState
 import com.aarokoinsaari.accessibilitymap.view.components.Footer
+import com.aarokoinsaari.accessibilitymap.view.components.NotificationBar
 import com.aarokoinsaari.accessibilitymap.view.components.PlaceSearchBar
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -170,11 +161,11 @@ fun MapScreen(
         }
     }
 
-    Box(Modifier.fillMaxSize()) {
+    Box(modifier) {
         Surface(
             color = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface,
-            modifier = modifier
+            modifier = Modifier.fillMaxSize()
         ) {
             MapContent(
                 state = state,
@@ -222,24 +213,24 @@ fun MapScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(Color.Transparent)
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                        .padding(horizontal = 6.dp, vertical = 4.dp)
                         .zIndex(1f)
                 )
 
-                Box(Modifier.padding(start = 12.dp)) {
+                Box(Modifier.padding(horizontal = 6.dp)) {
                     IconButton(
                         onClick = onOpenDrawer,
                         modifier = Modifier
                             .background(
-                                color = MaterialTheme.colorScheme.surface,
+                                color = MaterialTheme.colorScheme.surfaceVariant,
                                 shape = CircleShape
                             )
                             .size(40.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Menu,
-                            contentDescription = "Open Navigation drawer",
-                            tint = MaterialTheme.colorScheme.onSurface
+                            contentDescription = stringResource(id = R.string.content_desc_open_drawer),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -268,75 +259,6 @@ fun MapScreen(
                 note = stringResource(R.string.map_footer_note)
             )
         }
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun FilterChipRow(
-    categories: List<PlaceCategory>,
-    selectedCategories: Set<String>,
-    modifier: Modifier = Modifier,
-    onIntent: (MapIntent) -> Unit = {},
-) {
-    LazyRow(modifier = modifier) {
-        items(categories) { category ->
-            val isSelected = selectedCategories.contains(category.rawValue)
-
-            FilterChip(
-                selected = isSelected,
-                onClick = {
-                    onIntent(MapIntent.ToggleFilter(category))
-                },
-                label = {
-                    Text(
-                        text = stringResource(id = category.displayNameRes)
-                    )
-                },
-                leadingIcon = if (isSelected) {
-                    { Icon(Icons.Default.Check, contentDescription = null) }
-                } else {
-                    {
-                        Icon(
-                            painter = painterResource(id = category.iconRes),
-                            contentDescription = null
-                        )
-                    }
-                },
-                colors = FilterChipDefaults.filterChipColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                border = FilterChipDefaults.filterChipBorder(
-                    enabled = false,
-                    selected = isSelected
-                ),
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .animateItem()
-            )
-        }
-    }
-}
-
-@Composable
-fun NotificationBar(
-    message: String,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier
-            .background(
-                color = Color.White.copy(alpha = 0.8f),
-                shape = RoundedCornerShape(8.dp)
-            )
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-        Text(
-            text = message,
-            color = Color.Black,
-            style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center
-        )
     }
 }
 

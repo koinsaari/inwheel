@@ -25,12 +25,19 @@
     <string name="content_desc_navigation_about">Open the About section</string>
     <string name="content_desc_navigation_accessibility_guidelines">Open the Accessibility Guidelines section</string>
     <string name="content_desc_property_info">Information about %1$s</string>
+    <string name="content_desc_open_drawer">Open Navigation drawer</string>
+    <string name="content_desc_filter_selected">%1$s filter selected. Tap to remove filter.</string>
+    <string name="content_desc_filter_unselected">%1$s filter not selected. Tap to apply filter.</string>
+    <string name="content_desc_filter_check_icon">Selected category indicator</string>
+    <string name="content_desc_filter_category_icon">Icon for %1$s category</string>
+    <string name="content_desc_filter_menu">Show all category filters</string>
 
     <!-- Map Related -->
     <string name="map">Map</string>
     <string name="place_search_bar_placeholder">Search for a place in current area…</string>
     <string name="location_permissions_not_granted">Enable location in your phone settings to see places near you.</string>
     <string name="map_footer_note">Location data © OpenStreetMap contributors.</string>
+    <string name="filter_categories">Filter by category</string>
 
     <!-- Place Details -->
     <string name="no_contact_info_available">No contact info provided for this place. ☹️</string>
@@ -112,10 +119,12 @@
     <string name="euro_key_dialog_title">About EuroKey</string>
     <string name="entrance_width_dialog_title">About entrance width</string>
 
-    <!-- Dialog Actions -->
+    <!-- Dialog/Button Actions -->
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="ok">OK</string>
+    <string name="apply">Apply</string>
+    <string name="reset">Reset</string>
     <string name="update_dialog_footer">⚠️ Your honest input helps make accessibility better for everyone.</string>
     <string name="info_dialog_footer">⚠️ These definitions are for general guidance only. Refer to official standards for regulatory details.</string>
 

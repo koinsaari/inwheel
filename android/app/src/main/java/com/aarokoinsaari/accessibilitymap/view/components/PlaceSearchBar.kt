@@ -26,13 +26,13 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
@@ -88,7 +88,7 @@ fun PlaceSearchBar(
         },
         expanded = expanded,
         onExpandedChange = onExpandedChange,
-        colors = SearchBarDefaults.colors(Color.White), // TODO: Use MaterialTheme
+        colors = SearchBarDefaults.colors(MaterialTheme.colorScheme.surfaceVariant), // TODO: Use MaterialTheme
         modifier = modifier
     ) {
         LazyColumn(
@@ -114,6 +114,7 @@ fun PlaceListItem(place: Place, onClick: () -> Unit = { }) {
     ListItem(
         headlineContent = { Text(place.name) },
         overlineContent = { Text(place.category.toString()) },
+        colors = ListItemDefaults.colors(MaterialTheme.colorScheme.surfaceVariant),
         modifier = Modifier.clickable { onClick() }
     )
 }
