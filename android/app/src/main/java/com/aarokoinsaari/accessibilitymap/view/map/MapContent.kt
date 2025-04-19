@@ -26,7 +26,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.domain.intent.MapIntent
 import com.aarokoinsaari.accessibilitymap.domain.state.MapState
 import com.aarokoinsaari.accessibilitymap.view.models.PlaceClusterItem

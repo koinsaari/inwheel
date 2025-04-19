@@ -22,7 +22,11 @@ import android.graphics.Canvas
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
-import com.aarokoinsaari.accessibilitymap.view.extensions.getAccessibilityStatusMarkerBgDrawableRes
+import com.aarokoinsaari.accessibilitymap.R
+import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus
+import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus.FULLY_ACCESSIBLE
+import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus.NOT_ACCESSIBLE
+import com.aarokoinsaari.accessibilitymap.domain.model.AccessibilityStatus.PARTIALLY_ACCESSIBLE
 import com.aarokoinsaari.accessibilitymap.view.models.PlaceClusterItem
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -72,3 +76,11 @@ private fun createMarkerBitmap(
         }
     }
 }
+
+private fun AccessibilityStatus?.getAccessibilityStatusMarkerBgDrawableRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.drawable.bg_marker_green
+        PARTIALLY_ACCESSIBLE -> R.drawable.bg_marker_yellow
+        NOT_ACCESSIBLE -> R.drawable.bg_marker_red
+        else -> R.drawable.bg_marker_grey
+    }

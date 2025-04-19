@@ -91,7 +91,7 @@ import com.aarokoinsaari.accessibilitymap.view.info.AboutScreen
 import com.aarokoinsaari.accessibilitymap.view.info.AccessibilityGuidelinesScreen
 import com.aarokoinsaari.accessibilitymap.view.map.MapScreen
 import com.aarokoinsaari.accessibilitymap.view.navigation.NavigationRoutes
-import com.aarokoinsaari.accessibilitymap.view.placedetails.PlaceDetailBottomSheet
+import com.aarokoinsaari.accessibilitymap.view.placedetails.PlaceDetailsBottomSheet
 import com.aarokoinsaari.accessibilitymap.view.theme.AccessibilityMapTheme
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
 import com.aarokoinsaari.accessibilitymap.viewmodel.PlaceDetailsViewModel
@@ -299,7 +299,7 @@ fun MainScreen() {
                         if (place != null) {
                             val placeDetailsViewModel: PlaceDetailsViewModel = koinViewModel()
                             placeDetailsViewModel.setPlace(place)
-                            PlaceDetailBottomSheet(
+                            PlaceDetailsBottomSheet(
                                 stateFlow = placeDetailsViewModel.state,
                                 onIntent = { intent ->
                                     placeDetailsViewModel.handleIntent(intent)
