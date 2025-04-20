@@ -17,16 +17,23 @@
 package com.aarokoinsaari.accessibilitymap.domain.model
 
 import androidx.annotation.StringRes
-import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Fts4
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.aarokoinsaari.accessibilitymap.R
 import com.aarokoinsaari.accessibilitymap.view.models.PlaceClusterItem
 import kotlinx.serialization.Serializable
 
 @Serializable
-@Entity(tableName = "places")
+@Entity(
+    tableName = "places",
+    indices = [
+        Index(value = ["lat", "lon"]),
+        Index(value = ["tileId"]),
+        Index(value = ["category"]),
+        Index(value = ["lastVisited"])
+    ]
+)
 data class Place(
     @PrimaryKey val id: String,
     val name: String,
@@ -55,6 +62,9 @@ data class Place(
     val emergencyAlarm: AccessibilityStatus? = null,
     val sink: AccessibilityStatus? = null,
     val euroKey: Boolean? = null,
+    val tileId: String? = null,
+    val fetchTimestamp: Long = System.currentTimeMillis(),
+    val lastVisited: Long = System.currentTimeMillis()
 )
 
 enum class PlaceDetailProperty(
@@ -178,12 +188,3 @@ fun Place.toClusterItem(zIndex: Float? = null): PlaceClusterItem =
         place = this,
         zIndex = zIndex
     )
-
-@Entity(tableName = "places_fts")
-@Fts4(contentEntity = Place::class)
-data class PlaceFts(
-    @PrimaryKey
-    @ColumnInfo(name = "rowid")
-    val rowId: Long,
-    val name: String,
-)

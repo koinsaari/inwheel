@@ -21,7 +21,6 @@ import com.aarokoinsaari.accessibilitymap.BuildConfig
 import com.aarokoinsaari.accessibilitymap.data.local.AppDatabase
 import com.aarokoinsaari.accessibilitymap.data.local.Converters
 import com.aarokoinsaari.accessibilitymap.data.local.PlacesDao
-import com.aarokoinsaari.accessibilitymap.data.local.PlacesFtsDao
 import com.aarokoinsaari.accessibilitymap.data.remote.supabase.SupabaseApiService
 import com.aarokoinsaari.accessibilitymap.data.repository.PlaceRepository
 import com.aarokoinsaari.accessibilitymap.viewmodel.MapViewModel
@@ -38,7 +37,6 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
-@Suppress("MagicNumber")
 val appModule = module {
 //    single {
 //        Room.databaseBuilder(
@@ -55,7 +53,7 @@ val appModule = module {
             AppDatabase::class.java,
         )
             .addTypeConverter(get<Converters>())
-            .fallbackToDestructiveMigration().build()
+            .fallbackToDestructiveMigration(false).build()
     }
 
     single {
@@ -82,9 +80,6 @@ val appModule = module {
     }
     single<PlacesDao> {
         get<AppDatabase>().placesDao()
-    }
-    single<PlacesFtsDao> {
-        get<AppDatabase>().placesFtsDao()
     }
     single {
         PlaceRepository(get(), get())

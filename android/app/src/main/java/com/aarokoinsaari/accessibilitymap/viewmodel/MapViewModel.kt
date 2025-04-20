@@ -50,10 +50,11 @@ class MapViewModel(
     private val _state = MutableStateFlow(MapState())
     val state: StateFlow<MapState> = _state.asStateFlow()
 
-    private var fetchJob: Job? = null
+    // Maintains unfiltered set of cluster items to support category filtering
+    private val cachedClusterItems = mutableSetOf<PlaceClusterItem>()
+
     private var moveJob: Job? = null
     private var cachedPlaces: Set<Place> = emptySet()
-    private val cachedClusterItems = mutableSetOf<PlaceClusterItem>()
 
     init {
         // Handle search query changes
@@ -62,62 +63,70 @@ class MapViewModel(
                 .distinctUntilChanged()
                 .collect { query ->
                     if (query.isNotBlank()) {
-                        applySearchFilter(query)
+                        applySearch(query)
                     }
                 }
         }
 
-        // updates cluster items based on category selections
+        // Apply category filters
         viewModelScope.launch {
             _state.map { it.selectedCategories }
                 .distinctUntilChanged()
                 .collect { categories ->
                     if (categories.isEmpty()) {
                         _state.update { it.copy(clusterItems = cachedClusterItems.toList()) }
-                        Log.d(
-                            "MapViewModel",
-                            "cluster items: ${_state.value.clusterItems.size}, " +
-                                    "filters: ${_state.value.selectedCategories}"
-                        )
                         return@collect
                     }
+
                     val filteredItems = cachedClusterItems.filter {
                         categories.contains(it.placeData.category.rawValue)
                     }
+
+                    Log.d(
+                        "MapViewModel",
+                        "Applied ${categories.size} filters: ${filteredItems.size}/${cachedClusterItems.size} places shown"
+                    )
                     _state.update {
                         it.copy(
                             selectedCategories = categories,
                             clusterItems = filteredItems
                         )
                     }
-                    Log.d(
-                        "MapViewModel",
-                        "cluster items: ${_state.value.clusterItems.size}, " +
-                                "filters: ${_state.value.selectedCategories}"
-                    )
                 }
         }
 
-        // updates cluster items based on smaller snapshot bounds changes fetching
-        // directly from Room
+        // Observe Room changes within bounds
         viewModelScope.launch {
-            _state.map { it.smallSnapshotBounds }
+            _state.map { it.snapshotBounds }
                 .filterNotNull()
                 .distinctUntilChanged()
-                .flatMapLatest { bounds -> repository.observePlacesWithinBounds(bounds) }
-                .map { places -> places.map { it.toClusterItem() } }
+                .flatMapLatest { bounds ->
+                    repository.observePlacesWithinBounds(bounds)
+                }
+                .map { places ->
+                    places.map { it.toClusterItem() }
+                }
                 .collect { clusterItems ->
+                    Log.d("MapViewModel", "Updating UI with ${clusterItems.size} markers")
+
+                    // Update cache before UI to ensure filters work on new data
+                    cachedClusterItems.clear()
+                    cachedClusterItems.addAll(clusterItems)
+
                     _state.update {
                         it.copy(
                             clusterItems = clusterItems,
                             isLoading = false
                         )
                     }
-                    cachedPlaces = clusterItems.map { it.placeData }.toSet()
-                    cachedClusterItems.addAll(clusterItems)
-                    Log.d("MapViewModel", "Updated cluster items: ${clusterItems.size}")
                 }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        repository.cleanup()
+        Log.d("MapViewModel", "Cleared ViewModel and repository resources")
     }
 
     fun handleIntent(intent: MapIntent) {
@@ -125,7 +134,7 @@ class MapViewModel(
             when (intent) {
                 is MapIntent.MoveMap -> handleMove(intent)
                 is MapIntent.ToggleFilter -> handleToggleFilter(intent.category)
-                is MapIntent.SearchPlace -> applySearchFilter(intent.query)
+                is MapIntent.SearchPlace -> applySearch(intent.query)
 
                 is MapIntent.UpdateQuery -> {
                     _state.update { it.copy(searchQuery = intent.query) }
@@ -138,12 +147,10 @@ class MapViewModel(
 
                 is MapIntent.LocationPermissionGranted -> {
                     _state.update { it.copy(locationPermissionGranted = intent.granted) }
-                    Log.d("MapViewModel", "Location permission granted: ${intent.granted}")
                 }
 
                 is MapIntent.UpdateUserLocation -> {
                     _state.update { it.copy(userLocation = intent.latLng) }
-                    Log.d("MapViewModel", "Updated user location: ${intent.latLng}")
                 }
             }
         }
@@ -153,90 +160,53 @@ class MapViewModel(
         moveJob?.cancel()
         moveJob = viewModelScope.launch {
             delay(DEBOUNCE_VALUE)
-            if (intent.zoomLevel < ZOOM_THRESHOLD_LARGE) {
-                cachedClusterItems.addAll(_state.value.clusterItems)
-                Log.d("MapViewModel", "Cached cluster items: ${cachedClusterItems.size}")
+
+            if (intent.zoomLevel < ZOOM_THRESHOLD) {
+                Log.d("MapViewModel", "Skipping fetch, zoom level too low")
                 handleClearMarkers()
                 return@launch
             }
 
-            val currentLargeBounds = _state.value.largeSnapshotBounds
-            if (currentLargeBounds == null || (!currentLargeBounds.contains(intent.center) &&
-                        intent.zoomLevel >= ZOOM_THRESHOLD_LARGE)
-            ) {
-                fetchJob?.cancel()
-                fetchJob = viewModelScope.launch {
-                    _state.update { it.copy(isLoading = true) }
-                    val newLargeBounds =
-                        calculateExpandedBounds(intent.bounds, intent.zoomLevel, true)
-                    repository.fetchAndStorePlaces(
-                        newLargeBounds,
-                        cachedPlaces.map { it.id }.toSet()
-                    )
+            val smallSnapshotBounds = _state.value.snapshotBounds
+            if (smallSnapshotBounds == null || !smallSnapshotBounds.contains(intent.center)) {
+                Log.d("MapViewModel", "Center moved outside snapshot bounds, fetching new data")
+
+                _state.update { it.copy(isLoading = true) }
+
+                try {
+                    val newSmallSnapshotBounds = intent.bounds
+                    val expandedBounds =
+                        calculateExpandedBounds(newSmallSnapshotBounds, intent.zoomLevel)
+
+                    // First fetch visible region, then prefetch nearby tiles for smoother panning
+                    repository.fetchPlacesForVisibleRegion(expandedBounds)
+                    repository.prefetchNearbyTiles(expandedBounds) // This is lower priority background fetch
+
                     _state.update {
                         it.copy(
-                            zoomLevel = intent.zoomLevel,
-                            center = intent.center,
-                            largeSnapshotBounds = newLargeBounds,
-                            selectedClusterItem = if (it.selectedClusterItem != null &&
-                                !intent.bounds.contains(it.selectedClusterItem.position)
-                            ) {
-                                sharedViewModel.clearSelectedPlace()
-                                null // closes the info window when out of view
-                            } else {
-                                it.selectedClusterItem
-                            },
-                            isLoading = false
+                            snapshotBounds = newSmallSnapshotBounds,
+                            expandedSnapshotBounds = expandedBounds
                         )
                     }
-                    Log.d("MapViewModel", "Updated state: ${_state.value}")
-                    cachedClusterItems.addAll(_state.value.clusterItems)
+                    Log.d("MapViewModel", "State after move: ${_state.value}")
+                } catch (e: Exception) {
+                    Log.e("MapViewModel", "Error fetching places: ${e.message}")
+                } finally {
+                    _state.update { it.copy(isLoading = false) }
                 }
             }
-
-            val currentSmallBounds = _state.value.smallSnapshotBounds
-            if (currentSmallBounds == null || (!currentSmallBounds.contains(intent.center) &&
-                        intent.zoomLevel >= ZOOM_THRESHOLD_SMALL)
-            ) {
-                val newSmallBounds = calculateExpandedBounds(intent.bounds, intent.zoomLevel, false)
-                _state.update {
-                    it.copy(
-                        zoomLevel = intent.zoomLevel,
-                        center = intent.center,
-                        smallSnapshotBounds = newSmallBounds,
-                        selectedClusterItem = if (it.selectedClusterItem != null &&
-                            !intent.bounds.contains(it.selectedClusterItem.position)
-                        ) {
-                            sharedViewModel.clearSelectedPlace()
-                            null // closes the info window when out of view
-                        } else {
-                            it.selectedClusterItem
-                        }
-                    )
-                }
-                Log.d("MapViewModel", "Updated state: ${_state.value}")
-            }
-            return@launch
         }
     }
 
+    // Calculate expanded bounds with zoom-based buffer factor
     private fun calculateExpandedBounds(
         bounds: LatLngBounds,
         zoomLevel: Float,
-        isLargeBounds: Boolean,
     ): LatLngBounds {
-        val zoomFactor = if (isLargeBounds) {
-            when {
-                zoomLevel < 12f -> 1.0f
-                zoomLevel in 12f..14f -> 1.5f
-                else -> 2.0f
-            }
-        } else {
-            when {
-                zoomLevel < 15f -> 1.0f
-                zoomLevel in 15f..17f -> 1.5f
-                else -> 2.0f
-            }
+        val zoomFactor = when {
+            zoomLevel < 12f -> 1.0f
+            zoomLevel in 12f..14f -> 1.5f
+            else -> 2.0f
         }
 
         val latDiff = bounds.northeast.latitude - bounds.southwest.latitude
@@ -254,6 +224,19 @@ class MapViewModel(
         return LatLngBounds(expandedSouthwest, expandedNortheast)
     }
 
+    private fun applySearch(query: String) {
+        val filtered = if (query.isBlank()) {
+            emptyList()
+        } else {
+            cachedPlaces.filter { place ->
+                place.name.contains(query, ignoreCase = true) &&
+                        place.name != place.category.rawValue
+            }
+        }
+        Log.d("MapViewModel", "Found ${filtered.size} places matching query")
+        _state.update { it.copy(filteredPlaces = filtered) }
+    }
+
     private fun handleToggleFilter(category: PlaceCategory) {
         val currentState = _state.value
         val updatedCategories =
@@ -265,7 +248,6 @@ class MapViewModel(
         _state.update {
             it.copy(selectedCategories = updatedCategories)
         }
-        Log.d("MapViewModel", "Updated categories: $updatedCategories")
     }
 
     private fun handleClearMarkers() {
@@ -273,33 +255,18 @@ class MapViewModel(
             _state.update {
                 it.copy(
                     clusterItems = emptyList(),
-                    currentBounds = null,
-                    smallSnapshotBounds = null,
+                    snapshotBounds = null,
+                    expandedSnapshotBounds = null,
                     selectedClusterItem = null,
                     isLoading = false
                 )
             }
-            Log.d("MapViewModel", "Clear markers action, current state: ${_state.value}")
+            Log.d("MapViewModel", "Cleared markers, reset bounds for next zoom-in")
         }
-    }
-
-    private fun applySearchFilter(query: String) {
-        val filtered = if (query.isBlank()) {
-            emptyList()
-        } else {
-            cachedPlaces.filter { place ->
-                // Excludes places without name (toilets, parking spots, etc)
-                place.name.contains(query, ignoreCase = true) &&
-                        place.name != place.category.rawValue
-            }
-        }
-        _state.update { it.copy(filteredPlaces = filtered) }
-        Log.d("MapViewModel", "Filtered places count: ${_state.value.filteredPlaces.size}")
     }
 
     companion object {
-        private const val ZOOM_THRESHOLD_LARGE = 12
-        private const val ZOOM_THRESHOLD_SMALL = 14
         private const val DEBOUNCE_VALUE = 200L
+        private const val ZOOM_THRESHOLD = 12
     }
 }

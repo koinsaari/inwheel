@@ -123,7 +123,7 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
                 val currentValue = getCurrentValue(place, detail)
                 val valueToUpdate = if (currentValue == newValue) null else newValue
                 
-                repository.updatePlaceAccessibilityDetail(
+                repository.updatePlaceDetailProperty(
                     place = place,
                     property = detail,
                     newValue = valueToUpdate

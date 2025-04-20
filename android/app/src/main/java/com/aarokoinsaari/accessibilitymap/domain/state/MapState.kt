@@ -24,10 +24,9 @@ import com.google.android.gms.maps.model.LatLngBounds
 data class MapState(
     val center: LatLng? = null,
     val zoomLevel: Float? = 10f,
-    val currentBounds: LatLngBounds? = null,
-    val smallSnapshotBounds: LatLngBounds? = null,
-    val largeSnapshotBounds: LatLngBounds? = null,
-    val clusterItems: List<PlaceClusterItem> = emptyList(), // Places shown on UI
+    val snapshotBounds: LatLngBounds? = null, // Small bounds for triggering fetching
+    val expandedSnapshotBounds: LatLngBounds? = null, // Expanded bounds for actual fetched area
+    val clusterItems: List<PlaceClusterItem> = emptyList(), // Places on UI
     val selectedClusterItem: PlaceClusterItem? = null,
     val selectedCategories: Set<String> = emptySet(),
     val selectedPlace: Place? = null, // Used for place details
@@ -43,9 +42,8 @@ data class MapState(
             MapState(
                 center=$center,
                 zoomLevel=$zoomLevel,
-                currentBounds=$currentBounds,
-                smallSnapshotBounds=$smallSnapshotBounds,
-                largeSnapshotBounds=$largeSnapshotBounds,
+                snapshotBounds=$snapshotBounds,
+                expandedSnapshotBounds=$expandedSnapshotBounds,
                 clusterItems=${clusterItems.size},
                 selectedClusterItem=$selectedClusterItem,
                 selectedCategories=$selectedCategories,

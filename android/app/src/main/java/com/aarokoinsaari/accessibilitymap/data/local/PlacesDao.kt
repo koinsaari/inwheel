@@ -21,73 +21,68 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
+import androidx.room.Transaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.aarokoinsaari.accessibilitymap.domain.model.Place
-import com.aarokoinsaari.accessibilitymap.domain.model.PlaceFts
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PlacesDao {
+
     @Query("""
-    SELECT * FROM places 
-    WHERE lat BETWEEN :southLat AND :northLat 
-      AND lon BETWEEN :westLon AND :eastLon 
-    LIMIT :limit
-""")
-    fun getPlacesFlowWithinBounds(
+        SELECT * FROM places 
+        WHERE lat BETWEEN :southLat AND :northLat 
+        AND lon BETWEEN :westLon AND :eastLon
+        LIMIT :limit
+    """)
+    fun getPlacesWithinBounds(
         southLat: Double,
         northLat: Double,
         westLon: Double,
         eastLon: Double,
-        limit: Int
+        limit: Int = 5000
     ): Flow<List<Place>>
+    
+    @Query("SELECT * FROM places WHERE tileId IN (:tileIds) AND fetchTimestamp > :minTimestamp")
+    fun getPlacesInTiles(tileIds: List<String>, minTimestamp: Long): Flow<List<Place>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlaces(places: List<Place>)
+    
+    @Transaction
+    suspend fun insertPlacesInTile(tileId: String, places: List<Place>) {
+        val placesWithTile = places.map { it.copy(tileId = tileId, lastVisited = System.currentTimeMillis()) }
+        insertPlaces(placesWithTile)
+    }
 
     @Query("UPDATE places SET generalAccessibility = :status WHERE id = :id")
     suspend fun updatePlaceGeneralAccessibility(id: String, status: String?)
 
     @RawQuery
     suspend fun updateAccessibilityDetail(query: SupportSQLiteQuery): Int
-
+    
     suspend fun updatePlaceAccessibilityDetailString(id: String, columnName: String, newValue: String) {
         val queryString = "UPDATE places SET $columnName = ? WHERE id = ?"
         val args = arrayOf<Any>(newValue, id)
         val query = SimpleSQLiteQuery(queryString, args)
         updateAccessibilityDetail(query)
     }
-
+    
     suspend fun updatePlaceAccessibilityDetailInt(id: String, columnName: String, newValue: Int) {
         val queryString = "UPDATE places SET $columnName = ? WHERE id = ?"
         val args = arrayOf<Any>(newValue, id)
         val query = SimpleSQLiteQuery(queryString, args)
         updateAccessibilityDetail(query)
     }
-
+    
     suspend fun updatePlaceAccessibilityDetailBoolean(id: String, columnName: String, newValue: Boolean) {
         val queryString = "UPDATE places SET $columnName = ? WHERE id = ?"
         val args = arrayOf<Any>(newValue, id)
         val query = SimpleSQLiteQuery(queryString, args)
         updateAccessibilityDetail(query)
     }
-}
 
-@Dao
-interface PlacesFtsDao {
-    @Query(
-        """
-        SELECT p.*, 
-        ((p.lat - :userLat)*(p.lat - :userLat) + (p.lon - :userLon)*(p.lon - :userLon)) AS distance 
-        FROM places p 
-        JOIN places_fts fts ON p.id = fts.rowid 
-        WHERE fts.name MATCH :query 
-        ORDER BY distance LIMIT 50
-    """
-    )
-    suspend fun searchPlacesByName(query: String, userLat: Double, userLon: Double): List<Place>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPlaces(placesFts: List<PlaceFts>)
+    @Query("DELETE FROM places WHERE lastVisited < :cutoffTimestamp AND tileId NOT IN (:activeTileIds)")
+    suspend fun cleanupOldPlaces(cutoffTimestamp: Long, activeTileIds: List<String>): Int
 }
