@@ -160,7 +160,7 @@ fun PlaceDetailsEntranceDetailsSection(
         )
         PlaceDetailItem(
             detailProperty = PlaceDetailProperty.LIFT,
-            value = stringResource(id = place.lift.getAccessibilityStringRes()),
+            value = stringResource(id = place.lift.getLiftValueStringRes()),
             place = place,
             onIntent = onIntent
         )
@@ -262,6 +262,14 @@ private fun AccessibilityStatus?.getDoorWidthValueStringRes(): Int =
         FULLY_ACCESSIBLE -> R.string.door_width_option_wide
         PARTIALLY_ACCESSIBLE -> R.string.door_width_option_standard
         NOT_ACCESSIBLE -> R.string.door_width_option_narrow
+        else -> R.string.emoji_question
+    }
+
+private fun AccessibilityStatus?.getLiftValueStringRes(): Int =
+    when (this) {
+        FULLY_ACCESSIBLE -> R.string.lift_option_accessible
+        PARTIALLY_ACCESSIBLE -> R.string.lift_option_partially_accessible
+        NOT_ACCESSIBLE -> R.string.lift_option_none
         else -> R.string.emoji_question
     }
 

@@ -152,6 +152,10 @@
     <string name="door_width_option_standard">⚠️ Standard (75–90 cm)</string>
     <string name="door_width_option_narrow">❌ Narrow (less than 75 cm)</string>
 
+    <string name="lift_option_accessible">✅ Fully accessible</string>
+    <string name="lift_option_partially_accessible">⚠️ Partially accessible</string>
+    <string name="lift_option_none">❌ No lift available</string>
+
     <string name="ramp_option_accessible">✅ Proper ramp available</string>
     <string name="ramp_option_partial">⚠️ Steep or narrow ramp</string>
     <string name="ramp_option_none">❌ No ramp available</string>
@@ -245,7 +249,7 @@
     </string>
 
     <string name="info_door_type">
-        Door type refers to how the door opens and whether it\'s easy to use for someone with limited mobility.\n\nAutomatic or sliding doors are typically the most accessible. Swing doors that are light and have a handle that\'s easy to grip can also be accessible.\n\nHeavy doors, revolving doors, or doors that require strong pulling force may be difficult or impossible to use without assistance.
+        Door type refers to how the door opens and how suitable it is for people with limited mobility.\n\nAutomatic sliding and automatic swinging doors are generally the most accessible, as they open without physical effort.\n\nManual swinging and manual sliding doors can be accessible if they are lightweight, easy to open, and have user-friendly handles.\n\nRevolving doors, which rotate around a central axis, may require timing and coordination. Double doors, with two panels that open in the middle, can vary in accessibility depending on space and ease of use.
     </string>
 
     <string name="info_door_width">

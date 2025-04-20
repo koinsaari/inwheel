@@ -290,6 +290,12 @@ private fun PlaceDetailProperty.getAccessibilityOptions(): List<Pair<Int, Access
             R.string.step_height_option_high to NOT_ACCESSIBLE
         )
 
+        PlaceDetailProperty.LIFT -> listOf(
+            R.string.lift_option_accessible to FULLY_ACCESSIBLE,
+            R.string.lift_option_partially_accessible to PARTIALLY_ACCESSIBLE,
+            R.string.lift_option_none to NOT_ACCESSIBLE
+        )
+
         PlaceDetailProperty.RAMP -> listOf(
             R.string.ramp_option_accessible to FULLY_ACCESSIBLE,
             R.string.ramp_option_partial to PARTIALLY_ACCESSIBLE,
