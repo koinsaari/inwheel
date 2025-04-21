@@ -24,8 +24,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -33,6 +36,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -217,7 +222,14 @@ fun MapScreen(
                         .zIndex(1f)
                 )
 
-                Box(Modifier.padding(horizontal = 6.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 6.dp)
+                ) {
+                    val size = 40.dp
                     IconButton(
                         onClick = onOpenDrawer,
                         modifier = Modifier
@@ -225,11 +237,49 @@ fun MapScreen(
                                 color = MaterialTheme.colorScheme.surfaceVariant,
                                 shape = CircleShape
                             )
-                            .size(40.dp)
+                            .size(size)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Menu,
                             contentDescription = stringResource(id = R.string.content_desc_open_drawer),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    if (state.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(size),
+                            strokeWidth = 2.dp
+                        )
+                    } else { // fill the space so the buttons stay always in the same place
+                        Spacer(Modifier.size(40.dp))
+                    }
+
+                    IconButton(
+                        onClick = {
+                            state.userLocation?.let { userLocation ->
+                                scope.launch {
+                                    cameraPositionState.animate(
+                                        update = CameraUpdateFactory.newLatLngZoom(
+                                            userLocation,
+                                            15f
+                                        ),
+                                        durationMs = 800
+                                    )
+                                }
+                            }
+                        },
+                        enabled = state.userLocation != null,
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                shape = CircleShape
+                            )
+                            .size(size)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MyLocation,
+                            contentDescription = stringResource(id = R.string.content_desc_locate_me),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }

@@ -31,6 +31,7 @@
     <string name="content_desc_filter_check_icon">Selected category indicator</string>
     <string name="content_desc_filter_category_icon">Icon for %1$s category</string>
     <string name="content_desc_filter_menu">Show all category filters</string>
+    <string name="content_desc_locate_me">Center map on my location</string>
 
     <!-- Map Related -->
     <string name="map">Map</string>
