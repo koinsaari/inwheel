@@ -50,10 +50,9 @@ class MapViewModel(
     private val _state = MutableStateFlow(MapState())
     val state: StateFlow<MapState> = _state.asStateFlow()
 
-    // Maintains unfiltered set of cluster items to support category filtering
     private val cachedClusterItems = mutableSetOf<PlaceClusterItem>()
-
     private var moveJob: Job? = null
+
     private var cachedPlaces: Set<Place> = emptySet()
 
     init {
@@ -103,19 +102,24 @@ class MapViewModel(
                 .flatMapLatest { bounds ->
                     repository.observePlacesWithinBounds(bounds)
                 }
-                .map { places ->
-                    places.map { it.toClusterItem() }
-                }
-                .collect { clusterItems ->
-                    Log.d("MapViewModel", "Updating UI with ${clusterItems.size} markers")
+                .collect { places ->
+                    Log.d("MapViewModel", "Updating UI with ${places.size} places")
 
-                    // Update cache before UI to ensure filters work on new data
+                    // Update both caches before UI update
+                    cachedPlaces = places.toSet()
+                    val clusterItems = places.map { it.toClusterItem() }
                     cachedClusterItems.clear()
                     cachedClusterItems.addAll(clusterItems)
 
                     _state.update {
                         it.copy(
-                            clusterItems = clusterItems,
+                            clusterItems = if (it.selectedCategories.isEmpty()) {
+                                clusterItems
+                            } else {
+                                clusterItems.filter { item ->
+                                    it.selectedCategories.contains(item.placeData.category.rawValue)
+                                }
+                            },
                             isLoading = false
                         )
                     }
