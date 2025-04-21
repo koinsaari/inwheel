@@ -112,8 +112,8 @@ class SupabaseApiService(
             PlaceDetailProperty.STEP_HEIGHT -> "entrance_accessibility" to "step_height"
             PlaceDetailProperty.RAMP -> "entrance_accessibility" to "ramp"
             PlaceDetailProperty.LIFT -> "entrance_accessibility" to "lift"
-            PlaceDetailProperty.DOOR_TYPE -> "entrance_accessibility" to "type"
-            PlaceDetailProperty.ENTRANCE_WIDTH -> "entrance_accessibility" to "width"
+            PlaceDetailProperty.DOOR_TYPE -> "entrance_accessibility" to "door_type"
+            PlaceDetailProperty.ENTRANCE_WIDTH -> "entrance_accessibility" to "entrance_width"
 
             // Restroom accessibility table
             PlaceDetailProperty.RESTROOM_ACCESSIBILITY -> "restroom_accessibility" to "accessibility"

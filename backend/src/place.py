@@ -44,7 +44,8 @@ class Place:
         contact: dict,
         general_accessibility: dict,
         entrance_accessibility: dict,
-        restroom_accessibility: dict
+        restroom_accessibility: dict,
+        region: str = None
     ):
         self.osm_id = osm_id
         self.name = name
@@ -55,6 +56,7 @@ class Place:
         self.general_accessibility = general_accessibility
         self.entrance_accessibility = entrance_accessibility
         self.restroom_accessibility = restroom_accessibility
+        self.region = region
 
 
 class PlaceHandler(osmium.SimpleHandler):
@@ -91,6 +93,7 @@ class PlaceHandler(osmium.SimpleHandler):
                 contact=contact,
                 general_accessibility=general_acc,
                 entrance_accessibility=entrance_acc,
-                restroom_accessibility=restroom_acc
+                restroom_accessibility=restroom_acc,
+                region=tags.get("region")
             )
             self.places.append(place)

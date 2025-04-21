@@ -166,13 +166,13 @@ fun PlaceDetailsEntranceDetailsSection(
         )
         PlaceDetailItem(
             detailProperty = PlaceDetailProperty.ENTRANCE_WIDTH,
-            value = stringResource(id = place.width.getDoorWidthValueStringRes()),
+            value = stringResource(id = place.entranceWidth.getDoorWidthValueStringRes()),
             place = place,
             onIntent = onIntent
         )
         PlaceDetailItem(
             detailProperty = PlaceDetailProperty.DOOR_TYPE,
-            value = place.type ?: stringResource(id = R.string.emoji_question),
+            value = place.doorType ?: stringResource(id = R.string.emoji_question),
             place = place,
             onIntent = onIntent
         )

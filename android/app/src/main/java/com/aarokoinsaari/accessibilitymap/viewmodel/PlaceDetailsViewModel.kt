@@ -153,8 +153,8 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
             PlaceDetailProperty.STEP_HEIGHT -> place.stepHeight
             PlaceDetailProperty.RAMP -> place.ramp
             PlaceDetailProperty.LIFT -> place.lift
-            PlaceDetailProperty.ENTRANCE_WIDTH -> place.width
-            PlaceDetailProperty.DOOR_TYPE -> place.type
+            PlaceDetailProperty.ENTRANCE_WIDTH -> place.entranceWidth
+            PlaceDetailProperty.DOOR_TYPE -> place.doorType
             PlaceDetailProperty.DOOR_WIDTH -> place.doorWidth
             PlaceDetailProperty.ROOM_MANEUVER -> place.roomManeuver
             PlaceDetailProperty.GRAB_RAILS -> place.grabRails
@@ -175,8 +175,8 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
             PlaceDetailProperty.STEP_HEIGHT -> copy(stepHeight = newValue as? AccessibilityStatus)
             PlaceDetailProperty.RAMP -> copy(ramp = newValue as? AccessibilityStatus)
             PlaceDetailProperty.LIFT -> copy(lift = newValue as? AccessibilityStatus)
-            PlaceDetailProperty.ENTRANCE_WIDTH -> copy(width = newValue as? AccessibilityStatus)
-            PlaceDetailProperty.DOOR_TYPE -> copy(type = newValue as? String)
+            PlaceDetailProperty.ENTRANCE_WIDTH -> copy(entranceWidth = newValue as? AccessibilityStatus)
+            PlaceDetailProperty.DOOR_TYPE -> copy(doorType = newValue as? String)
             PlaceDetailProperty.DOOR_WIDTH -> copy(doorWidth = newValue as? AccessibilityStatus)
             PlaceDetailProperty.ROOM_MANEUVER -> copy(roomManeuver = newValue as? AccessibilityStatus)
             PlaceDetailProperty.GRAB_RAILS -> copy(grabRails = newValue as? AccessibilityStatus)

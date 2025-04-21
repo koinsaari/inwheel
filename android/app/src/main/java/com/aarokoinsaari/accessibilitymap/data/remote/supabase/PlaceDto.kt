@@ -64,8 +64,8 @@ data class EntranceAccessibilityDto(
     @SerialName("step_height") val stepHeight: String?,
     val ramp: String?,
     val lift: String?,
-    val width: String?,
-    val type: String?,
+    @SerialName("entrance_width") val entranceWidth: String?,
+    @SerialName("door_type") val doorType: String?,
     @SerialName("user_modified") val userModified: Boolean? = false,
 )
 
@@ -101,8 +101,8 @@ fun PlaceDto.toDomain(): Place =
         stepHeight = parseStatus(entranceAccessibility?.stepHeight),
         ramp = parseStatus(entranceAccessibility?.ramp),
         lift = parseStatus(entranceAccessibility?.lift),
-        width = parseStatus(entranceAccessibility?.width),
-        type = entranceAccessibility?.type,
+        entranceWidth = parseStatus(entranceAccessibility?.entranceWidth),
+        doorType = entranceAccessibility?.doorType,
         restroomAccessibility = parseStatus(restroomAccessibility?.accessibility),
         doorWidth = parseStatus(restroomAccessibility?.doorWidth),
         roomManeuver = parseStatus(restroomAccessibility?.roomManeuver),

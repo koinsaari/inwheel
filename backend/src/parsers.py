@@ -136,8 +136,8 @@ def parse_accessibility_info(tags: Dict[str, str]):
         "step_height": parse_meters(tags.get("entrance:kerb:height")),
         "ramp": parse_yes_no(tags.get("entrance:ramp") or tags.get("ramp") or tags.get("wheelchair:ramp")),
         "lift": None,
-        "width": parse_width(tags.get("door:width") or tags.get("entrance:width")),
-        "type": "automatic" if tags.get("entrance:automatic_door", "").strip().lower() == "yes" else (tags.get("entrance:door")[:50] if tags.get("entrance:door") else None)
+        "entrance_width": parse_width(tags.get("door:width") or tags.get("entrance:width")),
+        "door_type": "automatic" if tags.get("entrance:automatic_door", "").strip().lower() == "yes" else (tags.get("entrance:door")[:50] if tags.get("entrance:door") else None)
     }
     restroom = {
         "accessibility": None,

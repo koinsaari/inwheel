@@ -10,6 +10,7 @@ CREATE TABLE public.places (
   lat DOUBLE PRECISION NOT NULL,
   lon DOUBLE PRECISION NOT NULL,
   geom GEOGRAPHY(Point, 4326),
+  region VARCHAR(50),
   last_osm_update TIMESTAMP WITH TIME ZONE DEFAULT now(),
   last_user_update TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
@@ -30,8 +31,8 @@ CREATE TABLE public.entrance_accessibility (
   step_height ACCESSIBILITY_STATUS,
   ramp ACCESSIBILITY_STATUS,
   lift ACCESSIBILITY_STATUS,
-  width ACCESSIBILITY_STATUS,
-  type VARCHAR(50),
+  entrance_width ACCESSIBILITY_STATUS,
+  door_type VARCHAR(50),
   user_modified BOOLEAN DEFAULT FALSE
 );
 
@@ -59,3 +60,4 @@ CREATE TABLE public.contact (
 CREATE INDEX idx_places_geom ON public.places USING GIST (geom);
 CREATE INDEX idx_places_osm_id ON public.places (osm_id);
 CREATE INDEX idx_places_category ON public.places (category);
+CREATE INDEX idx_places_region ON public.places (region);
