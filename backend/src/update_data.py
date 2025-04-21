@@ -139,9 +139,9 @@ def seed_places(places: List[Place], limit: int = None, update_all: bool = False
             INSERT INTO public.general_accessibility (place_id, accessibility, indoor_accessibility, additional_info)
             SELECT id, %s, %s, %s FROM public.places WHERE osm_id = %s
             ON CONFLICT (place_id) DO UPDATE SET 
-              accessibility = CASE WHEN user_modified AND NOT %s THEN general_accessibility.accessibility ELSE EXCLUDED.accessibility END,
-              indoor_accessibility = CASE WHEN user_modified AND NOT %s THEN general_accessibility.indoor_accessibility ELSE EXCLUDED.indoor_accessibility END,
-              additional_info = CASE WHEN user_modified AND NOT %s THEN general_accessibility.additional_info ELSE EXCLUDED.additional_info END
+              accessibility = CASE WHEN general_accessibility.user_modified AND NOT %s THEN general_accessibility.accessibility ELSE EXCLUDED.accessibility END,
+              indoor_accessibility = CASE WHEN general_accessibility.user_modified AND NOT %s THEN general_accessibility.indoor_accessibility ELSE EXCLUDED.indoor_accessibility END,
+              additional_info = CASE WHEN general_accessibility.user_modified AND NOT %s THEN general_accessibility.additional_info ELSE EXCLUDED.additional_info END
             """,
             (
                 ga.get("accessibility"),
@@ -162,13 +162,13 @@ def seed_places(places: List[Place], limit: int = None, update_all: bool = False
             )
             SELECT id, %s, %s, %s, %s, %s, %s, %s FROM public.places WHERE osm_id = %s
             ON CONFLICT (place_id) DO UPDATE SET
-              accessibility = CASE WHEN user_modified AND NOT %s THEN entrance_accessibility.accessibility ELSE EXCLUDED.accessibility END,
-              step_count = CASE WHEN user_modified AND NOT %s THEN entrance_accessibility.step_count ELSE EXCLUDED.step_count END,
-              step_height = CASE WHEN user_modified AND NOT %s THEN entrance_accessibility.step_height ELSE EXCLUDED.step_height END,
-              ramp = CASE WHEN user_modified AND NOT %s THEN entrance_accessibility.ramp ELSE EXCLUDED.ramp END,
-              lift = CASE WHEN user_modified AND NOT %s THEN entrance_accessibility.lift ELSE EXCLUDED.lift END,
-              entrance_width = CASE WHEN user_modified AND NOT %s THEN entrance_accessibility.entrance_width ELSE EXCLUDED.entrance_width END,
-              door_type = CASE WHEN user_modified AND NOT %s THEN entrance_accessibility.door_type ELSE EXCLUDED.door_type END
+              accessibility = CASE WHEN entrance_accessibility.user_modified AND NOT %s THEN entrance_accessibility.accessibility ELSE EXCLUDED.accessibility END,
+              step_count = CASE WHEN entrance_accessibility.user_modified AND NOT %s THEN entrance_accessibility.step_count ELSE EXCLUDED.step_count END,
+              step_height = CASE WHEN entrance_accessibility.user_modified AND NOT %s THEN entrance_accessibility.step_height ELSE EXCLUDED.step_height END,
+              ramp = CASE WHEN entrance_accessibility.user_modified AND NOT %s THEN entrance_accessibility.ramp ELSE EXCLUDED.ramp END,
+              lift = CASE WHEN entrance_accessibility.user_modified AND NOT %s THEN entrance_accessibility.lift ELSE EXCLUDED.lift END,
+              entrance_width = CASE WHEN entrance_accessibility.user_modified AND NOT %s THEN entrance_accessibility.entrance_width ELSE EXCLUDED.entrance_width END,
+              door_type = CASE WHEN entrance_accessibility.user_modified AND NOT %s THEN entrance_accessibility.door_type ELSE EXCLUDED.door_type END
             """,
             (
                 ea.get("accessibility"),
@@ -198,14 +198,14 @@ def seed_places(places: List[Place], limit: int = None, update_all: bool = False
             )
             SELECT id, %s, %s, %s, %s, %s, %s, %s, %s FROM public.places WHERE osm_id = %s
             ON CONFLICT (place_id) DO UPDATE SET
-              accessibility = CASE WHEN user_modified AND NOT %s THEN restroom_accessibility.accessibility ELSE EXCLUDED.accessibility END,
-              door_width = CASE WHEN user_modified AND NOT %s THEN restroom_accessibility.door_width ELSE EXCLUDED.door_width END,
-              room_maneuver = CASE WHEN user_modified AND NOT %s THEN restroom_accessibility.room_maneuver ELSE EXCLUDED.room_maneuver END,
-              grab_rails = CASE WHEN user_modified AND NOT %s THEN restroom_accessibility.grab_rails ELSE EXCLUDED.grab_rails END,
-              sink = CASE WHEN user_modified AND NOT %s THEN restroom_accessibility.sink ELSE EXCLUDED.sink END,
-              toilet_seat = CASE WHEN user_modified AND NOT %s THEN restroom_accessibility.toilet_seat ELSE EXCLUDED.toilet_seat END,
-              emergency_alarm = CASE WHEN user_modified AND NOT %s THEN restroom_accessibility.emergency_alarm ELSE EXCLUDED.emergency_alarm END,
-              euro_key = CASE WHEN user_modified AND NOT %s THEN restroom_accessibility.euro_key ELSE EXCLUDED.euro_key END
+              accessibility = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.accessibility ELSE EXCLUDED.accessibility END,
+              door_width = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.door_width ELSE EXCLUDED.door_width END,
+              room_maneuver = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.room_maneuver ELSE EXCLUDED.room_maneuver END,
+              grab_rails = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.grab_rails ELSE EXCLUDED.grab_rails END,
+              sink = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.sink ELSE EXCLUDED.sink END,
+              toilet_seat = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.toilet_seat ELSE EXCLUDED.toilet_seat END,
+              emergency_alarm = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.emergency_alarm ELSE EXCLUDED.emergency_alarm END,
+              euro_key = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.euro_key ELSE EXCLUDED.euro_key END
             """,
             (
                 ra.get("accessibility"),
@@ -266,6 +266,7 @@ def main():
     parser = argparse.ArgumentParser(description='Seed accessibility data from OSM')
     parser.add_argument('--region', help='Process only specific region')
     parser.add_argument('--update-all', action='store_true', help='Update all places, even user-modified ones')
+    parser.add_argument('--test', action='store_true', help='Test mode: only process 100 places')
     args = parser.parse_args()
     
     total_places = 0
@@ -275,7 +276,14 @@ def main():
         for region in REGIONS:
             if region['name'] == args.region:
                 print(f"Processing region: {region['name']}")
-                total_places += process_region(region, args.update_all)
+                places = parse_filtered_pbf(filter_pbf(download_pbf(region)), region['name'])
+                if args.test:
+                    print("TEST MODE: Only processing 100 places")
+                    seed_places(places, limit=100, update_all=args.update_all)
+                    total_places += min(100, len(places))
+                else:
+                    seed_places(places, update_all=args.update_all)
+                    total_places += len(places)
                 break
         else:
             print(f"Region {args.region} not found")
@@ -283,7 +291,14 @@ def main():
         # Process all regions
         for region in REGIONS:
             print(f"Processing region: {region['name']}")
-            total_places += process_region(region, args.update_all)
+            places = parse_filtered_pbf(filter_pbf(download_pbf(region)), region['name'])
+            if args.test:
+                print("TEST MODE: Only processing 100 places")
+                seed_places(places, limit=100, update_all=args.update_all)
+                total_places += min(100, len(places))
+            else:
+                seed_places(places, update_all=args.update_all)
+                total_places += len(places)
     
     print(f"Total places processed: {total_places}")
 
