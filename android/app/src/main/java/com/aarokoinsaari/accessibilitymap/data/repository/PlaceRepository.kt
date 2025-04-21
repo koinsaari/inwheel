@@ -79,40 +79,43 @@ class PlaceRepository(
         newValue: Any?,
     ) {
         withContext(Dispatchers.IO) {
-            when (newValue) {
+            val processedValue = when {
+                newValue is String && property == PlaceDetailProperty.ADDITIONAL_INFO ->
+                    newValue.sanitize()
+                else -> newValue
+            }
+            
+            when (processedValue) {
                 is AccessibilityStatus ->
                     dao.updatePlaceAccessibilityDetailString(
                         place.id,
                         property.dbColumnRoom,
-                        newValue.name
+                        processedValue.name
                     )
 
                 is Boolean ->
                     dao.updatePlaceAccessibilityDetailBoolean(
                         place.id,
                         property.dbColumnRoom,
-                        newValue
+                        processedValue
                     )
-
-                is Int ->
-                    dao.updatePlaceAccessibilityDetailInt(place.id, property.dbColumnRoom, newValue)
 
                 is String ->
                     dao.updatePlaceAccessibilityDetailString(
                         place.id,
                         property.dbColumnRoom,
-                        newValue
+                        processedValue
                     )
 
                 else -> {
-                    Log.e("PlaceRepository", "Unsupported type: ${newValue?.javaClass?.name}")
+                    Log.e("PlaceRepository", "Unsupported type: ${processedValue?.javaClass?.name}")
                 }
             }
 
             api.updatePlaceAccessibilityDetail(
                 placeId = place.id,
                 property = property,
-                newValue = newValue
+                newValue = processedValue
             )
 
             Log.d(
@@ -356,6 +359,11 @@ class PlaceRepository(
             Log.d("PlaceRepository", "Database cleanup: removed $deletedCount old places")
         }
     }
+
+    private fun String.sanitize(): String =
+        this.replace(Regex("\\p{Cc}&&[^\r\n\t]"), "") // Keep newlines and tabs
+            .trim()
+            .take(1000)
 
     companion object {
         private const val CACHE_EXPIRY_MS = 1000 * 60 * 60 // 1 hour

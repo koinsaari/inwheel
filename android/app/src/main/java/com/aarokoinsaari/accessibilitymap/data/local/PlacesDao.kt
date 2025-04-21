@@ -69,13 +69,6 @@ interface PlacesDao {
         updateAccessibilityDetail(query)
     }
     
-    suspend fun updatePlaceAccessibilityDetailInt(id: String, columnName: String, newValue: Int) {
-        val queryString = "UPDATE places SET $columnName = ? WHERE id = ?"
-        val args = arrayOf<Any>(newValue, id)
-        val query = SimpleSQLiteQuery(queryString, args)
-        updateAccessibilityDetail(query)
-    }
-    
     suspend fun updatePlaceAccessibilityDetailBoolean(id: String, columnName: String, newValue: Boolean) {
         val queryString = "UPDATE places SET $columnName = ? WHERE id = ?"
         val args = arrayOf<Any>(newValue, id)
