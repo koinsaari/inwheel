@@ -60,9 +60,10 @@ class Place:
 
 
 class PlaceHandler(osmium.SimpleHandler):
-    def __init__(self):
+    def __init__(self, region=None):
         super().__init__()
         self.places = []
+        self.region = region
 
     def node(self, n):
         tags = dict(n.tags)
@@ -79,14 +80,14 @@ class PlaceHandler(osmium.SimpleHandler):
             general_acc, entrance_acc, restroom_acc = parse_accessibility_info(tags)
             contact = {
                 "address": format_address(tags),
-                "phone": tags.get("phone")[:255] if tags.get("phone") else None,
+                "phone": tags.get("phone")[:100] if tags.get("phone") else None,
                 "email": tags.get("email")[:255] if tags.get("email") else None,
                 "website": tags.get("website")[:255] if tags.get("website") else None,
             }
 
             place = Place(
                 osm_id=n.id,
-                name=tags.get("name", "Unknown")[:150],
+                name=tags.get("name", "Unknown")[:255],
                 category=cat[:50],
                 lat=n.location.lat,
                 lon=n.location.lon,
@@ -94,6 +95,6 @@ class PlaceHandler(osmium.SimpleHandler):
                 general_accessibility=general_acc,
                 entrance_accessibility=entrance_acc,
                 restroom_accessibility=restroom_acc,
-                region=tags.get("region")
+                region=self.region[:50]
             )
             self.places.append(place)

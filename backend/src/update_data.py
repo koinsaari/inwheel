@@ -79,7 +79,7 @@ def filter_pbf(pbf_filename: str):
 
 def parse_filtered_pbf(filtered_filename: str, region_name: str) -> List[Place]:
     """Parse filtered PBF file and extract places with additional region info"""
-    handler = PlaceHandler()
+    handler = PlaceHandler(region_name)
     handler.apply_file(filtered_filename)
     print(f"Parsing {filtered_filename}...")
 
@@ -115,6 +115,12 @@ def seed_places(places: List[Place], limit: int = None, overwrite: bool = False)
     
     print(f"Preparing to insert {total_places} places for region {places[0].region}...")
     
+    # using these as the last check to make sure the values are valid and seeding
+    # does not rollback because of one invalid value
+    valid_accessibility_values = {
+        "FULLY_ACCESSIBLE", "PARTIALLY_ACCESSIBLE", "NOT_ACCESSIBLE", None
+    }
+    
     conn = psycopg.connect(DATABASE_URL)
     try:
         with conn.cursor() as cur:
@@ -142,33 +148,33 @@ def seed_places(places: List[Place], limit: int = None, overwrite: bool = False)
                 ga = p.general_accessibility
                 general_data.append((
                     p.osm_id,
-                    ga.get("accessibility"),
-                    ga.get("indoor_accessibility"),
+                    ga.get("accessibility") if ga.get("accessibility") in valid_accessibility_values else None,
+                    ga.get("indoor_accessibility") if ga.get("indoor_accessibility") in valid_accessibility_values else None,
                     ga.get("additional_info")[:1000] if ga.get("additional_info") else None
                 ))
                 
                 ea = p.entrance_accessibility
                 entrance_data.append((
                     p.osm_id,
-                    ea.get("accessibility"),
-                    ea.get("step_count"),
-                    ea.get("step_height"),
-                    ea.get("ramp"),
-                    ea.get("lift"),
-                    ea.get("entrance_width"),
+                    ea.get("accessibility") if ea.get("accessibility") in valid_accessibility_values else None,
+                    ea.get("step_count") if ea.get("step_count") in valid_accessibility_values else None,
+                    ea.get("step_height")if ea.get("step_height") in valid_accessibility_values else None,
+                    ea.get("ramp") if ea.get("ramp") in valid_accessibility_values else None,
+                    ea.get("lift") if ea.get("lift") in valid_accessibility_values else None,
+                    ea.get("entrance_width") if ea.get("entrance_width") in valid_accessibility_values else None,
                     ea.get("door_type")
                 ))
                 
                 ra = p.restroom_accessibility
                 restroom_data.append((
                     p.osm_id,
-                    ra.get("accessibility"),
-                    ra.get("door_width"),
-                    ra.get("room_maneuver"),
-                    ra.get("grab_rails"),
-                    ra.get("sink"),
-                    ra.get("toilet_seat"),
-                    ra.get("emergency_alarm"),
+                    ra.get("accessibility") if ra.get("accessibility") in valid_accessibility_values else None,
+                    ra.get("door_width") if ra.get("door_width") in valid_accessibility_values else None,
+                    ra.get("room_maneuver") if ra.get("room_maneuver") in valid_accessibility_values else None,
+                    ra.get("grab_rails") if ra.get("grab_rails") in valid_accessibility_values else None,
+                    ra.get("sink") if ra.get("sink") in valid_accessibility_values else None,
+                    ra.get("toilet_seat") if ra.get("toilet_seat") in valid_accessibility_values else None,
+                    ra.get("emergency_alarm") if ra.get("emergency_alarm") in valid_accessibility_values else None,
                     ra.get("euro_key")
                 ))
                 
