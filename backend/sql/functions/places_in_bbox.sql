@@ -46,6 +46,7 @@ BEGIN
       'category', p.category,
       'lat', p.lat,
       'lon', p.lon,
+      'region', p.region,
       'last_osm_update', p.last_osm_update,
       'last_user_update', p.last_user_update,
       'created_at', p.created_at,
@@ -70,7 +71,7 @@ BEGIN
     ST_MakeEnvelope(safe_min_lon, safe_min_lat, safe_max_lon, safe_max_lat, 4326)::geography
   )
   LIMIT result_limit;
-  
+
   RETURN result;
 END;
 $$;

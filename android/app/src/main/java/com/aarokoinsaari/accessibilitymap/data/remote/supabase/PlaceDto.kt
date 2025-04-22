@@ -32,6 +32,7 @@ data class PlaceDto(
     val category: String,
     val lat: Double,
     val lon: Double,
+    val region: String,
     @SerialName("last_osm_update") val lastOsmUpdate: String?,
     @SerialName("last_user_update") val lastUserUpdate: String?,
     @SerialName("created_at") val createdAt: String,
@@ -89,6 +90,7 @@ fun PlaceDto.toDomain(): Place =
         category = PlaceCategory.valueOf(category.uppercase()),
         lat = lat,
         lon = lon,
+        region = region,
         email = contact?.email,
         phone = contact?.phone,
         address = contact?.address,
@@ -110,7 +112,10 @@ fun PlaceDto.toDomain(): Place =
         toiletSeat = parseStatus(restroomAccessibility?.toiletSeat),
         emergencyAlarm = parseStatus(restroomAccessibility?.emergencyAlarm),
         sink = parseStatus(restroomAccessibility?.sink),
-        euroKey = restroomAccessibility?.euroKey
+        euroKey = restroomAccessibility?.euroKey,
+        userModified = generalAccessibility?.userModified == true ||
+                entranceAccessibility?.userModified == true ||
+                restroomAccessibility?.userModified == true
     )
 
 private fun parseStatus(value: String?): AccessibilityStatus {

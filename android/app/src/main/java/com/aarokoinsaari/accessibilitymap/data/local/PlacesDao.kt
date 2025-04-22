@@ -56,21 +56,21 @@ interface PlacesDao {
         insertPlaces(placesWithTile)
     }
 
-    @Query("UPDATE places SET generalAccessibility = :status WHERE id = :id")
+    @Query("UPDATE places SET generalAccessibility = :status, userModified = 1 WHERE id = :id")
     suspend fun updatePlaceGeneralAccessibility(id: String, status: String?)
 
     @RawQuery
     suspend fun updateAccessibilityDetail(query: SupportSQLiteQuery): Int
     
     suspend fun updatePlaceAccessibilityDetailString(id: String, columnName: String, newValue: String) {
-        val queryString = "UPDATE places SET $columnName = ? WHERE id = ?"
+        val queryString = "UPDATE places SET $columnName = ?, userModified = 1 WHERE id = ?"
         val args = arrayOf<Any>(newValue, id)
         val query = SimpleSQLiteQuery(queryString, args)
         updateAccessibilityDetail(query)
     }
     
     suspend fun updatePlaceAccessibilityDetailBoolean(id: String, columnName: String, newValue: Boolean) {
-        val queryString = "UPDATE places SET $columnName = ? WHERE id = ?"
+        val queryString = "UPDATE places SET $columnName = ?, userModified = 1 WHERE id = ?"
         val args = arrayOf<Any>(newValue, id)
         val query = SimpleSQLiteQuery(queryString, args)
         updateAccessibilityDetail(query)

@@ -30,6 +30,7 @@ import kotlinx.serialization.Serializable
     indices = [
         Index(value = ["lat", "lon"]),
         Index(value = ["tileId"]),
+        Index(value = ["region"]),
         Index(value = ["category"]),
         Index(value = ["lastVisited"])
     ]
@@ -40,6 +41,7 @@ data class Place(
     val category: PlaceCategory,
     val lat: Double,
     val lon: Double,
+    val region: String? = null,
     val email: String? = null,
     val phone: String? = null,
     val address: String? = null,
@@ -64,7 +66,8 @@ data class Place(
     val euroKey: Boolean? = null,
     val tileId: String? = null,
     val fetchTimestamp: Long = System.currentTimeMillis(),
-    val lastVisited: Long = System.currentTimeMillis()
+    val lastVisited: Long = System.currentTimeMillis(),
+    val userModified: Boolean = false,
 )
 
 enum class PlaceDetailProperty(

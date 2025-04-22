@@ -14,7 +14,7 @@ CREATE TABLE public.places (
   lat DOUBLE PRECISION NOT NULL,
   lon DOUBLE PRECISION NOT NULL,
   geom GEOGRAPHY(Point, 4326),
-  region VARCHAR(50),
+  region VARCHAR(50) NOT NULL,
   last_osm_update TIMESTAMP WITH TIME ZONE DEFAULT now(),
   last_user_update TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now()

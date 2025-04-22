@@ -31,9 +31,8 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import java.util.concurrent.CancellationException
 
-@Suppress("TooGenericExceptionCaught")
 class SupabaseApiService(
-    private val httpClient: HttpClient,
+    private val httpClient: HttpClient
 ) {
     suspend fun fetchPlacesInBBox(
         westLon: Double,
@@ -82,7 +81,12 @@ class SupabaseApiService(
                 header("apikey", BuildConfig.SUPABASE_KEY)
                 header("Authorization", "Bearer ${BuildConfig.SUPABASE_KEY}")
                 contentType(ContentType.Application.Json)
-                setBody(mapOf("accessibility" to status))
+                setBody(
+                    mapOf(
+                        "accessibility" to status,
+                        "user_modified" to true
+                    )
+                )
             }
             Log.d("SupabaseApiService", "Update response status: ${response.status}")
             if (!response.status.isSuccess()) {
@@ -132,7 +136,12 @@ class SupabaseApiService(
                 header("apikey", BuildConfig.SUPABASE_KEY)
                 header("Authorization", "Bearer ${BuildConfig.SUPABASE_KEY}")
                 contentType(ContentType.Application.Json)
-                setBody(mapOf(column to newValue))
+                setBody(
+                    mapOf(
+                        column to newValue,
+                        "user_modified" to true
+                    )
+                )
             }
             Log.d("SupabaseApiService", "Update response status: ${response.status}")
             if (!response.status.isSuccess()) {
