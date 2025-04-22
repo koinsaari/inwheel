@@ -12,7 +12,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - DATA_DIR=/app/data
       - REGION=${REGION:-}
-      - UPDATE_ALL=${UPDATE_ALL:-false}
+      - OVERWRITE=${OVERWRITE:-false}
       - TEST_MODE=${TEST_MODE:-false}
     command: ${ARGS:-}
     restart: 'no'
@@ -20,5 +20,5 @@ services:
       - inwheel-network
 
 networks:
-  map-network:
+  inwheel-network:
     driver: bridge
