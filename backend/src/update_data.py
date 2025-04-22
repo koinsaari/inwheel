@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Aaro Koinsaari
+# Copyright © 2025 Aaro Koinsaari
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -89,9 +89,17 @@ def parse_filtered_pbf(filtered_filename: str, region_name: str) -> List[Place]:
     return handler.places
 
 
+def load_sql(filepath, **kwargs):
+    """Load SQL from file and format with provided parameters"""
+    sql_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'sql')
+    with open(os.path.join(sql_dir, filepath), 'r') as f:
+        sql = f.read()
+    return sql.format(**kwargs)
+
+
 def seed_places(places: List[Place], limit: int = None, overwrite: bool = False):
     """
-    Seed places to database with batching.
+    Seed places to database using staging tables.
     If overwrite is False, places with user_modified flag will not be updated.
     Uses a single transaction for all operations.
     """
@@ -101,179 +109,114 @@ def seed_places(places: List[Place], limit: int = None, overwrite: bool = False)
     if not places:
         print("No places to insert.")
         return
-        
-    BATCH_SIZE = 2000
+    
     total_places = len(places)
-    total_batches = (total_places + BATCH_SIZE - 1) // BATCH_SIZE
     start_time = time.time()
     
-    print(f"Inserting {total_places} places for region {places[0].region} in batches of {BATCH_SIZE}...")
+    print(f"Preparing to insert {total_places} places for region {places[0].region}...")
     
     conn = psycopg.connect(DATABASE_URL)
     try:
         with conn.cursor() as cur:
-            for i in range(0, total_places, BATCH_SIZE):
-                batch = places[i:i+BATCH_SIZE]
-                batch_start = time.time()
+            print("Creating staging tables...")
+            cur.execute(load_sql("operations/staging/create_staging_tables.sql"))
+            
+            # Prepare data for bulk insert
+            print("Preparing data for bulk insert...")
+            places_data = []
+            general_data = []
+            entrance_data = []
+            restroom_data = []
+            contact_data = []
+            
+            for p in places:
+                places_data.append((
+                    p.osm_id,
+                    p.name,
+                    p.category,
+                    p.lat,
+                    p.lon,
+                    p.region
+                ))
                 
-                print(f"Processing batch {i//BATCH_SIZE + 1}/{total_batches} ({len(batch)} places)")
+                ga = p.general_accessibility
+                general_data.append((
+                    p.osm_id,
+                    ga.get("accessibility"),
+                    ga.get("indoor_accessibility"),
+                    ga.get("additional_info")[:1000] if ga.get("additional_info") else None
+                ))
                 
-                places_sql = """
-                INSERT INTO public.places (
-                osm_id, name, category, lat, lon, geom, region, last_osm_update
-                )
-                VALUES (%s, %s, %s, %s, %s, ST_SetSRID(ST_MakePoint(%s, %s),4326), %s, now())
-                ON CONFLICT (osm_id) DO UPDATE SET
-                  name = EXCLUDED.name,
-                  category = EXCLUDED.category,
-                  lat = EXCLUDED.lat,
-                  lon = EXCLUDED.lon,
-                  geom = EXCLUDED.geom,
-                  region = EXCLUDED.region,
-                  last_osm_update = now()
-                """
+                ea = p.entrance_accessibility
+                entrance_data.append((
+                    p.osm_id,
+                    ea.get("accessibility"),
+                    ea.get("step_count"),
+                    ea.get("step_height"),
+                    ea.get("ramp"),
+                    ea.get("lift"),
+                    ea.get("entrance_width"),
+                    ea.get("door_type")
+                ))
                 
-                place_values = [
-                    (
-                        p.osm_id,
-                        p.name,
-                        p.category,
-                        p.lat, p.lon,
-                        p.lon, p.lat,
-                        p.region,
-                    )
-                    for p in batch
-                ]
-                cur.executemany(places_sql, place_values)
+                ra = p.restroom_accessibility
+                restroom_data.append((
+                    p.osm_id,
+                    ra.get("accessibility"),
+                    ra.get("door_width"),
+                    ra.get("room_maneuver"),
+                    ra.get("grab_rails"),
+                    ra.get("sink"),
+                    ra.get("toilet_seat"),
+                    ra.get("emergency_alarm"),
+                    ra.get("euro_key")
+                ))
                 
-                ga_sql = """
-                INSERT INTO public.general_accessibility (place_id, accessibility, indoor_accessibility, additional_info)
-                SELECT id, %s, %s, %s FROM public.places WHERE osm_id = %s
-                ON CONFLICT (place_id) DO UPDATE SET 
-                  accessibility = CASE WHEN general_accessibility.user_modified AND NOT %s THEN general_accessibility.accessibility ELSE EXCLUDED.accessibility END,
-                  indoor_accessibility = CASE WHEN general_accessibility.user_modified AND NOT %s THEN general_accessibility.indoor_accessibility ELSE EXCLUDED.indoor_accessibility END,
-                  additional_info = CASE WHEN general_accessibility.user_modified AND NOT %s THEN general_accessibility.additional_info ELSE EXCLUDED.additional_info END
-                """
-                
-                ea_sql = """
-                INSERT INTO public.entrance_accessibility (
-                  place_id, accessibility, step_count, step_height, ramp, lift, entrance_width, door_type
-                )
-                SELECT id, %s, %s, %s, %s, %s, %s, %s FROM public.places WHERE osm_id = %s
-                ON CONFLICT (place_id) DO UPDATE SET
-                  accessibility = CASE WHEN entrance_accessibility.user_modified AND NOT %s THEN entrance_accessibility.accessibility ELSE EXCLUDED.accessibility END,
-                  step_count = CASE WHEN entrance_accessibility.user_modified AND NOT %s THEN entrance_accessibility.step_count ELSE EXCLUDED.step_count END,
-                  step_height = CASE WHEN entrance_accessibility.user_modified AND NOT %s THEN entrance_accessibility.step_height ELSE EXCLUDED.step_height END,
-                  ramp = CASE WHEN entrance_accessibility.user_modified AND NOT %s THEN entrance_accessibility.ramp ELSE EXCLUDED.ramp END,
-                  lift = CASE WHEN entrance_accessibility.user_modified AND NOT %s THEN entrance_accessibility.lift ELSE EXCLUDED.lift END,
-                  entrance_width = CASE WHEN entrance_accessibility.user_modified AND NOT %s THEN entrance_accessibility.entrance_width ELSE EXCLUDED.entrance_width END,
-                  door_type = CASE WHEN entrance_accessibility.user_modified AND NOT %s THEN entrance_accessibility.door_type ELSE EXCLUDED.door_type END
-                """
-                
-                ra_sql = """
-                INSERT INTO public.restroom_accessibility (
-                  place_id, accessibility, door_width, room_maneuver, grab_rails,
-                  sink, toilet_seat, emergency_alarm, euro_key
-                )
-                SELECT id, %s, %s, %s, %s, %s, %s, %s, %s FROM public.places WHERE osm_id = %s
-                ON CONFLICT (place_id) DO UPDATE SET
-                  accessibility = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.accessibility ELSE EXCLUDED.accessibility END,
-                  door_width = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.door_width ELSE EXCLUDED.door_width END,
-                  room_maneuver = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.room_maneuver ELSE EXCLUDED.room_maneuver END,
-                  grab_rails = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.grab_rails ELSE EXCLUDED.grab_rails END,
-                  sink = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.sink ELSE EXCLUDED.sink END,
-                  toilet_seat = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.toilet_seat ELSE EXCLUDED.toilet_seat END,
-                  emergency_alarm = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.emergency_alarm ELSE EXCLUDED.emergency_alarm END,
-                  euro_key = CASE WHEN restroom_accessibility.user_modified AND NOT %s THEN restroom_accessibility.euro_key ELSE EXCLUDED.euro_key END
-                """
-                
-                contact_sql = """
-                INSERT INTO public.contact (place_id, phone, website, email, address)
-                SELECT id, %s, %s, %s, %s FROM public.places WHERE osm_id = %s
-                ON CONFLICT (place_id) DO UPDATE SET 
-                  phone = EXCLUDED.phone,
-                  website = EXCLUDED.website,
-                  email = EXCLUDED.email,
-                  address = EXCLUDED.address
-                """
-                
-                for p in batch:
-                    ga = p.general_accessibility
-                    cur.execute(
-                        ga_sql,
-                        (
-                            ga.get("accessibility"),
-                            ga.get("indoor_accessibility"),
-                            ga.get("additional_info")[:1000] if ga.get("additional_info") else None,
-                            p.osm_id,
-                            overwrite,
-                            overwrite,
-                            overwrite
-                        )
-                    )
-                    
-                    ea = p.entrance_accessibility
-                    cur.execute(
-                        ea_sql,
-                        (
-                            ea.get("accessibility"),
-                            ea.get("step_count"),
-                            ea.get("step_height"),
-                            ea.get("ramp"),
-                            ea.get("lift"),
-                            ea.get("entrance_width"),
-                            ea.get("door_type"),
-                            p.osm_id,
-                            overwrite,
-                            overwrite,
-                            overwrite,
-                            overwrite,
-                            overwrite,
-                            overwrite,
-                            overwrite
-                        )
-                    )
-                    
-                    ra = p.restroom_accessibility
-                    cur.execute(
-                        ra_sql,
-                        (
-                            ra.get("accessibility"),
-                            ra.get("door_width"),
-                            ra.get("room_maneuver"),
-                            ra.get("grab_rails"),
-                            ra.get("sink"),
-                            ra.get("toilet_seat"),
-                            ra.get("emergency_alarm"),
-                            ra.get("euro_key"),
-                            p.osm_id,
-                            overwrite,
-                            overwrite,
-                            overwrite,
-                            overwrite,
-                            overwrite,
-                            overwrite,
-                            overwrite,
-                            overwrite
-                        )
-                    )
-
-                    cur.execute(
-                        contact_sql,
-                        (
-                            p.contact.get("phone"),
-                            p.contact.get("website"),
-                            p.contact.get("email"),
-                            p.contact.get("address"),
-                            p.osm_id
-                        )
-                    )
-
-                batch_time = time.time() - batch_start
-                print(f"Batch {i//BATCH_SIZE + 1} complete: {len(batch)} places inserted in {batch_time:.2f}s ({len(batch)/batch_time:.1f} places/s)")
+                contact_data.append((
+                    p.osm_id,
+                    p.contact.get("phone"),
+                    p.contact.get("website"),
+                    p.contact.get("email"),
+                    p.contact.get("address")
+                ))
+            
+            print("Bulk inserting into staging tables...")
+            stage_start = time.time()
+            
+            cur.executemany(load_sql("operations/staging/insert_staging_places.sql"), places_data)
+            cur.executemany(load_sql("operations/staging/insert_staging_ga.sql"), general_data)
+            cur.executemany(load_sql("operations/staging/insert_staging_ea.sql"), entrance_data)
+            cur.executemany(load_sql("operations/staging/insert_staging_ra.sql"), restroom_data)
+            cur.executemany(load_sql("operations/staging/insert_staging_contact.sql"), contact_data)
+            
+            stage_time = time.time() - stage_start
+            print(f"Staging tables populated in {stage_time:.2f}s")
+            
+            # Merge from staging tables to main tables
+            print("Merging data from staging tables to main tables...")
+            merge_start = time.time()
+            
+            print("Updating places...")
+            cur.execute(load_sql("operations/insert_places.sql"))
+            overwrite_clause = "TRUE" if overwrite else "FALSE"
+            
+            print("Updating general accessibility...")
+            cur.execute(load_sql("operations/insert_ga.sql", overwrite=overwrite_clause))
+            
+            print("Updating entrance accessibility...")
+            cur.execute(load_sql("operations/insert_ea.sql", overwrite=overwrite_clause))
+            
+            print("Updating restroom accessibility...")
+            cur.execute(load_sql("operations/insert_ra.sql", overwrite=overwrite_clause))
+            
+            print("Updating contact information...")
+            cur.execute(load_sql("operations/insert_contact.sql"))
+            
+            merge_time = time.time() - merge_start
+            print(f"Merge completed in {merge_time:.2f}s")
             
             conn.commit()
-            print(f"Committing all changes.")
+            print("Committing all changes.")
             
     except Exception as e:
         conn.rollback()
@@ -284,15 +227,6 @@ def seed_places(places: List[Place], limit: int = None, overwrite: bool = False)
     
     total_time = time.time() - start_time
     print(f"Seeding done. {total_places} places seeded for region {places[0].region} in {total_time:.2f}s ({total_places/total_time:.1f} places/s)")
-
-
-def process_region(region: Dict, overwrite: bool = False):
-    """Process a single region from download to database insert"""
-    pbf_filename = download_pbf(region)
-    filtered_filename = filter_pbf(pbf_filename)
-    places = parse_filtered_pbf(filtered_filename, region['name'])
-    seed_places(places, overwrite=overwrite)
-    return len(places)
 
 
 def main():

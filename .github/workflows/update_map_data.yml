@@ -1,5 +1,6 @@
-# Copyright (c) 2025 Aaro Koinsaari
+# Copyright © 2025 Aaro Koinsaari
 # Licensed under the Apache License, Version 2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 
 name: Update Map Data
 
@@ -37,7 +38,7 @@ concurrency:
 jobs:
   update-data:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 60
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

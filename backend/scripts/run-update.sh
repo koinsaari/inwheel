@@ -1,6 +1,7 @@
 #!/bin/bash
-# Copyright (c) 2025 Aaro Koinsaari
+# Copyright © 2025 Aaro Koinsaari
 # Licensed under the Apache License, Version 2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 
 set -e
 mkdir -p ./backend/data

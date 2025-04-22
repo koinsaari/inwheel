@@ -1,3 +1,7 @@
+-- Copyright © 2025 Aaro Koinsaari
+-- Licensed under the Apache License, Version 2.0
+-- http://www.apache.org/licenses/LICENSE-2.0
+
 ALTER TABLE public.places ENABLE ROW LEVEL SECURITY;
 CREATE POLICY select_places ON public.places FOR SELECT USING (true);
 CREATE POLICY update_places ON public.places FOR UPDATE 

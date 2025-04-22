@@ -1,3 +1,7 @@
+-- Copyright © 2025 Aaro Koinsaari
+-- Licensed under the Apache License, Version 2.0
+-- http://www.apache.org/licenses/LICENSE-2.0
+
 CREATE OR REPLACE FUNCTION places_in_bbox(
   min_lon float8, min_lat float8,
   max_lon float8, max_lat float8

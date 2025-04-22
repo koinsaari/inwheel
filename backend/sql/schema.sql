@@ -1,3 +1,7 @@
+-- Copyright © 2025 Aaro Koinsaari
+-- Licensed under the Apache License, Version 2.0
+-- http://www.apache.org/licenses/LICENSE-2.0
+
 CREATE EXTENSION IF NOT EXISTS postgis;
 
 CREATE TYPE ACCESSIBILITY_STATUS AS ENUM ('FULLY_ACCESSIBLE', 'PARTIALLY_ACCESSIBLE', 'NOT_ACCESSIBLE');
