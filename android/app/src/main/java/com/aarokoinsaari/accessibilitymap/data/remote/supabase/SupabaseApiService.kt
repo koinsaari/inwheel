@@ -73,24 +73,39 @@ class SupabaseApiService(
         }
     }
 
+    /**
+     * Updates the general accessibility status for a place and marks it as user-modified.
+     *
+     * Makes two separate API calls: one to update the property value and another to set
+     * the user_modified flag. This approach works around Kotlin serialization limitations
+     * that prevent mixing different value types (like String and Boolean) in a single map.
+     *
+     * TODO: Consider implementing a database function that handles both updates in a single transaction.
+     *
+     * @param placeId The unique identifier of the place to update
+     * @param status The new accessibility status to set (one of the AccessibilityStatus values)
+     */
     suspend fun updatePlaceGeneralAccessibility(placeId: String, status: String?) {
         val url = "${BuildConfig.SUPABASE_URL}/rest/v1/general_accessibility?place_id=eq.$placeId"
         Log.d("SupabaseApiService", "Status: $status")
         try {
-            val response: HttpResponse = httpClient.patch(url) {
+            val response1: HttpResponse = httpClient.patch(url) {
                 header("apikey", BuildConfig.SUPABASE_KEY)
                 header("Authorization", "Bearer ${BuildConfig.SUPABASE_KEY}")
                 contentType(ContentType.Application.Json)
-                setBody(
-                    mapOf(
-                        "accessibility" to status,
-                        "user_modified" to true
-                    )
-                )
+                setBody(mapOf("accessibility" to status))
             }
-            Log.d("SupabaseApiService", "Update response status: ${response.status}")
-            if (!response.status.isSuccess()) {
-                Log.e("SupabaseApiService", "Error updating place: ${response.status}")
+            
+            val response2: HttpResponse = httpClient.patch(url) {
+                header("apikey", BuildConfig.SUPABASE_KEY)
+                header("Authorization", "Bearer ${BuildConfig.SUPABASE_KEY}")
+                contentType(ContentType.Application.Json)
+                setBody(mapOf("user_modified" to true))
+            }
+            
+            Log.d("SupabaseApiService", "Update response status: ${response1.status}, ${response2.status}")
+            if (!response1.status.isSuccess() || !response2.status.isSuccess()) {
+                Log.e("SupabaseApiService", "Error updating place: ${response1.status}, ${response2.status}")
             }
         } catch (e: CancellationException) {
             Log.d("SupabaseApiService", "Request was cancelled $e")
@@ -99,12 +114,61 @@ class SupabaseApiService(
         }
     }
 
+    /**
+     * Updates a specific accessibility property for a place and marks it as user-modified.
+     *
+     * Makes two separate API calls: one to update the property value and another to set
+     * the user_modified flag. This way we work around Kotlin serialization limitations
+     * that prevent mixing different value types (like String and Boolean) in a single map.
+     *
+     * TODO: Consider implementing a database function that handles both updates in a single transaction.
+     *
+     * @param placeId The ID of the place to update
+     * @param property The accessibility property to update
+     * @param newValue The new value for the property
+     */
     suspend fun updatePlaceAccessibilityDetail(
         placeId: String,
         property: PlaceDetailProperty,
         newValue: Any?,
     ) {
-        val (table, column) = when (property) {
+        val (table, column) = mapPropertyToTableAndColumn(property)
+
+        val url = "${BuildConfig.SUPABASE_URL}/rest/v1/$table?place_id=eq.$placeId"
+        try {
+            val response1: HttpResponse = httpClient.patch(url) {
+                header("apikey", BuildConfig.SUPABASE_KEY)
+                header("Authorization", "Bearer ${BuildConfig.SUPABASE_KEY}")
+                contentType(ContentType.Application.Json)
+                setBody(mapOf(column to newValue))
+            }
+            
+            val response2: HttpResponse = httpClient.patch(url) {
+                header("apikey", BuildConfig.SUPABASE_KEY)
+                header("Authorization", "Bearer ${BuildConfig.SUPABASE_KEY}")
+                contentType(ContentType.Application.Json)
+                setBody(mapOf("user_modified" to true))
+            }
+            
+            Log.d("SupabaseApiService", "Update response status: ${response1.status}, ${response2.status}")
+            if (!response1.status.isSuccess() || !response2.status.isSuccess()) {
+                Log.e("SupabaseApiService", "Error updating place: ${response1.status}, ${response2.status}")
+            }
+        } catch (e: CancellationException) {
+            Log.d("SupabaseApiService", "Request was cancelled $e")
+        } catch (e: Exception) {
+            Log.e("SupabaseApiService", "Error updating place: $e")
+        }
+    }
+
+    /**
+     * Maps a PlaceDetailProperty to its corresponding database table and column.
+     * 
+     * This helper function centralizes the mapping logic to make the main function
+     * more readable and maintainable.
+     */
+    private fun mapPropertyToTableAndColumn(property: PlaceDetailProperty): Pair<String, String> {
+        return when (property) {
             // General accessibility table
             PlaceDetailProperty.GENERAL_ACCESSIBILITY -> "general_accessibility" to "accessibility"
             PlaceDetailProperty.INDOOR_ACCESSIBILITY -> "general_accessibility" to "indoor_accessibility"
@@ -129,29 +193,5 @@ class SupabaseApiService(
             PlaceDetailProperty.EMERGENCY_ALARM -> "restroom_accessibility" to "emergency_alarm"
             PlaceDetailProperty.EURO_KEY -> "restroom_accessibility" to "euro_key"
         }
-
-        val url = "${BuildConfig.SUPABASE_URL}/rest/v1/$table?place_id=eq.$placeId"
-        try {
-            val response: HttpResponse = httpClient.patch(url) {
-                header("apikey", BuildConfig.SUPABASE_KEY)
-                header("Authorization", "Bearer ${BuildConfig.SUPABASE_KEY}")
-                contentType(ContentType.Application.Json)
-                setBody(
-                    mapOf(
-                        column to newValue,
-                        "user_modified" to true
-                    )
-                )
-            }
-            Log.d("SupabaseApiService", "Update response status: ${response.status}")
-            if (!response.status.isSuccess()) {
-                Log.e("SupabaseApiService", "Error updating place: ${response.status}")
-            }
-        } catch (e: CancellationException) {
-            Log.d("SupabaseApiService", "Request was cancelled $e")
-        } catch (e: Exception) {
-            Log.e("SupabaseApiService", "Error updating place: $e")
-        }
     }
-
 }
