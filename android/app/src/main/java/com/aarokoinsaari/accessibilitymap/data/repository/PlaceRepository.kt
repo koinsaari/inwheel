@@ -41,6 +41,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.io.IOException
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 
 class PlaceRepository(
     private val api: SupabaseApiService,
@@ -184,24 +185,33 @@ class PlaceRepository(
             lastFetchTime == null || System.currentTimeMillis() - lastFetchTime > CACHE_EXPIRY_MS
         }
 
-        Log.d(
-            "PlaceRepository",
-            "Fetching ${tilesToFetch.size}/${allTiles.size} tiles for visible region"
-        )
+        Log.d("PlaceRepository", "Fetching ${tilesToFetch.size}/${allTiles.size} tiles for visible region")
 
-        tilesToFetch.map { tileId ->
-            async {
-                try {
-                    requestSemaphore.withPermit {
-                        fetchTile(tileId)
+        try {
+            tilesToFetch.map { tileId ->
+                async {
+                    try {
+                        requestSemaphore.withPermit {
+                            fetchTile(tileId)
+                        }
+                    } catch (e: Exception) {
+                        when (e) {
+                            is CancellationException -> {
+                                Log.d("PlaceRepository", "Cancelled fetch for tile $tileId")
+                            }
+                            else -> {
+                                Log.e("PlaceRepository", "Failed to fetch tile $tileId: ${e.message}")
+                                // Still mark the tile as partially fetched to avoid repeated failures
+                                loadedTiles[tileId] = System.currentTimeMillis() - (CACHE_EXPIRY_MS * 3 / 4)
+                            }
+                        }
                     }
-                } catch (e: Exception) {
-                    Log.e("PlaceRepository", "Failed to fetch tile $tileId: ${e.message}")
-                    // Still mark the tile as partially fetched to avoid repeated failures
-                    loadedTiles[tileId] = System.currentTimeMillis() - (CACHE_EXPIRY_MS * 3 / 4)
                 }
-            }
-        }.awaitAll()
+            }.awaitAll()
+        } catch (e: CancellationException) {
+            Log.d("PlaceRepository", "Fetch operation was cancelled")
+            throw e
+        }
 
         Log.d("PlaceRepository", "Completed fetching ${tilesToFetch.size} tiles")
     }
@@ -323,25 +333,20 @@ class PlaceRepository(
 
                 Log.d("PlaceRepository", "Tile $tileId fetched ${places.size} places")
                 return
+            } catch (e: CancellationException) {
+                Log.d("PlaceRepository", "Fetch for tile $tileId was cancelled")
+                throw e
             } catch (e: IOException) {
                 retryCount++
-                Log.e(
-                    "PlaceRepository",
-                    "Network error on tile $tileId (retry $retryCount/$maxRetries): ${e.message}"
-                )
-                delay(1000L * retryCount) // Wait a bit longer each time
+                Log.e("PlaceRepository", "Network error on tile $tileId (retry $retryCount/$maxRetries): ${e.message}")
+                delay(1000L * retryCount)
             } catch (e: Exception) {
-                Log.e(
-                    "PlaceRepository",
-                    "Failed to fetch tile $tileId: ${e.javaClass.simpleName}: ${e.message}"
-                )
-                // Set partial expiry to trigger a retry sooner than normal
+                Log.e("PlaceRepository", "Failed to fetch tile $tileId: ${e.javaClass.simpleName}: ${e.message}")
                 loadedTiles[tileId] = System.currentTimeMillis() - (CACHE_EXPIRY_MS * 3 / 4)
                 return
             }
         }
 
-        // All retries failed, mark with partial expiry
         loadedTiles[tileId] = System.currentTimeMillis() - (CACHE_EXPIRY_MS / 2)
         Log.e("PlaceRepository", "Abandoned tile $tileId after $maxRetries failed attempts")
     }

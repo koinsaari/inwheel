@@ -161,9 +161,16 @@ class MapViewModel(
     }
 
     private fun handleMove(intent: MapIntent.MoveMap) {
+        if (intent.zoomLevel >= ZOOM_THRESHOLD) {
+            val currentBounds = _state.value.snapshotBounds
+            if (currentBounds == null || !currentBounds.contains(intent.center)) {
+                _state.update { it.copy(isLoading = true) }
+            }
+        }
+
         moveJob?.cancel()
         moveJob = viewModelScope.launch {
-            delay(DEBOUNCE_VALUE)
+            delay(if (_state.value.snapshotBounds == null) INITIAL_DEBOUNCE_VALUE else DEBOUNCE_VALUE)
 
             if (intent.zoomLevel < ZOOM_THRESHOLD) {
                 Log.d("MapViewModel", "Skipping fetch, zoom level too low")
@@ -174,8 +181,6 @@ class MapViewModel(
             val smallSnapshotBounds = _state.value.snapshotBounds
             if (smallSnapshotBounds == null || !smallSnapshotBounds.contains(intent.center)) {
                 Log.d("MapViewModel", "Center moved outside snapshot bounds, fetching new data")
-
-                _state.update { it.copy(isLoading = true) }
 
                 try {
                     val newSmallSnapshotBounds = intent.bounds
@@ -193,8 +198,12 @@ class MapViewModel(
                         )
                     }
                     Log.d("MapViewModel", "State after move: ${_state.value}")
+                    
+                    // Add a minimum loading time to give feedback to the user
+                    delay(MINIMUM_LOADING_DISPLAY_TIME)
                 } catch (e: Exception) {
                     Log.e("MapViewModel", "Error fetching places: ${e.message}")
+                    delay(MINIMUM_LOADING_DISPLAY_TIME)
                 } finally {
                     _state.update { it.copy(isLoading = false) }
                 }
@@ -271,6 +280,8 @@ class MapViewModel(
 
     companion object {
         private const val DEBOUNCE_VALUE = 200L
+        private const val INITIAL_DEBOUNCE_VALUE = 500L
         private const val ZOOM_THRESHOLD = 12
+        private const val MINIMUM_LOADING_DISPLAY_TIME = 800L
     }
 }
