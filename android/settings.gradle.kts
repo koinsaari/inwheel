@@ -20,5 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Accessibility Map"
+rootProject.name = "InWheel"
 include(":app")

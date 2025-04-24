@@ -4,31 +4,24 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.ksp)
     alias(libs.plugins.secrets.gradle.plugin)
-    id("io.gitlab.arturbosch.detekt").version("1.23.7")
-    id("com.github.jk1.dependency-license-report").version("2.9")
-    kotlin("plugin.serialization").version("2.0.0")
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.dependency.license.report)
 }
 
 android {
-    namespace = "com.aarokoinsaari.accessibilitymap"
+    namespace = "com.aarokoinsaari.inwheel"
     compileSdk = 35
 
-    buildFeatures {
-        buildConfig = true
-    }
-
     defaultConfig {
-        applicationId = "com.aarokoinsaari.accessibilitymap"
+        applicationId = "com.aarokoinsaari.inwheel"
         minSdk = 29
         targetSdk = 35
         versionCode = 5
         versionName = "0.0.5d"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
-
+        
         buildConfigField("String", "SUPABASE_URL", "\"${project.findProperty("SUPABASE_URL")}\"")
         buildConfigField("String", "SUPABASE_KEY", "\"${project.findProperty("SUPABASE_KEY")}\"")
     }
@@ -51,19 +44,25 @@ android {
             )
         }
     }
+    
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    
     kotlinOptions {
         jvmTarget = "17"
     }
+    
     buildFeatures {
         compose = true
+        buildConfig = true
     }
+    
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
+    
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -76,30 +75,29 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.runtime)
+    implementation(libs.androidx.navigation.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.play.services.maps)
     implementation(libs.androidx.material.icons.extended)
-    implementation(libs.maps.utils.ktx)
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
     implementation(libs.maps.compose)
     implementation(libs.maps.compose.utils)
-    implementation(libs.maps.compose.widgets)
-    implementation(libs.android.maps.utils)
-    implementation(libs.logging.interceptor)
+    implementation(libs.maps.utils)
+    implementation(libs.maps.utils.ktx)
     implementation(libs.androidx.room.ktx)
-    implementation(libs.accompanist.permissions)
-    implementation(libs.play.services.location)
-    implementation(platform("io.github.jan-tennert.supabase:bom:3.0.3"))
-    implementation("io.github.jan-tennert.supabase:postgrest-kt")
-    implementation(libs.ktor.client.android)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.ktor.client.android)
+    implementation(libs.okhttp.logging.interceptor)
+    implementation(platform(libs.supabase.bom))
+    implementation(libs.supabase.postgrest)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
     implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.accompanist.permissions)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -115,7 +113,7 @@ secrets {
 }
 
 detekt {
-    toolVersion = "1.23.7"
+    toolVersion = libs.versions.detekt.get()
     buildUponDefaultConfig = true
 }
 

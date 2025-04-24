@@ -1,6 +1,6 @@
 <resources>
     <!-- App Name -->
-    <string name="app_name">Accessibility Map</string>
+    <string name="app_name">InWheel</string>
 
     <!-- Emojis -->
     <string name="emoji_checkmark">✅</string>
