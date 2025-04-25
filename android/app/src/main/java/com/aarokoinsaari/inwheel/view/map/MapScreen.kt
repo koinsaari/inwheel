@@ -206,6 +206,7 @@ fun MapScreen(
                             )
                         }
                     },
+                    isSearching = state.isSearching,
                     modifier = Modifier
                         .fillMaxWidth()
                         .zIndex(1f)

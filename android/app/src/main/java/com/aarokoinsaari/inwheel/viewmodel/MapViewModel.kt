@@ -52,6 +52,7 @@ class MapViewModel(
 
     private val cachedClusterItems = mutableSetOf<PlaceClusterItem>()
     private var moveJob: Job? = null
+    private var searchJob: Job? = null
 
     private var cachedPlaces: Set<Place> = emptySet()
 
@@ -61,7 +62,7 @@ class MapViewModel(
             _state.map { it.searchQuery }
                 .distinctUntilChanged()
                 .collect { query ->
-                    if (query.isNotBlank()) {
+                    if (query.isNotBlank() && query.length >= 3) {
                         applySearch(query)
                     }
                 }
@@ -238,16 +239,48 @@ class MapViewModel(
     }
 
     private fun applySearch(query: String) {
-        val filtered = if (query.isBlank()) {
-            emptyList()
-        } else {
-            cachedPlaces.filter { place ->
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            if (query.isBlank() || query.length < 3) {
+                _state.update { it.copy(filteredPlaces = emptyList(), isSearching = false) }
+                return@launch
+            }
+            _state.update { it.copy(isSearching = true) }
+            
+            val cachedResults = cachedPlaces.filter { place ->
                 place.name.contains(query, ignoreCase = true) &&
                         place.name != place.category.rawValue
             }
+            
+            if (cachedResults.isNotEmpty()) {
+                Log.d("MapViewModel", "Found ${cachedResults.size} places in cache matching query")
+                _state.update { it.copy(filteredPlaces = cachedResults, isSearching = false) }
+                return@launch
+            }
+            
+            Log.d("MapViewModel", "No cached results, searching Room...")
+            _state.update { it.copy(isSearching = true) }
+            
+            try {
+                val databaseResults = repository.searchPlacesInRoom("%$query%")
+                if (databaseResults.isNotEmpty()) {
+                    Log.d("MapViewModel", "Found ${databaseResults.size} places in database matching query")
+                    _state.update { it.copy(filteredPlaces = databaseResults, isSearching = false) }
+                    return@launch
+                }
+                
+                Log.d("MapViewModel", "No database results, searching API...")
+                delay(500) // Small delay to show loading state and avoid flooding API
+                
+                val apiResults = repository.searchPlacesViaApi(query)
+                Log.d("MapViewModel", "Found ${apiResults.size} places via API matching query")
+                
+                _state.update { it.copy(filteredPlaces = apiResults, isSearching = false) }
+            } catch (e: Exception) {
+                Log.e("MapViewModel", "Error searching places: ${e.message}")
+                _state.update { it.copy(isSearching = false) }
+            }
         }
-        Log.d("MapViewModel", "Found ${filtered.size} places matching query")
-        _state.update { it.copy(filteredPlaces = filtered) }
     }
 
     private fun handleToggleFilter(category: PlaceCategory) {

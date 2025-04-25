@@ -216,6 +216,28 @@ class PlaceRepository(
         Log.d("PlaceRepository", "Completed fetching ${tilesToFetch.size} tiles")
     }
 
+    suspend fun searchPlacesInRoom(query: String): List<Place> = withContext(dispatcher) {
+        dao.searchPlacesByName(query)
+    }
+
+    suspend fun searchPlacesViaApi(query: String): List<Place> = withContext(dispatcher) {
+        try {
+            requestSemaphore.withPermit {
+                val results = api.searchPlaces(query).map { it.toDomain() }
+
+                // Cache results in the database
+                if (results.isNotEmpty()) {
+                    dao.insertPlaces(results)
+                    Log.d("PlaceRepository", "Cached ${results.size} places from API search")
+                }
+                results
+            }
+        } catch (e: Exception) {
+            Log.e("PlaceRepository", "API search error: ${e.message}")
+            emptyList()
+        }
+    }
+
     /**
      * Converts map bounds to a collection of tile IDs that cover the visible region.
      *

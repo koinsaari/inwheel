@@ -47,6 +47,9 @@ interface PlacesDao {
     @Query("SELECT * FROM places WHERE tileId IN (:tileIds) AND fetchTimestamp > :minTimestamp")
     fun getPlacesInTiles(tileIds: List<String>, minTimestamp: Long): Flow<List<Place>>
 
+    @Query("SELECT * FROM places WHERE name LIKE :searchQuery LIMIT 50")
+    suspend fun searchPlacesByName(searchQuery: String): List<Place>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlaces(places: List<Place>)
     

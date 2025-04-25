@@ -33,6 +33,7 @@ data class MapState(
     val filteredPlaces: List<Place> = emptyList(),
     val searchQuery: String = "",
     val isLoading: Boolean = false,
+    val isSearching: Boolean = false,
     val locationPermissionGranted: Boolean = false,
     val errorState: ErrorState = ErrorState.None,
     val userLocation: LatLng? = null
@@ -51,6 +52,7 @@ data class MapState(
                 filteredPlaces=${filteredPlaces.size},
                 searchQuery='$searchQuery',
                 isLoading=$isLoading,
+                isSearching=$isSearching,
                 locationPermissionGranted=$locationPermissionGranted,
                 errorState=$errorState
                 userLocation=$userLocation

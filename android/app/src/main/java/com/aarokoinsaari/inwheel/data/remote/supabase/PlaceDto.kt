@@ -53,8 +53,8 @@ data class ContactDto(
 @Serializable
 data class GeneralAccessibilityDto(
     val accessibility: String?,
-    @SerialName("indoor_accessibility") val indoorAccessibility: String?,
-    @SerialName("additional_info") val additionalInfo: String?,
+    @SerialName("indoor_accessibility") val indoorAccessibility: String? = null,
+    @SerialName("additional_info") val additionalInfo: String? = null,
     @SerialName("user_modified") val userModified: Boolean? = false,
 )
 

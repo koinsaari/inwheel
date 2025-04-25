@@ -24,6 +24,8 @@ import io.ktor.client.call.body
 import io.ktor.client.request.header
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
@@ -163,6 +165,36 @@ class SupabaseApiService(
             Log.d("SupabaseApiService", "Request was cancelled $e")
         } catch (e: Exception) {
             Log.e("SupabaseApiService", "Error updating place: $e")
+        }
+    }
+
+    /**
+     * Searches for places by name globally.
+     */
+    suspend fun searchPlaces(query: String): List<SearchResultDto> {
+        val endpoint = "$supabaseUrl/rest/v1/places"
+        return try {
+            val response = httpClient.get(endpoint) {
+                header("apikey", supabaseKey)
+                header("Authorization", "Bearer $supabaseKey")
+                parameter("select",
+                    "id,name,category,lat,lon,region," +
+                            "contact(address)," +
+                            "general_accessibility(accessibility)"
+                )
+                parameter("name", "ilike.*$query*")
+                parameter("limit", "50")
+            }
+            
+            if (response.status.isSuccess()) {
+                response.body<List<SearchResultDto>>()
+            } else {
+                Log.d("SupabaseApiService", "Global search response status: ${response.status}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("SupabaseApiService", "Search error: ${e.message}", e)
+            emptyList()
         }
     }
 

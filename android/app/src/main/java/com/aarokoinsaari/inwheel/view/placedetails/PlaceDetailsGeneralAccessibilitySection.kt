@@ -60,6 +60,8 @@ import com.aarokoinsaari.inwheel.domain.model.AccessibilityStatus.PARTIALLY_ACCE
 import com.aarokoinsaari.inwheel.domain.model.AccessibilityStatus.UNKNOWN
 import com.aarokoinsaari.inwheel.domain.model.Place
 import com.aarokoinsaari.inwheel.domain.model.PlaceDetailProperty
+import com.aarokoinsaari.inwheel.view.utils.getAccessibilityStatusContentDescStringRes
+import com.aarokoinsaari.inwheel.view.utils.getAccessibilityStatusDrawableRes
 
 @Composable
 fun PlaceDetailsGeneralAccessibilitySection(
@@ -582,20 +584,4 @@ private fun AccessibilityStatus?.getRestroomAccessibilityStringRes(): Int =
         PARTIALLY_ACCESSIBLE -> R.string.restroom_partially_accessible_status_label
         NOT_ACCESSIBLE -> R.string.restroom_not_accessible_status_label
         else -> R.string.restroom_unknown_label
-    }
-
-private fun AccessibilityStatus?.getAccessibilityStatusContentDescStringRes(): Int =
-    when (this) {
-        FULLY_ACCESSIBLE -> R.string.content_desc_fully_accessible
-        PARTIALLY_ACCESSIBLE -> R.string.content_desc_partially_accessible
-        NOT_ACCESSIBLE -> R.string.content_desc_not_accessible
-        else -> R.string.content_desc_unknown_accessibility
-    }
-
-private fun AccessibilityStatus?.getAccessibilityStatusDrawableRes(): Int =
-    when (this) {
-        FULLY_ACCESSIBLE -> R.drawable.accessibility_status_green
-        PARTIALLY_ACCESSIBLE -> R.drawable.accessibility_status_yellow
-        NOT_ACCESSIBLE -> R.drawable.accessibility_status_red
-        else -> R.drawable.accessibility_status_grey
     }

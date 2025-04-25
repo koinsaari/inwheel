@@ -32,10 +32,12 @@
     <string name="content_desc_filter_category_icon">Icon for %1$s category</string>
     <string name="content_desc_filter_menu">Show all category filters</string>
     <string name="content_desc_locate_me">Center map on my location</string>
+    <string name="content_desc_back">Go back</string>
+    <string name="content_desc_clear_search">Clear search text</string>
 
     <!-- Map Related -->
     <string name="map">Map</string>
-    <string name="place_search_bar_placeholder">Search for a place in current area…</string>
+    <string name="place_search_bar_placeholder">Search for a place…</string>
     <string name="location_permissions_not_granted">Enable location in your phone settings to see places near you.</string>
     <string name="map_footer_note">Location data © OpenStreetMap contributors.</string>
     <string name="filter_categories">Filter by category</string>
