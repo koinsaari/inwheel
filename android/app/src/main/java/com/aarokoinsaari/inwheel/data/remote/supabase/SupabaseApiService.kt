@@ -17,7 +17,7 @@
 package com.aarokoinsaari.inwheel.data.remote.supabase
 
 import android.util.Log
-import com.aarokoinsaari.inwheel.BuildConfig
+import com.aarokoinsaari.inwheel.data.remote.config.ConfigProvider
 import com.aarokoinsaari.inwheel.domain.model.PlaceDetailProperty
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -32,20 +32,24 @@ import io.ktor.http.isSuccess
 import java.util.concurrent.CancellationException
 
 class SupabaseApiService(
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
+    configProvider: ConfigProvider
 ) {
+    private val supabaseUrl = configProvider.getSupabaseUrl()
+    private val supabaseKey = configProvider.getSupabaseKey()
+    
     suspend fun fetchPlacesInBBox(
         westLon: Double,
         southLat: Double,
         eastLon: Double,
         northLat: Double,
     ): List<PlaceDto> {
-        val url = "${BuildConfig.SUPABASE_URL}/rest/v1/rpc/places_in_bbox"
+        val url = "$supabaseUrl/rest/v1/rpc/places_in_bbox"
 
         return try {
             val response: HttpResponse = httpClient.post(url) {
-                header("apikey", BuildConfig.SUPABASE_KEY)
-                header("Authorization", "Bearer ${BuildConfig.SUPABASE_KEY}")
+                header("apikey", supabaseKey)
+                header("Authorization", "Bearer $supabaseKey")
                 contentType(ContentType.Application.Json)
                 setBody(
                     mapOf(
@@ -86,19 +90,20 @@ class SupabaseApiService(
      * @param status The new accessibility status to set (one of the AccessibilityStatus values)
      */
     suspend fun updatePlaceGeneralAccessibility(placeId: String, status: String?) {
-        val url = "${BuildConfig.SUPABASE_URL}/rest/v1/general_accessibility?place_id=eq.$placeId"
+        val url = "$supabaseUrl/rest/v1/general_accessibility?place_id=eq.$placeId"
+        
         Log.d("SupabaseApiService", "Status: $status")
         try {
             val response1: HttpResponse = httpClient.patch(url) {
-                header("apikey", BuildConfig.SUPABASE_KEY)
-                header("Authorization", "Bearer ${BuildConfig.SUPABASE_KEY}")
+                header("apikey", supabaseKey)
+                header("Authorization", "Bearer $supabaseKey")
                 contentType(ContentType.Application.Json)
                 setBody(mapOf("accessibility" to status))
             }
             
             val response2: HttpResponse = httpClient.patch(url) {
-                header("apikey", BuildConfig.SUPABASE_KEY)
-                header("Authorization", "Bearer ${BuildConfig.SUPABASE_KEY}")
+                header("apikey", supabaseKey)
+                header("Authorization", "Bearer $supabaseKey")
                 contentType(ContentType.Application.Json)
                 setBody(mapOf("user_modified" to true))
             }
@@ -134,18 +139,18 @@ class SupabaseApiService(
     ) {
         val (table, column) = mapPropertyToTableAndColumn(property)
 
-        val url = "${BuildConfig.SUPABASE_URL}/rest/v1/$table?place_id=eq.$placeId"
+        val url = "$supabaseUrl/rest/v1/$table?place_id=eq.$placeId"
         try {
             val response1: HttpResponse = httpClient.patch(url) {
-                header("apikey", BuildConfig.SUPABASE_KEY)
-                header("Authorization", "Bearer ${BuildConfig.SUPABASE_KEY}")
+                header("apikey", supabaseKey)
+                header("Authorization", "Bearer $supabaseKey")
                 contentType(ContentType.Application.Json)
                 setBody(mapOf(column to newValue))
             }
             
             val response2: HttpResponse = httpClient.patch(url) {
-                header("apikey", BuildConfig.SUPABASE_KEY)
-                header("Authorization", "Bearer ${BuildConfig.SUPABASE_KEY}")
+                header("apikey", supabaseKey)
+                header("Authorization", "Bearer $supabaseKey")
                 contentType(ContentType.Application.Json)
                 setBody(mapOf("user_modified" to true))
             }
@@ -163,9 +168,6 @@ class SupabaseApiService(
 
     /**
      * Maps a PlaceDetailProperty to its corresponding database table and column.
-     * 
-     * This helper function centralizes the mapping logic to make the main function
-     * more readable and maintainable.
      */
     private fun mapPropertyToTableAndColumn(property: PlaceDetailProperty): Pair<String, String> {
         return when (property) {

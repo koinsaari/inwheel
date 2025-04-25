@@ -17,10 +17,11 @@
 package com.aarokoinsaari.inwheel.di
 
 import androidx.room.Room
-import com.aarokoinsaari.inwheel.BuildConfig
+import com.aarokoinsaari.inwheel.InWheel
 import com.aarokoinsaari.inwheel.data.local.AppDatabase
 import com.aarokoinsaari.inwheel.data.local.Converters
 import com.aarokoinsaari.inwheel.data.local.PlacesDao
+import com.aarokoinsaari.inwheel.data.remote.config.ConfigProvider
 import com.aarokoinsaari.inwheel.data.remote.supabase.SupabaseApiService
 import com.aarokoinsaari.inwheel.data.repository.PlaceRepository
 import com.aarokoinsaari.inwheel.viewmodel.MapViewModel
@@ -38,6 +39,8 @@ import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val appModule = module {
+    single { (androidContext().applicationContext as InWheel).configProvider }
+
 //    single {
 //        Room.databaseBuilder(
 //            androidContext(),
@@ -57,9 +60,10 @@ val appModule = module {
     }
 
     single {
+        val configProvider = get<ConfigProvider>()
         createSupabaseClient(
-            supabaseUrl = BuildConfig.SUPABASE_URL,
-            supabaseKey = BuildConfig.SUPABASE_KEY
+            supabaseUrl = configProvider.getSupabaseUrl(),
+            supabaseKey = configProvider.getSupabaseKey()
         ) {
             install(Postgrest)
         }
@@ -80,9 +84,8 @@ val appModule = module {
     single { Converters() }
     single<PlacesDao> { get<AppDatabase>().placesDao() }
     single { PlaceRepository(get(), get()) }
-    single { SupabaseApiService(get()) }
+    single { SupabaseApiService(get(), get()) }
     single { SharedViewModel() }
-
     factoryOf(::MapViewModel)
     factoryOf(::PlaceDetailsViewModel)
 }

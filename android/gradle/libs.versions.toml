@@ -20,12 +20,13 @@ maps-utils = "3.12.0"
 maps-utils-ktx = "5.2.0"
 play-services-maps = "19.2.0"
 play-services-location = "21.3.0"
-secrets-gradle = "2.0.1"
 ktor = "3.1.2"
 okhttp-logging = "4.9.0"
 supabase = "3.1.4"
 koin = "4.0.4"
 accompanist-permissions = "0.37.2"
+firebase-bom = "33.13.0"
+google-services = "4.4.2"
 detekt = "1.23.8"
 dependency-license = "2.9"
 
@@ -52,6 +53,9 @@ maps-utils = { module = "com.google.maps.android:android-maps-utils", version.re
 maps-utils-ktx = { module = "com.google.maps.android:maps-utils-ktx", version.ref = "maps-utils-ktx" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "play-services-maps" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-config = { module = "com.google.firebase:firebase-config" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp-logging" }
 supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabase" }
@@ -69,7 +73,7 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-secrets-gradle-plugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secrets-gradle" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-serialization" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dependency-license-report = { id = "com.github.jk1.dependency-license-report", version.ref = "dependency-license" }
