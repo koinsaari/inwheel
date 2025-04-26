@@ -1,6 +1,6 @@
 <resources>
-    <!-- App Name -->
     <string name="app_name">InWheel</string>
+    <string name="copyright_prefix">Copyright © 2025</string>
 
     <!-- Emojis -->
     <string name="emoji_checkmark">✅</string>
@@ -34,6 +34,7 @@
     <string name="content_desc_locate_me">Center map on my location</string>
     <string name="content_desc_back">Go back</string>
     <string name="content_desc_clear_search">Clear search text</string>
+    <string name="content_desc_navigation_legal">Legal information and licenses</string>
 
     <!-- Map Related -->
     <string name="map">Map</string>
@@ -41,6 +42,23 @@
     <string name="location_permissions_not_granted">Enable location in your phone settings to see places near you.</string>
     <string name="map_footer_note">Location data © OpenStreetMap contributors.</string>
     <string name="filter_categories">Filter by category</string>
+
+    <!-- Licenses and legal related -->
+    <string name="legal_licenses_title">Legal &amp; Licenses</string>
+    <string name="osm_data_section_title">OpenStreetMap Data</string>
+    <string name="osm_data_description">This application uses location data from OpenStreetMap, which is available under the Open Database License (ODbL).</string>
+    <string name="view_osm_copyright">OpenStreetMap Copyright</string>
+    <string name="open_source_licenses_title">Open Source Licenses</string>
+    <string name="open_source_licenses_description">This application includes various open source components, each licensed under their respective terms. A full list of these components and their licenses is available by clicking the button below.</string>
+    <string name="view_licenses">View Licenses</string>
+    <string name="data_disclaimer_title">Data Disclaimer</string>
+    <string name="data_disclaimer_description">The accessibility information presented in this application is based on open data sources and user-contributed content. While we strive for accuracy, the information is provided \"as is\" without warranties of any kind. Users are advised to independently verify critical accessibility details before relying on them. We encourage contributions to help improve the quality and coverage of the data.</string>
+    <string name="privacy_policy_title">Privacy Policy</string>
+    <string name="privacy_policy_description">This section explains how InWheel handles your location data, map services, and user contributions. Tap below to view the full Privacy Policy.</string>
+    <string name="view_privacy_policy">View Privacy Policy</string>
+    <string name="app_license_title">App License</string>
+    <string name="app_license_description">InWheel is an open-source application distributed under the Apache License 2.0. You are free to use, modify, and distribute it according to the terms of this license.</string>
+    <string name="view_app_license">View Full License</string>
 
     <!-- Place Details -->
     <string name="no_contact_info_available">No contact info provided for this place. ☹️</string>

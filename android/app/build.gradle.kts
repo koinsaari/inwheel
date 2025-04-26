@@ -1,3 +1,4 @@
+import com.github.jk1.license.render.SimpleHtmlReportRenderer
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -115,8 +116,8 @@ detekt {
 }
 
 licenseReport {
-    outputDir = "$projectDir"
-    renderers = arrayOf(com.github.jk1.license.render.InventoryMarkdownReportRenderer("NOTICE.md"))
+    outputDir = "$projectDir/src/main/assets"
+    renderers = arrayOf(SimpleHtmlReportRenderer("licenses.html"))
 }
 
 tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {

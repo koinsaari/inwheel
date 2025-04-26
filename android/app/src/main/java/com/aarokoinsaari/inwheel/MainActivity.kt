@@ -89,6 +89,8 @@ import com.aarokoinsaari.inwheel.domain.model.Place
 import com.aarokoinsaari.inwheel.view.components.Footer
 import com.aarokoinsaari.inwheel.view.info.AboutScreen
 import com.aarokoinsaari.inwheel.view.info.AccessibilityGuidelinesScreen
+import com.aarokoinsaari.inwheel.view.info.LicensesWebViewScreen
+import com.aarokoinsaari.inwheel.view.info.LicensesLegalScreen
 import com.aarokoinsaari.inwheel.view.map.MapScreen
 import com.aarokoinsaari.inwheel.view.navigation.NavigationRoutes
 import com.aarokoinsaari.inwheel.view.placedetails.PlaceDetailsBottomSheet
@@ -130,8 +132,8 @@ fun MainScreen() {
     val currentRoute = navBackStackEntry.value?.destination?.route
 
     ModalNavigationDrawer(
-        // this has to be false when the map is visible or cannot swipe right without opening the drawer
-        gesturesEnabled = currentRoute != NavigationRoutes.MAP,
+        // this has to be false when the map or licenses view is visible or cannot swipe right without opening the drawer
+        gesturesEnabled = currentRoute != NavigationRoutes.MAP && currentRoute != NavigationRoutes.LICENSES_WEBVIEW,
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
@@ -145,6 +147,7 @@ fun MainScreen() {
                     Spacer(modifier = Modifier.height(12.dp))
                     HorizontalDivider()
 
+                    // Map
                     NavigationDrawerItem(
                         label = { Text(stringResource(id = R.string.map)) },
                         icon = {
@@ -168,6 +171,7 @@ fun MainScreen() {
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
 
+                    // About
                     NavigationDrawerItem(
                         label = { Text(stringResource(id = R.string.about)) },
                         icon = {
@@ -191,6 +195,7 @@ fun MainScreen() {
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                     )
 
+                    // Accessibility guidelines
                     NavigationDrawerItem(
                         label = { Text(stringResource(id = R.string.accessibility_guidelines)) },
                         icon = {
@@ -206,6 +211,30 @@ fun MainScreen() {
                             if (currentRoute != NavigationRoutes.ACCESSIBILITY_GUIDELINES) {
                                 navController.navigate(NavigationRoutes.ACCESSIBILITY_GUIDELINES) {
                                     popUpTo(NavigationRoutes.ACCESSIBILITY_GUIDELINES)
+                                    launchSingleTop = true
+                                }
+                            }
+                            scope.launch {
+                                drawerState.close()
+                            }
+                        },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
+
+                    // Licenses and legal
+                    NavigationDrawerItem(
+                        label = { Text(stringResource(id = R.string.legal_licenses_title)) },
+                        icon = {
+                            Icon(
+                                Icons.Outlined.Info,
+                                contentDescription = stringResource(id = R.string.content_desc_navigation_legal)
+                            )
+                        },
+                        selected = currentRoute == NavigationRoutes.LICENSES_AND_LEGAL,
+                        onClick = {
+                            if (currentRoute != NavigationRoutes.LICENSES_AND_LEGAL) {
+                                navController.navigate(NavigationRoutes.LICENSES_AND_LEGAL) {
+                                    popUpTo(NavigationRoutes.LICENSES_AND_LEGAL)
                                     launchSingleTop = true
                                 }
                             }
@@ -410,6 +439,24 @@ fun MainScreen() {
                         }
                         composable(NavigationRoutes.ACCESSIBILITY_GUIDELINES) {
                             AccessibilityGuidelinesScreen()
+                        }
+                        composable(NavigationRoutes.LICENSES_AND_LEGAL) {
+                            val context = LocalContext.current
+                            LicensesLegalScreen(
+                                onNavigateToLicenseReport = {
+                                    navController.navigate(NavigationRoutes.LICENSES_WEBVIEW)
+                                },
+                                onNavigateToPrivacyPolicy = {
+                                    val intent = Intent(
+                                        Intent.ACTION_VIEW,
+                                        "".toUri() // TODO
+                                    )
+                                    context.startActivity(intent)
+                                }
+                            )
+                        }
+                        composable(NavigationRoutes.LICENSES_WEBVIEW) {
+                            LicensesWebViewScreen()
                         }
                     }
                 }

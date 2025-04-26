@@ -20,4 +20,6 @@ object NavigationRoutes {
     const val MAP = "map"
     const val ABOUT = "about"
     const val ACCESSIBILITY_GUIDELINES = "accessibility_guidelines"
+    const val LICENSES_AND_LEGAL = "licenses_and_legal"
+    const val LICENSES_WEBVIEW = "licenses_webview"
 }
