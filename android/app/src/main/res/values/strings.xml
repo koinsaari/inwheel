@@ -35,6 +35,7 @@
     <string name="content_desc_back">Go back</string>
     <string name="content_desc_clear_search">Clear search text</string>
     <string name="content_desc_navigation_legal">Legal information and licenses</string>
+    <string name="content_desc_accessibility_disclaimer_info">Information about accessibility guidelines</string>
 
     <!-- Map Related -->
     <string name="map">Map</string>
@@ -60,6 +61,15 @@
     <string name="app_license_description">InWheel is an open-source application distributed under the Apache License 2.0. You are free to use, modify, and distribute it according to the terms of this license.</string>
     <string name="view_app_license">View Full License</string>
 
+    <!-- Accessibility guidelines related -->
+    <string name="general_status_title_unknown">Accessibility status has not been verified or reported yet.</string>
+    <string name="general_accessibility_title">General Accessibility</string>
+    <string name="step_count_and_step_height">Step Count &amp; Step Height</string>
+    <string name="ramp_and_lift_availability">Ramp &amp; Lift Availability</string>
+    <string name="accessibility_guidelines_disclaimer">
+        The accessibility guidelines presented here are based on recognized principles, real-world observations, and user experiences.\nThey are intended to offer helpful guidance, but they do not replace official standards.\nAlways consult official resources when specific legal or technical requirements are needed.
+    </string>
+
     <!-- Place Details -->
     <string name="no_contact_info_available">No contact info provided for this place. ☹️</string>
     <string name="close_detail_sheet_button">Close detail sheet</string>
@@ -76,7 +86,7 @@
 
     <!-- Entrance Accessibility -->
     <string name="entrance">Entrance</string>
-    <string name="entrance_accessibility">Entrance accessibility</string>
+    <string name="entrance_accessibility">Entrance Accessibility</string>
     <string name="entrance_accessibility_dialog_title">About entrance accessibility</string>
     <string name="entrance_fully_accessible_label">No steps or has lift/ramp on entrance.</string>
     <string name="entrance_partially_accessible_label">Max 1 step not too steep on entrance, or the door is not practical to open.</string>
@@ -84,7 +94,7 @@
     <string name="entrance_unknown_label">No detailed information given about entrance.</string>
 
     <!-- Indoor Accessibility -->
-    <string name="indoor_accessibility">Indoor accessibility</string>
+    <string name="indoor_accessibility">Indoor Accessibility</string>
     <string name="indoor_accessibility_dialog_title">About indoor accessibility</string>
     <string name="indoor_fully_accessible_status_label">Inside spacious enough to move with a wheelchair.</string>
     <string name="indoor_partially_accessible_status_label">Inside some areas may be difficult to access with a wheelchair.</string>
@@ -93,7 +103,7 @@
 
     <!-- Restroom Accessibility -->
     <string name="restroom">Restroom</string>
-    <string name="restroom_accessibility">Restroom accessibility</string>
+    <string name="restroom_accessibility">Restroom Accessibility</string>
     <string name="restroom_accessibility_dialog_title">About restroom accessibility</string>
     <string name="restroom_fully_accessible_status_label">The restroom is spacious and fully wheelchair accessible.</string>
     <string name="restroom_partially_accessible_status_label">The restroom is partially accessible and may require assistance.</string>

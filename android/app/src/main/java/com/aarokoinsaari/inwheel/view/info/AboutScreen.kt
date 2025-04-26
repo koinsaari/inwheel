@@ -115,8 +115,8 @@ fun AboutScreen() {
                     Spacer(Modifier.height(16.dp))
                     LinkRow(
                         icon = Icons.Outlined.Code,
-                        text = "GitHub: koinsaari/accessibility-map",
-                        url = "https://github.com/koinsaari/accessibility-map",
+                        text = "GitHub: koinsaari/inwheel",
+                        url = "https://github.com/koinsaari/inwheel",
                         contentDescription = "GitHub Repository"
                     )
 

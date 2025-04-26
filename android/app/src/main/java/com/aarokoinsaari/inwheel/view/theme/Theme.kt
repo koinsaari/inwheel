@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2025 Aaro Koinsaari
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.aarokoinsaari.inwheel.view.theme
 
 import android.os.Build
@@ -8,18 +24,27 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    secondary = Warning,
+    tertiary = Success,
+    error = Error,
+    errorContainer = ErrorContainer.adjustForDarkTheme(),
+    tertiaryContainer = SuccessContainer.adjustForDarkTheme(),
+    secondaryContainer = WarningContainer.adjustForDarkTheme()
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    secondary = Warning,
+    tertiary = Success,
+    error = Error,
+    errorContainer = ErrorContainer,
+    tertiaryContainer = SuccessContainer,
+    secondaryContainer = WarningContainer
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -31,6 +56,15 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color(0xFF1C1B1F),
     */
 )
+
+private fun Color.adjustForDarkTheme(): Color {
+    return copy(
+        red = red * 0.6f,
+        green = green * 0.6f,
+        blue = blue * 0.6f,
+        alpha = 1f
+    )
+}
 
 @Composable
 fun InWheelMapTheme(
