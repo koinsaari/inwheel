@@ -25,7 +25,7 @@ from place import PlaceHandler, Place, TAGS
 load_dotenv(override=True)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-DATA_DIR = os.getenv("DATA_DIR", "data")
+DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 REGIONS = [
@@ -74,6 +74,10 @@ def filter_pbf(pbf_filename: str):
     print("Running:", " ".join(filter_cmd))
     subprocess.run(filter_cmd, check=True)
     print(f"Filtering complete for {pbf_filename}.")
+
+    print(f"Deleting original PBF file {pbf_filename}")
+    os.remove(pbf_filename)
+
     return filtered_filename
 
 
@@ -85,7 +89,10 @@ def parse_filtered_pbf(filtered_filename: str, region_name: str) -> List[Place]:
 
     for place in handler.places:
         place.region = region_name
-        
+
+    print(f"Deleting filtered PBF file {filtered_filename}")
+    os.remove(filtered_filename)
+
     return handler.places
 
 
@@ -235,6 +242,23 @@ def seed_places(places: List[Place], limit: int = None, overwrite: bool = False)
     print(f"Seeding done. {total_places} places seeded for region {places[0].region} in {total_time:.2f}s ({total_places/total_time:.1f} places/s)")
 
 
+def dump_tables():
+    tables = [
+        "places",
+        "general_accessibility",
+        "entrance_accessibility",
+        "restroom_accessibility",
+        "contact"
+    ]
+    for tbl in tables:
+        out_file = os.path.join(DATA_DIR, f"{tbl}.csv")
+        print(f"Dumping {tbl} → {out_file}")
+        subprocess.run([
+            "psql", DATABASE_URL,
+            "-c", f"\\COPY public.{tbl} TO STDOUT WITH CSV HEADER"
+        ], stdout=open(out_file, "w"), check=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description='Seed accessibility data from OSM')
     parser.add_argument('--region', help='Process only specific region')
@@ -274,6 +298,10 @@ def main():
                 total_places += len(places)
     
     print(f"Total places processed: {total_places}")
+
+    print("Starting database dump...")
+    dump_tables()
+    print("Database dump completed.")
 
 
 if __name__ == "__main__":

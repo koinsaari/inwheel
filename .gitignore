@@ -5,7 +5,9 @@ output-metadata.json
 secrets.properties
 *.pbf
 debug/
-!backend/data/.gitkeep
+/backend/data/*
+!/backend/data/.gitkeep
+!/data/
 
 # General
 .DS_Store

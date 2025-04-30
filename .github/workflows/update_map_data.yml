@@ -39,6 +39,8 @@ jobs:
   update-data:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -65,6 +67,22 @@ jobs:
           OVERWRITE: ${{ github.event.inputs.overwrite }}
           TEST_MODE: ${{ github.event.inputs.test_mode }}
         run: ./backend/scripts/run-update.sh
+
+      - name: List generated CSV files
+        run: ls -la ./backend/data/
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and push updated data files
+        run: |
+          mkdir -p ./data
+          cp ./backend/data/*.csv ./data/
+          git add ./data/*.csv
+          git commit -m "Update accessibility data [automated]" || echo "No changes to commit"
+          git push
 
       - name: Upload run logs
         if: always()
