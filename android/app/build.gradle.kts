@@ -1,5 +1,13 @@
 import com.github.jk1.license.render.SimpleHtmlReportRenderer
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
+
+val localProps = Properties().apply {
+    val propsFile = rootProject.file("local.properties")
+    if (propsFile.exists()) {
+        load(propsFile.inputStream())
+    }
+}
 
 plugins {
     alias(libs.plugins.android.application)
@@ -20,20 +28,31 @@ android {
         applicationId = "com.aarokoinsaari.inwheel"
         minSdk = 29
         targetSdk = 35
-        versionCode = 5
-        versionName = "0.0.5d"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        versionCode = 1
+        versionName = "1.0.0"
     }
+
+    signingConfigs {
+        create("release") {
+            storeFile = rootProject.file(localProps["INWHEEL_KEYSTORE_FILE"] as String)
+            storePassword = localProps["INWHEEL_KEYSTORE_PASSWORD"] as String
+            keyAlias = localProps["INWHEEL_KEY_ALIAS"] as String
+            keyPassword = localProps["INWHEEL_KEY_PASSWORD"] as String
+        }
+    }
+
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             isDebuggable = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("Boolean", "DEBUG_MODE", "false")
         }
         debug {
             isMinifyEnabled = false
@@ -99,15 +118,7 @@ dependencies {
     implementation(libs.supabase.postgrest)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
-    implementation(libs.kotlinx.collections.immutable)
     implementation(libs.accompanist.permissions)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 }
 
 detekt {
