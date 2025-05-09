@@ -41,9 +41,9 @@ import com.aarokoinsaari.inwheel.view.theme.InWheelTheme
 
 @Composable
 fun TermsDialog(
-    onAccept: () -> Unit,
-    onDecline: () -> Unit,
     modifier: Modifier = Modifier,
+    onAccept: () -> Unit = {},
+    onDecline: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -118,9 +118,6 @@ fun TermsDialog(
 @Composable
 private fun TermsDialogPreview() {
     InWheelTheme {
-        TermsDialog(
-            onAccept = {},
-            onDecline = {}
-        )
+        TermsDialog()
     }
 }
