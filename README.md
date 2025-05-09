@@ -20,9 +20,16 @@ InWheel leverages OpenStreetMap (OSM) data as its foundation, enriched with addi
 
 ## Contact
 
-For any questions, feedback, or support, please contact me at [aaro.koinsaari@protonmail.ch](mailto:aaro.koinsaari@protonmail.ch).
+For any questions, feedback, or support, please contact [info@inwheel.ch](mailto:info@inwheel.ch).
 
-## License
+## Legal
+
+### Terms & Privacy
+
+- 📜 [Terms of Service](./TERMS.md)
+- 🔐 [Privacy Policy](./PRIVACY.md)
+
+### License
 
 This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
 
