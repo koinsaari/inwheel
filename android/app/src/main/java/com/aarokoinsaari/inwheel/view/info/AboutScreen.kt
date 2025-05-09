@@ -122,8 +122,8 @@ fun AboutScreen() {
 
                     LinkRow(
                         icon = Icons.Default.Email,
-                        text = "aaro.koinsaari@protonmail.ch",
-                        url = "mailto:aaro.koinsaari@protonmail.ch",
+                        text = "info@inwheel.ch",
+                        url = "mailto:info@inwheel.ch",
                         contentDescription = "Email"
                     )
                 }
