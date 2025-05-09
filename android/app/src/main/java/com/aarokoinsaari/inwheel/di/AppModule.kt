@@ -18,6 +18,7 @@ package com.aarokoinsaari.inwheel.di
 
 import androidx.room.Room
 import com.aarokoinsaari.inwheel.InWheel
+import com.aarokoinsaari.inwheel.data.PreferencesManager
 import com.aarokoinsaari.inwheel.data.local.AppDatabase
 import com.aarokoinsaari.inwheel.data.local.Converters
 import com.aarokoinsaari.inwheel.data.local.PlacesDao
@@ -86,6 +87,7 @@ val appModule = module {
     single { PlaceRepository(get(), get()) }
     single { SupabaseApiService(get(), get()) }
     single { SharedViewModel() }
+    single { PreferencesManager(androidContext()) }
     factoryOf(::MapViewModel)
     factoryOf(::PlaceDetailsViewModel)
 }

@@ -58,7 +58,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aarokoinsaari.inwheel.R
 import com.aarokoinsaari.inwheel.view.components.Footer
-import com.aarokoinsaari.inwheel.view.theme.InWheelMapTheme
+import com.aarokoinsaari.inwheel.view.theme.InWheelTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -365,7 +365,7 @@ fun StatusLevelItem(
 @Preview(showBackground = true)
 @Composable
 private fun AccessibilityGuidelinesScreenPreview() {
-    InWheelMapTheme {
+    InWheelTheme {
         AccessibilityGuidelinesScreen()
     }
 }

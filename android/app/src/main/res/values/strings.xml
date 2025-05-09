@@ -45,6 +45,10 @@
     <string name="filter_categories">Filter by category</string>
 
     <!-- Licenses and legal related -->
+    <string name="terms_dialog_title">Terms of Service &amp; Privacy Policy</string>
+    <string name="terms_dialog_message">Before using InWheel, please review and agree to our Terms of Service and Privacy Policy. By tapping \"Accept\" you acknowledge that you have read and agree to these policies.</string>
+    <string name="terms_dialog_accept">Accept</string>
+    <string name="terms_dialog_decline">Decline</string>
     <string name="legal_licenses_title">Legal &amp; Licenses</string>
     <string name="osm_data_section_title">OpenStreetMap Data</string>
     <string name="osm_data_description">This application uses location data from OpenStreetMap, which is available under the Open Database License (ODbL).</string>
@@ -60,6 +64,8 @@
     <string name="app_license_title">App License</string>
     <string name="app_license_description">InWheel is an open-source application distributed under the Apache License 2.0. You are free to use, modify, and distribute it according to the terms of this license.</string>
     <string name="view_app_license">View Full License</string>
+    <string name="view_terms_of_service">View Terms of Service</string>
+    <string name="terms_of_service_title">Terms of Service</string>
 
     <!-- Accessibility guidelines related -->
     <string name="general_status_title_unknown">Accessibility status has not been verified or reported yet.</string>
@@ -352,4 +358,5 @@
     <string name="category_shoes">Shoe shop</string>
     <string name="category_sports">Sports store</string>
     <string name="category_books">Books store</string>
+    <string name="terms_of_service_description">This section explains the Terms of Service for using Inwheel. Tap below to view the full Terms of Service.</string>
 </resources>

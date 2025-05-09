@@ -64,7 +64,7 @@ import com.aarokoinsaari.inwheel.domain.model.PlaceCategory
 import com.aarokoinsaari.inwheel.domain.model.PlaceDetailProperty
 import com.aarokoinsaari.inwheel.domain.state.PlaceDetailState
 import com.aarokoinsaari.inwheel.view.components.Footer
-import com.aarokoinsaari.inwheel.view.theme.InWheelMapTheme
+import com.aarokoinsaari.inwheel.view.theme.InWheelTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -447,7 +447,7 @@ private fun PlaceDetailBottomSheet_Preview() {
         sink = FULLY_ACCESSIBLE,
         euroKey = false
     )
-    InWheelMapTheme {
+    InWheelTheme {
         PlaceDetailsBottomSheet(
             stateFlow = MutableStateFlow(PlaceDetailState(place))
         )
@@ -467,7 +467,7 @@ private fun PlaceDetailBottomSheetUnknownAccessibility_Preview() {
         generalAccessibility = UNKNOWN
     )
 
-    InWheelMapTheme {
+    InWheelTheme {
         PlaceDetailsBottomSheet(
             stateFlow = MutableStateFlow(PlaceDetailState(place))
         )
@@ -486,7 +486,7 @@ private fun PropertyUpdateDialogPreview() {
         generalAccessibility = PARTIALLY_ACCESSIBLE
     )
 
-    InWheelMapTheme {
+    InWheelTheme {
         PlaceDetailPropertyDialog(
             place = place,
             property = PlaceDetailProperty.ADDITIONAL_INFO,

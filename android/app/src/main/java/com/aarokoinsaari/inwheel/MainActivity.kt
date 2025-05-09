@@ -68,6 +68,8 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -83,31 +85,52 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.aarokoinsaari.inwheel.data.PreferencesManager
 import com.aarokoinsaari.inwheel.domain.intent.MapIntent
 import com.aarokoinsaari.inwheel.domain.model.AccessibilityStatus
 import com.aarokoinsaari.inwheel.domain.model.Place
 import com.aarokoinsaari.inwheel.view.components.Footer
+import com.aarokoinsaari.inwheel.view.components.TermsDialog
 import com.aarokoinsaari.inwheel.view.info.AboutScreen
 import com.aarokoinsaari.inwheel.view.info.AccessibilityGuidelinesScreen
-import com.aarokoinsaari.inwheel.view.info.LicensesWebViewScreen
 import com.aarokoinsaari.inwheel.view.info.LicensesLegalScreen
+import com.aarokoinsaari.inwheel.view.info.LicensesWebViewScreen
 import com.aarokoinsaari.inwheel.view.map.MapScreen
 import com.aarokoinsaari.inwheel.view.navigation.NavigationRoutes
 import com.aarokoinsaari.inwheel.view.placedetails.PlaceDetailsBottomSheet
-import com.aarokoinsaari.inwheel.view.theme.InWheelMapTheme
+import com.aarokoinsaari.inwheel.view.theme.InWheelTheme
 import com.aarokoinsaari.inwheel.viewmodel.MapViewModel
 import com.aarokoinsaari.inwheel.viewmodel.PlaceDetailsViewModel
 import com.aarokoinsaari.inwheel.viewmodel.SharedViewModel
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
+    private val preferencesManager: PreferencesManager by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            InWheelMapTheme {
-                MainScreen()
+            InWheelTheme {
+                val showTermsDialog =
+                    remember { mutableStateOf(!preferencesManager.hasAcceptedTerms()) }
+
+                if (showTermsDialog.value) {
+                    TermsDialog(
+                        onAccept = {
+                            preferencesManager.setTermsAccepted(true)
+                            showTermsDialog.value = false
+                        },
+                        onDecline = {
+                            // If user declines we just exit the app
+                            finish()
+                        }
+                    )
+                } else {
+                    MainScreen()
+                }
             }
         }
     }
@@ -449,7 +472,7 @@ fun MainScreen() {
                                 onNavigateToPrivacyPolicy = {
                                     val intent = Intent(
                                         Intent.ACTION_VIEW,
-                                        "".toUri() // TODO
+                                        "https://inwheel.ch/privacy-policy".toUri()
                                     )
                                     context.startActivity(intent)
                                 }

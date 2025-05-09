@@ -45,7 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.aarokoinsaari.inwheel.R
-import com.aarokoinsaari.inwheel.view.theme.InWheelMapTheme
+import com.aarokoinsaari.inwheel.view.theme.InWheelTheme
 
 @Composable
 fun LicensesLegalScreen(
@@ -76,6 +76,33 @@ fun LicensesLegalScreen(
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
+            // Terms of Service section
+            SectionCard(
+                title = stringResource(R.string.terms_of_service_title),
+                content = {
+                    Text(
+                        text = stringResource(R.string.terms_of_service_description),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    OutlinedButton(
+                        onClick = {
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                "https://inwheel.ch/terms-of-service".toUri()
+                            )
+                            context.startActivity(intent)
+                        },
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text(text = stringResource(R.string.view_terms_of_service))
+                    }
+                }
+            )
+
+            Spacer(Modifier.height(16.dp))
+
             // OpenStreetMap section
             SectionCard(
                 title = stringResource(R.string.osm_data_section_title),
@@ -101,7 +128,7 @@ fun LicensesLegalScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
             // Open source licenses section
             SectionCard(
@@ -122,7 +149,7 @@ fun LicensesLegalScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
             // Data disclaimer section
             SectionCard(
@@ -136,7 +163,7 @@ fun LicensesLegalScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
             // Privacy policy section
             SectionCard(
@@ -157,7 +184,7 @@ fun LicensesLegalScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
             // App license section
             SectionCard(
@@ -184,7 +211,7 @@ fun LicensesLegalScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(Modifier.height(24.dp))
 
             // Copyright footer
             Row {
@@ -224,9 +251,7 @@ fun SectionCard(
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column(Modifier.padding(16.dp)) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
@@ -238,7 +263,6 @@ fun SectionCard(
                 modifier = Modifier.padding(bottom = 16.dp),
                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
             )
-
             content()
         }
     }
@@ -247,7 +271,7 @@ fun SectionCard(
 @Preview(showBackground = true)
 @Composable
 private fun LicensesLegalScreenPreview() {
-    InWheelMapTheme {
+    InWheelTheme {
         LicensesLegalScreen()
     }
 }
