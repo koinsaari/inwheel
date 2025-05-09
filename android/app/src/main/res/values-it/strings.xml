@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Wheelchair Access Descriptions -->
+    <string name="unknown_accessibility">Accessibilità sconosciuta</string>
+
+    <!-- Content Descriptions -->
+    <string name="content_desc_navigation_map">Apri la mappa</string>
+    <string name="content_desc_fully_accessible">Completamente accessibile</string>
+    <string name="content_desc_partially_accessible">Parzialmente accessibile</string>
+    <string name="content_desc_not_accessible">Non accessibile</string>
+    <string name="content_desc_unknown_accessibility">Accessibilità sconosciuta</string>
+    <string name="content_desc_phone">Numero di telefono</string>
+    <string name="content_desc_email">Indirizzo email</string>
+    <string name="content_desc_website">Sito web</string>
+    <string name="content_desc_address">Indirizzo</string>
+    <string name="content_desc_show_options">Mostra opzioni per %1$s</string>
+    <string name="content_desc_navigation_about">Apri la sezione Informazioni</string>
+    <string name="content_desc_navigation_accessibility_guidelines">Apri la sezione Linee guida per l\'accessibilità</string>
+    <string name="content_desc_property_info">Informazioni su %1$s</string>
+    <string name="content_desc_open_drawer">Apri menu di navigazione</string>
+    <string name="content_desc_filter_selected">Filtro %1$s selezionato. Tocca per rimuovere il filtro.</string>
+    <string name="content_desc_filter_unselected">Filtro %1$s non selezionato. Tocca per applicare il filtro.</string>
+    <string name="content_desc_filter_check_icon">Indicatore di categoria selezionata</string>
+    <string name="content_desc_filter_category_icon">Icona per la categoria %1$s</string>
+    <string name="content_desc_filter_menu">Mostra tutti i filtri di categoria</string>
+    <string name="content_desc_locate_me">Centra la mappa sulla mia posizione</string>
+    <string name="content_desc_back">Torna indietro</string>
+    <string name="content_desc_clear_search">Cancella testo di ricerca</string>
+    <string name="content_desc_navigation_legal">Informazioni legali e licenze</string>
+    <string name="content_desc_accessibility_disclaimer_info">Informazioni sulle linee guida di accessibilità</string>
+
+    <!-- Map Related -->
+    <string name="map">Mappa</string>
+    <string name="place_search_bar_placeholder">Cerca un luogo…</string>
+    <string name="location_permissions_not_granted">Attiva la posizione nelle impostazioni del telefono per vedere luoghi vicino a te.</string>
+    <string name="map_footer_note">Dati di localizzazione © contributori OpenStreetMap.</string>
+    <string name="filter_categories">Filtra per categoria</string>
+
+    <!-- Licenses and legal related -->
+    <string name="terms_dialog_title">Termini di servizio &amp; Informativa sulla privacy</string>
+    <string name="terms_dialog_message">Prima di usare InWheel, ti preghiamo di leggere e accettare i nostri Termini di servizio e l\'Informativa sulla privacy. Toccando \"Accetta\" confermi di aver letto e accettato queste politiche.</string>
+    <string name="terms_dialog_accept">Accetta</string>
+    <string name="terms_dialog_decline">Rifiuta</string>
+    <string name="legal_licenses_title">Legale &amp; Licenze</string>
+    <string name="osm_data_section_title">Dati OpenStreetMap</string>
+    <string name="osm_data_description">Questa applicazione utilizza dati di localizzazione di OpenStreetMap, disponibili sotto la Open Database License (ODbL).</string>
+    <string name="view_osm_copyright">Copyright OpenStreetMap</string>
+    <string name="open_source_licenses_title">Licenze Open Source</string>
+    <string name="open_source_licenses_description">Questa applicazione include vari componenti open source, ciascuno con la propria licenza. Un elenco completo di questi componenti e delle loro licenze è disponibile cliccando sul pulsante qui sotto.</string>
+    <string name="view_licenses">Visualizza licenze</string>
+    <string name="data_disclaimer_title">Disclaimer sui dati</string>
+    <string name="data_disclaimer_description">Le informazioni sull\'accessibilità presentate in questa applicazione si basano su fonti di dati aperte e contenuti contribuiti dagli utenti. Sebbene ci impegniamo per l\'accuratezza, le informazioni sono fornite \"così come sono\" senza garanzie di alcun tipo. Gli utenti sono invitati a verificare indipendentemente i dettagli critici sull\'accessibilità prima di fare affidamento su di essi. Incoraggiamo i contributi per migliorare la qualità e la copertura dei dati.</string>
+    <string name="privacy_policy_title">Informativa sulla privacy</string>
+    <string name="privacy_policy_description">Questa sezione spiega come InWheel gestisce i tuoi dati di posizione, i servizi di mappatura e i contributi degli utenti. Tocca qui sotto per visualizzare l\'informativa completa sulla privacy.</string>
+    <string name="view_privacy_policy">Visualizza Informativa sulla privacy</string>
+    <string name="app_license_title">Licenza dell\'app</string>
+    <string name="app_license_description">InWheel è un\'applicazione open source distribuita sotto la licenza Apache 2.0. Sei libero di usarla, modificarla e distribuirla secondo i termini di questa licenza.</string>
+    <string name="view_app_license">Visualizza licenza completa</string>
+    <string name="view_terms_of_service">Visualizza Termini di servizio</string>
+    <string name="terms_of_service_title">Termini di servizio</string>
+
+    <!-- Accessibility guidelines related -->
+    <string name="general_status_title_unknown">Lo stato di accessibilità non è ancora stato verificato o segnalato.</string>
+    <string name="general_accessibility_title">Accessibilità generale</string>
+    <string name="step_count_and_step_height">Numero &amp; altezza dei gradini</string>
+    <string name="ramp_and_lift_availability">Disponibilità di rampe &amp; ascensori</string>
+    <string name="accessibility_guidelines_disclaimer">
+        Le linee guida per l\'accessibilità qui presentate si basano su principi riconosciuti, osservazioni reali ed esperienze degli utenti.\nSono intese come orientamento utile, ma non sostituiscono gli standard ufficiali.\nConsulta sempre le risorse ufficiali quando sono necessari requisiti legali o tecnici specifici.
+    </string>
+
+    <!-- Place Details -->
+    <string name="no_contact_info_available">Nessuna informazione di contatto fornita per questo luogo. ☹️</string>
+    <string name="close_detail_sheet_button">Chiudi scheda dettagli</string>
+    <string name="place_detail_footer_note">⚠️ L\'accuratezza dei dati non è garantita. Il tuo contributo onesto aiuta a migliorare l\'accessibilità per tutti.</string>
+
+    <!-- Accessibility Status Titles -->
+    <string name="general_status_title_fully_accessible">Questo luogo è completamente accessibile. \nLe persone con mobilità ridotta non dovrebbero aver bisogno di assistenza</string>
+    <string name="general_status_title_partially_accessible">Questo luogo è parzialmente accessibile. \nLe persone con mobilità ridotta potrebbero aver bisogno di assistenza.</string>
+    <string name="general_status_title_not_accessible">Questo luogo non è accessibile per persone con mobilità ridotta.</string>
+    <string name="how_accessible_question">Quanto è accessibile questo luogo per una persona con mobilità ridotta?</string>
+    <string name="image_desc_fully_accessible">Completamente accessibile!</string>
+    <string name="image_desc_partially_accessible">Richiede un assistente!</string>
+    <string name="image_desc_not_accessible">Non accessibile del tutto!</string>
+
+    <!-- Entrance Accessibility -->
+    <string name="entrance">Ingresso</string>
+    <string name="entrance_accessibility">Accessibilità dell\'ingresso</string>
+    <string name="entrance_accessibility_dialog_title">Informazioni sull\'accessibilità dell\'ingresso</string>
+    <string name="entrance_fully_accessible_label">Nessun gradino o presenza di ascensore/rampa all\'ingresso.</string>
+    <string name="entrance_partially_accessible_label">Max 1 gradino non troppo alto all\'ingresso, o la porta non è pratica da aprire.</string>
+    <string name="entrance_not_accessible_label">Più gradini all\'ingresso, o la porta non è abbastanza larga.</string>
+    <string name="entrance_unknown_label">Nessuna informazione dettagliata fornita sull\'ingresso.</string>
+
+    <!-- Indoor Accessibility -->
+    <string name="indoor_accessibility">Accessibilità interna</string>
+    <string name="indoor_accessibility_dialog_title">Informazioni sull\'accessibilità interna</string>
+    <string name="indoor_fully_accessible_status_label">Spazio interno sufficiente per muoversi con una sedia a rotelle.</string>
+    <string name="indoor_partially_accessible_status_label">All\'interno alcune aree potrebbero essere difficili da raggiungere con una sedia a rotelle.</string>
+    <string name="indoor_not_accessible_status_label">Non c\'è abbastanza spazio per muoversi con una sedia a rotelle.</string>
+    <string name="indoor_unknown_label">Nessuna informazione dettagliata fornita sull\'accessibilità interna.</string>
+
+    <!-- Restroom Accessibility -->
+    <string name="restroom">Bagno</string>
+    <string name="restroom_accessibility">Accessibilità del bagno</string>
+    <string name="restroom_accessibility_dialog_title">Informazioni sull\'accessibilità del bagno</string>
+    <string name="restroom_fully_accessible_status_label">Il bagno è spazioso e completamente accessibile in sedia a rotelle.</string>
+    <string name="restroom_partially_accessible_status_label">Il bagno è parzialmente accessibile e potrebbe richiedere assistenza.</string>
+    <string name="restroom_not_accessible_status_label">Il bagno non è accessibile per gli utenti in sedia a rotelle.</string>
+    <string name="restroom_unknown_label">Nessuna informazione fornita sui bagni interni.</string>
+
+    <!-- Entrance Details -->
+    <string name="step_count">Numero di gradini:</string>
+    <string name="step_height">Altezza dei gradini:</string>
+    <string name="ramp">Rampa:</string>
+    <string name="lift">Ascensore:</string>
+    <string name="door_width">Larghezza della porta:</string>
+    <string name="doorType">"Tipo di porta:"</string>
+    <string name="entrance_width">Larghezza dell\'ingresso:</string>
+
+    <!-- Restroom Details -->
+    <string name="room_maneuver">Spazio di manovra:</string>
+    <string name="grab_rails">Maniglioni:</string>
+    <string name="sink">Lavandino:</string>
+    <string name="toilet_seat">Sedile del WC:</string>
+    <string name="emergency_alarm">Allarme di emergenza:</string>
+    <string name="euro_key">EuroKey:</string>
+
+    <!-- Additional Information -->
+    <string name="additional_info">Informazioni aggiuntive</string>
+    <string name="additional_info_dialog_title">Spiega l\'accessibilità del luogo</string>
+    <string name="additional_info_placeholder">Cosa vorresti che gli altri sapessero sull\'accessibilità di questo luogo?</string>
+    <string name="additional_info_label">Aggiungi testo qui…</string>
+
+    <!-- Dialog Titles -->
+    <string name="general_accessibility">Livello di accessibilità generale</string>
+    <string name="general_accessibility_dialog_title">Quanto è accessibile questo luogo?</string>
+    <string name="step_count_dialog_title">Informazioni sul numero di gradini</string>
+    <string name="step_height_dialog_title">Informazioni sull\'altezza dei gradini</string>
+    <string name="door_width_dialog_title">Informazioni sulla larghezza della porta</string>
+    <string name="ramp_dialog_title">Informazioni sulle rampe</string>
+    <string name="lift_dialog_title">Informazioni sugli ascensori</string>
+    <string name="door_type_dialog_title">Informazioni sui tipi di porta</string>
+    <string name="room_maneuver_dialog_title">Informazioni sullo spazio di manovra</string>
+    <string name="grab_rails_dialog_title">Informazioni sui maniglioni nei bagni</string>
+    <string name="toilet_seat_dialog_title">Informazioni sui sedili dei WC</string>
+    <string name="emergency_alarm_dialog_title">Informazioni sugli allarmi di emergenza nei bagni</string>
+    <string name="sink_dialog_title">Informazioni sul lavandino nel bagno</string>
+    <string name="euro_key_dialog_title">Informazioni su EuroKey</string>
+    <string name="entrance_width_dialog_title">Informazioni sulla larghezza dell\'ingresso</string>
+
+    <!-- Dialog/Button Actions -->
+    <string name="cancel">Annulla</string>
+    <string name="save">Salva</string>
+    <string name="ok">OK</string>
+    <string name="apply">Applica</string>
+    <string name="reset">Reimposta</string>
+    <string name="update_dialog_footer">⚠️ Il tuo contributo onesto aiuta a migliorare l\'accessibilità per tutti.</string>
+    <string name="info_dialog_footer">⚠️ Queste definizioni sono solo per orientamento generale. Consulta gli standard ufficiali per dettagli normativi.</string>
+
+    <!-- Options -->
+    <string name="accessibility_option_fully_accessible">✅ Completamente accessibile</string>
+    <string name="accessibility_option_partially_accessible">⚠️ Parzialmente accessibile</string>
+    <string name="accessibility_option_not_accessible">❌ Non accessibile</string>
+
+    <string name="door_type_automatic_sliding">✅ Porta scorrevole automatica</string>
+    <string name="door_type_automatic_swing">✅ Porta a battente automatica</string>
+    <string name="door_type_manual_swing">⚠️ Porta a battente manuale</string>
+    <string name="door_type_manual_sliding">⚠️ Porta scorrevole manuale</string>
+    <string name="door_type_revolving">⚠️ Porta girevole</string>
+    <string name="door_type_double">⚠️ Porta doppia</string>
+
+    <string name="step_count_option_none">✅ Nessuno (accesso a livello)</string>
+    <string name="step_count_option_one">⚠️ Un gradino</string>
+    <string name="step_count_option_multiple">❌ Più gradini</string>
+
+    <string name="step_height_option_low">✅ Bassa (meno di 3 cm)</string>
+    <string name="step_height_option_medium">⚠️ Media (3–7 cm)</string>
+    <string name="step_height_option_high">❌ Alta (più di 7 cm)</string>
+
+    <string name="door_width_option_wide">✅ Larga (90+ cm)</string>
+    <string name="door_width_option_standard">⚠️ Standard (75–90 cm)</string>
+    <string name="door_width_option_narrow">❌ Stretta (meno di 75 cm)</string>
+
+    <string name="lift_option_accessible">✅ Completamente accessibile</string>
+    <string name="lift_option_partially_accessible">⚠️ Parzialmente accessibile</string>
+    <string name="lift_option_none">❌ Nessun ascensore disponibile</string>
+
+    <string name="ramp_option_accessible">✅ Rampa adeguata disponibile</string>
+    <string name="ramp_option_partial">⚠️ Rampa ripida o stretta</string>
+    <string name="ramp_option_none">❌ Nessuna rampa disponibile</string>
+
+    <string name="room_maneuver_option_spacious">✅ Spazioso</string>
+    <string name="room_maneuver_option_limited">⚠️ Limitato</string>
+    <string name="room_maneuver_option_tight">❌ Stretto</string>
+
+    <string name="grab_rails_option_both_sides">✅ Maniglioni su entrambi i lati</string>
+    <string name="grab_rails_option_one_side">⚠️ Maniglioni solo su un lato</string>
+    <string name="grab_rails_option_none">❌ Nessun maniglione</string>
+
+    <string name="emergency_alarm_option_available">✅ Allarme disponibile e accessibile</string>
+    <string name="emergency_alarm_option_limited">⚠️ Accesso limitato all\'allarme</string>
+    <string name="emergency_alarm_option_none">❌ Nessun allarme di emergenza</string>
+
+    <!-- About/Info Screen -->
+    <string name="about">Informazioni</string>
+    <string name="about_title">ℹ️ Informazioni su InWheel</string>
+    <string name="about_body">
+        InWheel fornisce informazioni dettagliate sull\'accessibilità dei luoghi pubblici in Svizzera 🇨🇭 e Finlandia 🇫🇮, facilitando la ricerca di luoghi adatti per le persone con difficoltà motorie.\n\nMentre la maggior parte dei servizi di mappe semplifica l\'accessibilità con etichette vaghe, InWheel si concentra sui dettagli che contano: gradini, rampe, larghezza delle porte e accessibilità dei bagni.
+    </string>
+    <string name="the_goal_title">🎯 La nostra missione</string>
+    <string name="the_goal_body">
+        InWheel mira a fornire dati dettagliati e accurati sull\'accessibilità dei luoghi pubblici, partendo da Svizzera e Finlandia.\n\nL\'app combina dati di OpenStreetMap con un database dedicato all\'accessibilità per offrire informazioni più complete.\n\nL\'obiettivo è andare oltre le etichette sì-o-no e mostrare esattamente quanto ogni luogo sia effettivamente accessibile.
+    </string>
+    <string name="a_work_in_progress_title">🛠️ Un lavoro in corso</string>
+    <string name="a_work_in_progress_body">
+        Questa app viene continuamente migliorata con l\'aggiunta di nuove funzionalità. Potrebbero esserci bug, dati mancanti e funzionalità da migliorare. Puoi dare un\'occhiata alla nostra pagina Progetti su GitHub per vedere i problemi attuali.\n\nGli aggiornamenti arriveranno regolarmente in base al feedback degli utenti e alle esigenze della comunità. InWheel si impegna a rimanere gratuita, open-source e focalizzata sull\'accessibilità.
+    </string>
+    <string name="contributing_title">🤝 Contribuire</string>
+    <string name="contributing_body">
+        InWheel è un progetto open-source. I contributi tramite problemi GitHub, pull request o invii di dati sono ben accetti e apprezzati. Tutti possono aiutare a rendere gli spazi pubblici più accessibili per le persone con difficoltà motorie. Per i problemi attuali, consulta la nostra pagina Progetti su GitHub
+    </string>
+    <string name="disclaimer_title">📌 Disclaimer</string>
+    <string name="disclaimer_body">
+        Questa app utilizza Google Maps per la sua stabilità e le funzionalità avanzate, che rendono la gestione di migliaia di luoghi sulla mappa molto più intuitiva. Tuttavia, Google Maps non è gratuito su larga scala, quindi potrebbero applicarsi alcuni limiti di utilizzo.\n\nIl backend e il database sono progettati per funzionare anche entro limiti gratuiti, poiché questo progetto è attualmente costruito e mantenuto da un singolo sviluppatore. Finché non ci saranno finanziamenti esterni, le funzionalità e la crescita saranno bilanciate con ciò che è realisticamente sostenibile.\n
+    </string>
+    <string name="disclaimer_data_note">
+        Si prega di notare che i dati di accessibilità in questa app si basano su fonti aperte e contributi degli utenti. Sebbene vengano compiuti tutti gli sforzi per mantenere le informazioni utili, l\'accuratezza non può essere garantita. L\'affidabilità dei dati dipende in ultima analisi dalla comunità. Se noti qualcosa di mancante o errato, considera di aggiornarlo nell\'app.
+    </string>
+    <string name="about_footer_note">
+        ⚠️ I dati sull\'accessibilità potrebbero essere incompleti o imprecisi. Aiuta gli altri mantenendoli aggiornati.
+    </string>
+    <string name="contact_title">📬 Contatti</string>
+    <string name="contact_body">
+        Se hai feedback, vuoi contribuire o hai semplicemente una domanda, non esitare a contattarci.
+    </string>
+    <string name="accessibility_guidelines">Linee guida per l\'accessibilità</string>
+
+    <!-- Info Dialogs -->
+    <string name="info_general_accessibility">
+        Un luogo completamente accessibile dovrebbe avere un accesso senza gradini, porte larghe e spazio sufficiente per muoversi in modo indipendente. L\'ingresso, le aree interne e il bagno giocano tutti un ruolo importante nell\'usabilità di un luogo. Anche se uno di questi elementi funziona bene, la mancanza di accessibilità altrove può comunque rendere difficile una visita.
+    </string>
+
+    <string name="info_indoor_accessibility">
+        Le aree interne dovrebbero essere senza gradini e abbastanza ampie per permettere a una sedia a rotelle di muoversi e girare. I corridoi dovrebbero consentire un passaggio facile, e qualsiasi cambiamento di livello dovrebbe essere dotato di rampe o ascensori. Passaggi stretti, scale interne o spazi angusti possono limitare l\'accesso anche quando l\'ingresso è accessibile.
+    </string>
+
+    <string name="info_entrance_accessibility">
+        L\'ingresso dovrebbe essere a livello o avere una rampa, con una porta abbastanza larga per l\'accesso in sedia a rotelle. Si raccomanda una larghezza minima di 90 cm. Piccole soglie sotto i 3 cm generalmente non sono problematiche, ma qualsiasi cosa più alta potrebbe richiedere una rampa. Porte automatiche o facili da aprire migliorano significativamente l\'accesso.
+    </string>
+
+    <string name="info_additional_info">
+        In questo campo puoi aggiungere qualsiasi dettaglio extra che non rientra nelle categorie standard.\n\nSegnala cose come ostacoli temporanei, assistenza del personale, parcheggi vicini, qualità della superficie o qualsiasi altra cosa che possa aiutare gli altri a comprendere meglio l\'accessibilità.
+    </string>
+
+    <string name="info_restroom_accessibility">
+        Un bagno accessibile dovrebbe avere spazio sufficiente per entrare e muoversi con una sedia a rotelle, maniglioni sicuri per il supporto, e un WC e lavandino facili da raggiungere. La porta dovrebbe essere abbastanza larga, e caratteristiche come un allarme di emergenza o l\'accesso con Euro key possono fare una grande differenza. Anche se un luogo è generalmente accessibile, la mancanza di un bagno utilizzabile può rappresentare ancora una barriera importante.
+    </string>
+
+    <string name="info_step_count">
+        Il numero di gradini si riferisce al numero di scalini all\'ingresso.\n\nZero gradini significa generalmente che l\'ingresso è completamente accessibile. Un gradino molto piccolo sotto i 3 cm è spesso ancora gestibile con una sedia a rotelle o un deambulatore.\n\nUno o due gradini possono essere parzialmente accessibili, a seconda dell\'altezza e del contesto. Tre o più gradini rendono tipicamente l\'ingresso non accessibile a meno che non ci sia una rampa o un ascensore.
+    </string>
+
+    <string name="info_step_height">
+        L\'altezza del gradino indica quanto è alto il gradino più alto all\'ingresso.\n\nUna soglia o gradino sotto i 3 cm è generalmente ancora considerato accessibile. Gradini tra 3–10 cm potrebbero essere gestibili con aiuto o una piccola rampa.\n\nQualsiasi cosa sopra i 10 cm è solitamente una barriera senza una rampa adeguata o un ascensore.
+    </string>
+
+    <string name="info_ramp">
+        Questo indica se è disponibile una rampa per aggirare eventuali gradini.\n\nPer essere accessibile, una rampa dovrebbe avere una pendenza dolce (idealmente 1:12), essere abbastanza larga per una sedia a rotelle, avere corrimano e una superficie antiscivolo.\n\nAnche se una rampa esiste, potrebbe essere comunque difficile da usare se è troppo ripida o stretta.
+    </string>
+
+    <string name="info_lift">
+        Questo indica se è disponibile un ascensore o una piattaforma elevatrice per superare barriere verticali come le scale.\n\nGli ascensori sono essenziali per l\'accessibilità negli edifici a più piani.\n\nÈ utile sapere se l\'ascensore può essere usato in modo indipendente o se richiede assistenza o una chiave.
+    </string>
+
+    <string name="info_entrance_width">
+        La larghezza dell\'ingresso si riferisce alla larghezza del punto di accesso principale o della porta dell\'edificio.\n\nUn ingresso accessibile ha tipicamente una larghezza libera di almeno 90 cm. Qualsiasi cosa inferiore a 75 cm è generalmente troppo stretta per le sedie a rotelle.\n\nQuesto aiuta a determinare se una persona che usa ausili per la mobilità può passare comodamente attraverso l\'ingresso.
+    </string>
+
+    <string name="info_door_type">
+        Il tipo di porta si riferisce a come la porta si apre e quanto è adatta per persone con mobilità limitata.\n\nLe porte scorrevoli automatiche e le porte a battente automatiche sono generalmente le più accessibili, poiché si aprono senza sforzo fisico.\n\nLe porte a battente manuali e le porte scorrevoli manuali possono essere accessibili se sono leggere, facili da aprire e hanno maniglie facili da usare.\n\nLe porte girevoli, che ruotano attorno a un asse centrale, potrebbero richiedere tempismo e coordinazione. Le porte doppie, con due pannelli che si aprono nel mezzo, possono variare in accessibilità a seconda dello spazio e della facilità d\'uso.
+    </string>
+
+    <string name="info_door_width">
+        La larghezza della porta determina se una persona che usa una sedia a rotelle o un deambulatore può passare comodamente.\n\nUna larghezza di almeno 90 cm è considerata completamente accessibile. Larghezze tra 75–89 cm potrebbero essere gestibili con sedie a rotelle più piccole o con difficoltà.\n\nQualsiasi cosa inferiore a 75 cm è tipicamente troppo stretta per un accesso sicuro con ausili per la mobilità.
+    </string>
+
+    <string name="info_room_maneuver">
+        Lo spazio di manovra si riferisce allo spazio all\'interno di un bagno o altra area accessibile per muovere e girare una sedia a rotelle.\n\nPer essere completamente accessibile, dovrebbe esserci spazio sufficiente per una rotazione completa di 360 gradi — solitamente un diametro di almeno 150 cm.\n\nUno spazio limitato può rendere molto difficile l\'utilizzo autonomo della stanza.
+    </string>
+
+    <string name="info_grab_rails">
+        I maniglioni forniscono supporto per il trasferimento da e verso il WC o per la stabilità generale.\n\nI bagni accessibili dovrebbero avere maniglioni sicuri, orizzontali e/o verticali posizionati accanto al WC e talvolta vicino al lavandino o alla porta.\n\nManiglioni mancanti o posizionati in modo improprio possono rendere il bagno difficile o pericoloso da utilizzare.
+    </string>
+
+    <string name="info_sink">
+        Il lavandino dovrebbe essere accessibile da una posizione seduta.\n\nCi dovrebbe essere spazio libero sotto per una sedia a rotelle, e i rubinetti dovrebbero essere raggiungibili e utilizzabili con forza manuale limitata.\n\nLavandini molto alti, profondi o ostruiti potrebbero non essere accessibili anche se il resto del bagno lo è.
+    </string>
+
+    <string name="info_toilet_seat">
+        L\'altezza del sedile del WC dovrebbe essere comoda e sicura per le persone che si trasferiscono da una sedia a rotelle.\n\nTipicamente, un\'altezza del sedile di 45–50 cm è considerata accessibile. Sedili troppo bassi o troppo alti possono rendere i trasferimenti difficili o rischiosi.\n\nAlcuni WC accessibili potrebbero includere anche schienali di supporto o caratteristiche aggiuntive.
+    </string>
+
+    <string name="info_emergency_alarm">
+        Gli allarmi di emergenza permettono agli utenti di chiedere aiuto in caso di incidente all\'interno del bagno.\n\nI bagni accessibili dovrebbero avere corde o pulsanti di allarme chiaramente contrassegnati, raggiungibili dal WC o dal livello del pavimento.\n\nSe nessun allarme è presente o è fuori portata, potrebbe non essere sicuro per un uso autonomo.
+    </string>
+
+    <string name="info_euro_key">
+        Un sistema Euro key è utilizzato in molti paesi europei per consentire l\'accesso a bagni accessibili chiusi a chiave.\n\nSe un luogo utilizza il sistema Euro key, gli utenti con una chiave registrata possono sbloccare e utilizzare l\'impianto in modo autonomo.\n\nQuesto può aiutare a garantire l\'accessibilità mantenendo le strutture sicure e pulite.
+    </string>
+
+    <!-- Common Boolean Options -->
+    <string name="checkmark_yes">✅ Sì</string>
+    <string name="cross_no">❌ No</string>
+
+    <!-- Place Categories -->
+    <string name="category_cafe">Caffè</string>
+    <string name="category_restaurant">Ristorante</string>
+    <string name="category_toilets">Bagni</string>
+    <string name="category_supermarket">Supermercato</string>
+    <string name="category_pharmacy">Farmacia</string>
+    <string name="category_hospital">Ospedale</string>
+    <string name="category_default">Sconosciuto</string>
+    <string name="category_bar">Bar</string>
+    <string name="category_pub">Pub</string>
+    <string name="category_gas_station">Stazione di servizio</string>
+    <string name="category_library">Biblioteca</string>
+    <string name="category_bank">Banca</string>
+    <string name="category_cinema">Cinema</string>
+    <string name="category_university">Università</string>
+    <string name="category_school">Scuola</string>
+    <string name="category_kindergarten">Asilo</string>
+    <string name="category_college">Collegio</string>
+    <string name="category_clinic">Clinica</string>
+    <string name="category_nightclub">Discoteca</string>
+    <string name="category_courthouse">Tribunale</string>
+    <string name="category_hotel">Hotel</string>
+    <string name="category_hostel">Ostello</string>
+    <string name="category_museum">Museo</string>
+    <string name="category_bakery">Panetteria</string>
+    <string name="category_clothes">Negozio di abbigliamento</string>
+    <string name="category_electronics">Negozio di elettronica</string>
+    <string name="category_convenience">Minimarket</string>
+    <string name="category_cosmetics">Negozio di cosmetici</string>
+    <string name="category_car">Concessionario auto</string>
+    <string name="category_bicycle">Negozio di biciclette</string>
+    <string name="category_motorcycle">Negozio di motociclette</string>
+    <string name="category_furniture">Negozio di mobili</string>
+    <string name="category_jewelry">Gioielleria</string>
+    <string name="category_shoes">Negozio di scarpe</string>
+    <string name="category_sports">Negozio di articoli sportivi</string>
+    <string name="category_books">Libreria</string>
+    <string name="terms_of_service_description">Questa sezione spiega i Termini di Servizio per l\'utilizzo di Inwheel. Tocca qui sotto per visualizzare i Termini di Servizio completi.</string>
+</resources>

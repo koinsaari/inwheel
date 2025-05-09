@@ -1,12 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">InWheel</string>
-    <string name="copyright_prefix">Copyright © 2025</string>
+    <string name="app_name" translatable="false">InWheel</string>
+    <string name="copyright_prefix" translatable="false">Copyright © 2025</string>
 
     <!-- Emojis -->
-    <string name="emoji_checkmark">✅</string>
-    <string name="emoji_warning">⚠️</string>
-    <string name="emoji_cross">❌</string>
-    <string name="emoji_question">❔</string>
+    <string name="emoji_checkmark" translatable="false">✅</string>
+    <string name="emoji_warning" translatable="false">⚠️</string>
+    <string name="emoji_cross" translatable="false">❌</string>
+    <string name="emoji_question" translatable="false">❔</string>
 
     <!-- Wheelchair Access Descriptions -->
     <string name="unknown_accessibility">Unknown accessibility</string>
@@ -241,7 +242,7 @@
     <string name="contact_body">
         If you have feedback, want to contribute, or just have a question, feel free to reach out to us.
     </string>
-    <string name="made_by_footer">"Made with 💚 by "</string>
+    <string name="made_by_footer" translatable="false">"Made with 💚 by "</string>
     <string name="accessibility_guidelines">Accessibility Guidelines</string>
 
     <!-- Info Dialogs -->

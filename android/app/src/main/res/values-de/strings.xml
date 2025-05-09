@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Wheelchair Access Descriptions -->
+    <string name="unknown_accessibility">Unbekannte Zugänglichkeit</string>
+
+    <!-- Content Descriptions -->
+    <string name="content_desc_navigation_map">Karte öffnen</string>
+    <string name="content_desc_fully_accessible">Vollständig zugänglich</string>
+    <string name="content_desc_partially_accessible">Teilweise zugänglich</string>
+    <string name="content_desc_not_accessible">Nicht zugänglich</string>
+    <string name="content_desc_unknown_accessibility">Unbekannte Zugänglichkeit</string>
+    <string name="content_desc_phone">Telefonnummer</string>
+    <string name="content_desc_email">E-Mail-Adresse</string>
+    <string name="content_desc_website">Webseite</string>
+    <string name="content_desc_address">Adresse</string>
+    <string name="content_desc_show_options">Optionen für %1$s anzeigen</string>
+    <string name="content_desc_navigation_about">Über uns-Sektion öffnen</string>
+    <string name="content_desc_navigation_accessibility_guidelines">Richtlinien für Barrierefreiheit öffnen</string>
+    <string name="content_desc_property_info">Informationen über %1$s</string>
+    <string name="content_desc_open_drawer">Navigationsmenü öffnen</string>
+    <string name="content_desc_filter_selected">%1$s Filter ausgewählt. Tippen zum Entfernen des Filters.</string>
+    <string name="content_desc_filter_unselected">%1$s Filter nicht ausgewählt. Tippen zum Anwenden des Filters.</string>
+    <string name="content_desc_filter_check_icon">Indikator für ausgewählte Kategorie</string>
+    <string name="content_desc_filter_category_icon">Symbol für Kategorie %1$s</string>
+    <string name="content_desc_filter_menu">Alle Kategoriefilter anzeigen</string>
+    <string name="content_desc_locate_me">Karte auf meinen Standort zentrieren</string>
+    <string name="content_desc_back">Zurück</string>
+    <string name="content_desc_clear_search">Suchtext löschen</string>
+    <string name="content_desc_navigation_legal">Rechtliche Informationen und Lizenzen</string>
+    <string name="content_desc_accessibility_disclaimer_info">Informationen über Richtlinien zur Barrierefreiheit</string>
+
+    <!-- Map Related -->
+    <string name="map">Karte</string>
+    <string name="place_search_bar_placeholder">Nach einem Ort suchen…</string>
+    <string name="location_permissions_not_granted">Aktivieren Sie die Standortfreigabe in Ihren Telefoneinstellungen, um Orte in Ihrer Nähe zu sehen.</string>
+    <string name="map_footer_note">Standortdaten © OpenStreetMap-Mitwirkende.</string>
+    <string name="filter_categories">Nach Kategorie filtern</string>
+
+    <!-- Licenses and legal related -->
+    <string name="terms_dialog_title">Nutzungsbedingungen &amp; Datenschutzrichtlinie</string>
+    <string name="terms_dialog_message">Bevor Sie InWheel nutzen, lesen und akzeptieren Sie bitte unsere Nutzungsbedingungen und Datenschutzrichtlinie. Durch Tippen auf \"Akzeptieren\" bestätigen Sie, dass Sie diese Richtlinien gelesen haben und damit einverstanden sind.</string>
+    <string name="terms_dialog_accept">Akzeptieren</string>
+    <string name="terms_dialog_decline">Ablehnen</string>
+    <string name="legal_licenses_title">Rechtliches &amp; Lizenzen</string>
+    <string name="osm_data_section_title">OpenStreetMap-Daten</string>
+    <string name="osm_data_description">Diese Anwendung verwendet Standortdaten von OpenStreetMap, die unter der Open Database License (ODbL) verfügbar sind.</string>
+    <string name="view_osm_copyright">OpenStreetMap-Copyright</string>
+    <string name="open_source_licenses_title">Open-Source-Lizenzen</string>
+    <string name="open_source_licenses_description">Diese Anwendung enthält verschiedene Open-Source-Komponenten, jede unter ihren jeweiligen Lizenzbedingungen. Eine vollständige Liste dieser Komponenten und ihrer Lizenzen ist durch Klicken auf die Schaltfläche unten verfügbar.</string>
+    <string name="view_licenses">Lizenzen anzeigen</string>
+    <string name="data_disclaimer_title">Daten-Haftungsausschluss</string>
+    <string name="data_disclaimer_description">Die in dieser Anwendung präsentierten Zugänglichkeitsinformationen basieren auf offenen Datenquellen und Nutzerinhalten. Obwohl wir uns um Genauigkeit bemühen, werden die Informationen \"wie sie sind\" ohne jegliche Garantien bereitgestellt. Nutzern wird empfohlen, kritische Zugänglichkeitsdetails selbständig zu überprüfen, bevor sie sich darauf verlassen. Wir ermutigen zu Beiträgen, um die Qualität und den Umfang der Daten zu verbessern.</string>
+    <string name="privacy_policy_title">Datenschutzrichtlinie</string>
+    <string name="privacy_policy_description">Dieser Abschnitt erklärt, wie InWheel mit Ihren Standortdaten, Kartendiensten und Nutzerbeiträgen umgeht. Tippen Sie unten, um die vollständige Datenschutzrichtlinie anzuzeigen.</string>
+    <string name="view_privacy_policy">Datenschutzrichtlinie anzeigen</string>
+    <string name="app_license_title">App-Lizenz</string>
+    <string name="app_license_description">InWheel ist eine Open-Source-Anwendung, die unter der Apache-Lizenz 2.0 vertrieben wird. Sie können sie gemäß den Bedingungen dieser Lizenz frei nutzen, modifizieren und verteilen.</string>
+    <string name="view_app_license">Vollständige Lizenz anzeigen</string>
+    <string name="view_terms_of_service">Nutzungsbedingungen anzeigen</string>
+    <string name="terms_of_service_title">Nutzungsbedingungen</string>
+    <string name="terms_of_service_description">Dieser Abschnitt erklärt die Nutzungsbedingungen für InWheel. Tippen Sie unten, um die vollständigen Nutzungsbedingungen anzuzeigen.</string>
+
+    <!-- Accessibility guidelines related -->
+    <string name="general_status_title_unknown">Der Zugänglichkeitsstatus wurde noch nicht überprüft oder gemeldet.</string>
+    <string name="general_accessibility_title">Allgemeine Zugänglichkeit</string>
+    <string name="step_count_and_step_height">Stufenanzahl &amp; Stufenhöhe</string>
+    <string name="ramp_and_lift_availability">Verfügbarkeit von Rampen &amp; Aufzügen</string>
+    <string name="accessibility_guidelines_disclaimer">
+        Die hier präsentierten Richtlinien zur Barrierefreiheit basieren auf anerkannten Prinzipien, realen Beobachtungen und Nutzererfahrungen.\nSie sollen hilfreiche Orientierung bieten, ersetzen aber keine offiziellen Standards.\nKonsultieren Sie immer offizielle Ressourcen, wenn spezifische rechtliche oder technische Anforderungen benötigt werden.
+    </string>
+
+    <!-- Place Details -->
+    <string name="no_contact_info_available">Keine Kontaktinformationen für diesen Ort angegeben. ☹️</string>
+    <string name="close_detail_sheet_button">Detailansicht schließen</string>
+    <string name="place_detail_footer_note">⚠️ Die Datengenauigkeit kann nicht garantiert werden. Ihre ehrlichen Eingaben helfen, die Barrierefreiheit für alle zu verbessern.</string>
+
+    <!-- Accessibility Status Titles -->
+    <string name="general_status_title_fully_accessible">Dieser Ort ist vollständig barrierefrei. \nPersonen mit eingeschränkter Mobilität sollten keine Hilfe benötigen</string>
+    <string name="general_status_title_partially_accessible">Dieser Ort ist teilweise barrierefrei. \nPersonen mit eingeschränkter Mobilität könnten Hilfe benötigen.</string>
+    <string name="general_status_title_not_accessible">Dieser Ort ist nicht barrierefrei für Personen mit eingeschränkter Mobilität.</string>
+    <string name="how_accessible_question">Wie barrierefrei ist dieser Ort für Personen mit eingeschränkter Mobilität?</string>
+    <string name="image_desc_fully_accessible">Vollständig barrierefrei!</string>
+    <string name="image_desc_partially_accessible">Benötigt einen Helfer!</string>
+    <string name="image_desc_not_accessible">Überhaupt nicht barrierefrei!</string>
+
+    <!-- Entrance Accessibility -->
+    <string name="entrance">Eingang</string>
+    <string name="entrance_accessibility">Zugänglichkeit des Eingangs</string>
+    <string name="entrance_accessibility_dialog_title">Über die Zugänglichkeit des Eingangs</string>
+    <string name="entrance_fully_accessible_label">Keine Stufen oder mit Aufzug/Rampe am Eingang.</string>
+    <string name="entrance_partially_accessible_label">Maximal 1 nicht zu steile Stufe am Eingang, oder die Tür ist nicht praktisch zu öffnen.</string>
+    <string name="entrance_not_accessible_label">Mehrere Stufen am Eingang, oder die Tür ist nicht breit genug.</string>
+    <string name="entrance_unknown_label">Keine detaillierten Informationen über den Eingang angegeben.</string>
+
+    <!-- Indoor Accessibility -->
+    <string name="indoor_accessibility">Innere Zugänglichkeit</string>
+    <string name="indoor_accessibility_dialog_title">Über die innere Zugänglichkeit</string>
+    <string name="indoor_fully_accessible_status_label">Innen genügend Platz, um sich mit einem Rollstuhl zu bewegen.</string>
+    <string name="indoor_partially_accessible_status_label">Im Inneren könnten einige Bereiche mit einem Rollstuhl schwer zugänglich sein.</string>
+    <string name="indoor_not_accessible_status_label">Nicht genug Platz, um sich mit einem Rollstuhl zu bewegen.</string>
+    <string name="indoor_unknown_label">Keine detaillierten Informationen über die innere Zugänglichkeit angegeben.</string>
+
+    <!-- Restroom Accessibility -->
+    <string name="restroom">Toilette</string>
+    <string name="restroom_accessibility">Zugänglichkeit der Toilette</string>
+    <string name="restroom_accessibility_dialog_title">Über die Zugänglichkeit der Toilette</string>
+    <string name="restroom_fully_accessible_status_label">Die Toilette ist geräumig und vollständig rollstuhlgerecht.</string>
+    <string name="restroom_partially_accessible_status_label">Die Toilette ist teilweise zugänglich und könnte Hilfe erfordern.</string>
+    <string name="restroom_not_accessible_status_label">Die Toilette ist nicht zugänglich für Rollstuhlnutzer.</string>
+    <string name="restroom_unknown_label">Keine Informationen über Toiletten im Inneren angegeben.</string>
+
+    <!-- Entrance Details -->
+    <string name="step_count">Stufenanzahl:</string>
+    <string name="step_height">Stufenhöhe:</string>
+    <string name="ramp">Rampe:</string>
+    <string name="lift">Aufzug:</string>
+    <string name="door_width">Türbreite:</string>
+    <string name="doorType">"Türart:"</string>
+    <string name="entrance_width">Eingangsbreite:</string>
+
+    <!-- Restroom Details -->
+    <string name="room_maneuver">Bewegungsfläche:</string>
+    <string name="grab_rails">Haltegriffe:</string>
+    <string name="sink">Waschbecken:</string>
+    <string name="toilet_seat">Toilettensitz:</string>
+    <string name="emergency_alarm">Notrufsystem:</string>
+    <string name="euro_key">EuroKey:</string>
+
+    <!-- Additional Information -->
+    <string name="additional_info">Zusätzliche Informationen</string>
+    <string name="additional_info_dialog_title">Erklären Sie die Barrierefreiheit des Ortes</string>
+    <string name="additional_info_placeholder">Was möchten Sie, dass andere über die Barrierefreiheit dieses Ortes wissen?</string>
+    <string name="additional_info_label">Text hier eingeben…</string>
+
+    <!-- Dialog Titles -->
+    <string name="general_accessibility">Allgemeines Zugänglichkeitsniveau</string>
+    <string name="general_accessibility_dialog_title">Wie barrierefrei ist dieser Ort?</string>
+    <string name="step_count_dialog_title">Über die Stufenanzahl</string>
+    <string name="step_height_dialog_title">Über die Stufenhöhe</string>
+    <string name="door_width_dialog_title">Über die Türbreite</string>
+    <string name="ramp_dialog_title">Über Rampen</string>
+    <string name="lift_dialog_title">Über Aufzüge</string>
+    <string name="door_type_dialog_title">Über Türarten</string>
+    <string name="room_maneuver_dialog_title">Über Bewegungsflächen</string>
+    <string name="grab_rails_dialog_title">Über Haltegriffe in Toiletten</string>
+    <string name="toilet_seat_dialog_title">Über Toilettensitze</string>
+    <string name="emergency_alarm_dialog_title">Über Notrufsysteme in Toiletten</string>
+    <string name="sink_dialog_title">Über Waschbecken in Toiletten</string>
+    <string name="euro_key_dialog_title">Über EuroKey</string>
+    <string name="entrance_width_dialog_title">Über die Eingangsbreite</string>
+
+    <!-- Dialog/Button Actions -->
+    <string name="cancel">Abbrechen</string>
+    <string name="save">Speichern</string>
+    <string name="ok">OK</string>
+    <string name="apply">Anwenden</string>
+    <string name="reset">Zurücksetzen</string>
+    <string name="update_dialog_footer">⚠️ Ihre ehrlichen Eingaben helfen, die Barrierefreiheit für alle zu verbessern.</string>
+    <string name="info_dialog_footer">⚠️ Diese Definitionen dienen nur zur allgemeinen Orientierung. Für regulatorische Details konsultieren Sie bitte offizielle Standards.</string>
+
+    <!-- Options -->
+    <string name="accessibility_option_fully_accessible">✅ Vollständig barrierefrei</string>
+    <string name="accessibility_option_partially_accessible">⚠️ Teilweise barrierefrei</string>
+    <string name="accessibility_option_not_accessible">❌ Nicht barrierefrei</string>
+
+    <string name="door_type_automatic_sliding">✅ Automatische Schiebetür</string>
+    <string name="door_type_automatic_swing">✅ Automatische Schwingtür</string>
+    <string name="door_type_manual_swing">⚠️ Manuelle Schwingtür</string>
+    <string name="door_type_manual_sliding">⚠️ Manuelle Schiebetür</string>
+    <string name="door_type_revolving">⚠️ Drehtür</string>
+    <string name="door_type_double">⚠️ Doppeltür</string>
+
+    <string name="step_count_option_none">✅ Keine (ebenerdiger Zugang)</string>
+    <string name="step_count_option_one">⚠️ Eine Stufe</string>
+    <string name="step_count_option_multiple">❌ Mehrere Stufen</string>
+
+    <string name="step_height_option_low">✅ Niedrig (weniger als 3 cm)</string>
+    <string name="step_height_option_medium">⚠️ Mittel (3–7 cm)</string>
+    <string name="step_height_option_high">❌ Hoch (mehr als 7 cm)</string>
+
+    <string name="door_width_option_wide">✅ Breit (90+ cm)</string>
+    <string name="door_width_option_standard">⚠️ Standard (75–90 cm)</string>
+    <string name="door_width_option_narrow">❌ Schmal (weniger als 75 cm)</string>
+
+    <string name="lift_option_accessible">✅ Vollständig barrierefrei</string>
+    <string name="lift_option_partially_accessible">⚠️ Teilweise barrierefrei</string>
+    <string name="lift_option_none">❌ Kein Aufzug verfügbar</string>
+
+    <string name="ramp_option_accessible">✅ Geeignete Rampe verfügbar</string>
+    <string name="ramp_option_partial">⚠️ Steile oder schmale Rampe</string>
+    <string name="ramp_option_none">❌ Keine Rampe verfügbar</string>
+
+    <string name="room_maneuver_option_spacious">✅ Geräumig</string>
+    <string name="room_maneuver_option_limited">⚠️ Begrenzt</string>
+    <string name="room_maneuver_option_tight">❌ Eng</string>
+
+    <string name="grab_rails_option_both_sides">✅ Griffe auf beiden Seiten</string>
+    <string name="grab_rails_option_one_side">⚠️ Griffe nur auf einer Seite</string>
+    <string name="grab_rails_option_none">❌ Keine Haltegriffe</string>
+
+    <string name="emergency_alarm_option_available">✅ Alarm verfügbar und zugänglich</string>
+    <string name="emergency_alarm_option_limited">⚠️ Begrenzter Zugang zum Alarm</string>
+    <string name="emergency_alarm_option_none">❌ Kein Notrufsystem</string>
+
+    <!-- About/Info Screen -->
+    <string name="about">Über</string>
+    <string name="about_title">ℹ️ Über InWheel</string>
+    <string name="about_body">
+        InWheel bietet detaillierte Informationen zur Barrierefreiheit für öffentliche Orte in der Schweiz 🇨🇭 und Finnland 🇫🇮 und erleichtert es Menschen mit Mobilitätseinschränkungen, geeignete Orte zu finden.\n\nWährend die meisten Kartendienste die Barrierefreiheit auf vage Bezeichnungen reduzieren, konzentriert sich InWheel auf die Details, die wichtig sind — Stufen, Rampen, Türbreiten und Toilettenzugänglichkeit.
+    </string>
+    <string name="the_goal_title">🎯 Unsere Mission</string>
+    <string name="the_goal_body">
+        InWheel zielt darauf ab, detaillierte, genaue Daten zur Barrierefreiheit für öffentliche Orte bereitzustellen — beginnend in der Schweiz und Finnland.\n\nDie App kombiniert Daten von OpenStreetMap mit einer speziellen Datenbank für Barrierefreiheit, um umfassendere Informationen anzubieten.\n\nDas Ziel ist, über Ja-oder-Nein-Bezeichnungen hinauszugehen und genau zu zeigen, wie barrierefrei jeder Ort tatsächlich ist.
+    </string>
+    <string name="a_work_in_progress_title">🛠️ Ein Projekt in Entwicklung</string>
+    <string name="a_work_in_progress_body">
+        Diese App wird kontinuierlich verbessert und neue Funktionen werden hinzugefügt. Es kann Fehler, fehlende Daten und Funktionen geben, die verbessert werden müssen. Sie können unsere Projektseite auf GitHub besuchen, um aktuelle Probleme zu sehen.\n\nAktualisierungen werden regelmäßig basierend auf Nutzerfeedback und Community-Bedürfnissen erfolgen. InWheel verpflichtet sich, kostenlos, Open-Source und auf Barrierefreiheit fokussiert zu bleiben.
+    </string>
+    <string name="contributing_title">🤝 Mitwirken</string>
+    <string name="contributing_body">
+        InWheel ist ein Open-Source-Projekt. Beiträge über GitHub-Issues, Pull-Requests oder Datenübermittlungen sind willkommen und werden geschätzt. Jeder kann helfen, öffentliche Räume für Menschen mit Mobilitätseinschränkungen besser zugänglich zu machen. Für aktuelle Probleme schauen Sie bitte auf unserer Projektseite auf GitHub nach.
+    </string>
+    <string name="disclaimer_title">📌 Haftungsausschluss</string>
+    <string name="disclaimer_body">
+        Diese App verwendet Google Maps aufgrund seiner Stabilität und fortschrittlichen Funktionen, was die Handhabung von tausenden Orten auf der Karte viel benutzerfreundlicher macht. Google Maps ist jedoch nicht kostenlos im großen Maßstab, daher können bestimmte Nutzungsbeschränkungen gelten.\n\nDas Backend und die Datenbank sind so konzipiert, dass sie auch innerhalb kostenloser Kontingente funktionieren, da dieses Projekt derzeit nur von einem einzelnen Entwickler erstellt und gepflegt wird. Solange es keine externe Finanzierung gibt, werden Funktionen und Wachstum mit dem abgestimmt, was realistisch nachhaltig ist.\n
+    </string>
+    <string name="disclaimer_data_note">
+        Bitte beachten Sie, dass die Daten zur Barrierefreiheit in dieser App auf offenen Quellen und Beiträgen von Nutzern basieren. Obwohl jede Anstrengung unternommen wird, um die Informationen nützlich zu halten, kann die Genauigkeit nicht garantiert werden. Die Zuverlässigkeit der Daten hängt letztendlich von der Community ab. Wenn Sie etwas bemerken, das fehlt oder falsch ist, erwägen Sie bitte, es in der App zu aktualisieren.
+    </string>
+    <string name="about_footer_note">
+        ⚠️ Daten zur Barrierefreiheit können unvollständig oder ungenau sein. Helfen Sie anderen, indem Sie sie aktuell halten.
+    </string>
+    <string name="contact_title">📬 Kontakt</string>
+    <string name="contact_body">
+        Wenn Sie Feedback haben, mitwirken möchten oder einfach eine Frage haben, zögern Sie nicht, uns zu kontaktieren.
+    </string>
+    <string name="made_by_footer">"Gemacht mit 💚 von "</string>
+    <string name="accessibility_guidelines">Richtlinien für Barrierefreiheit</string>
+
+    <!-- Info Dialogs -->
+    <string name="info_general_accessibility">
+        Ein vollständig barrierefreier Ort sollte stufenfreien Zugang, breite Türen und genügend Platz haben, um sich selbständig zu bewegen. Der Eingang, die Innenbereiche und die Toilette spielen alle eine Rolle bei der Nutzbarkeit eines Ortes. Selbst wenn einer dieser Bereiche gut funktioniert, kann fehlende Barrierefreiheit anderswo einen Besuch immer noch schwierig machen.
+    </string>
+
+    <string name="info_indoor_accessibility">
+        Innenbereiche sollten stufenfrei und breit genug sein, damit sich ein Rollstuhl bewegen und drehen kann. Flure sollten eine einfache Passage ermöglichen, und Höhenunterschiede sollten mit Rampen oder Aufzügen überbrückt werden. Enge Durchgänge, innere Treppen oder beengte Räume können den Zugang beschränken, selbst wenn der Eingang barrierefrei ist.
+    </string>
+
+    <string name="info_entrance_accessibility">
+        Der Eingang sollte eben sein oder eine Rampe haben, mit einer Tür, die breit genug für Rollstuhlzugang ist. Eine Mindestbreite von 90 cm wird empfohlen. Kleine Schwellen unter 3 cm sind in der Regel kein Problem, aber alles höhere könnte eine Rampe erfordern. Automatische oder leicht zu öffnende Türen verbessern den Zugang erheblich.
+    </string>
+
+    <string name="info_additional_info">
+        In diesem Feld können Sie zusätzliche Details eingeben, die nicht in die Standardkategorien passen.\n\nNotieren Sie Dinge wie temporäre Hindernisse, Personalunterstützung, nahegelegene Parkplätze, Bodenqualität oder alles andere, was anderen helfen könnte, die Barrierefreiheit besser zu verstehen.
+    </string>
+
+    <string name="info_restroom_accessibility">
+        Eine barrierefreie Toilette sollte genügend Platz haben, um mit einem Rollstuhl einzutreten und sich zu bewegen, sichere Haltegriffe zur Unterstützung und eine Toilette und ein Waschbecken, die leicht zu erreichen sind. Die Tür sollte breit genug sein, und Funktionen wie ein Notrufsystem oder EuroKey-Zugang können auch einen großen Unterschied machen. Selbst wenn ein Ort allgemein zugänglich ist, kann das Fehlen einer nutzbaren Toilette immer noch ein großes Hindernis darstellen.
+    </string>
+
+    <string name="info_step_count">
+        Die Stufenanzahl bezieht sich auf die Anzahl der Stufen am Eingang.\n\nNull Stufen bedeutet meist, dass der Eingang vollständig barrierefrei ist. Eine sehr kleine Stufe unter 3 cm ist oft noch mit einem Rollstuhl oder Rollator zu bewältigen.\n\nEine oder zwei Stufen können teilweise barrierefrei sein, abhängig von der Höhe und dem Kontext. Drei oder mehr Stufen machen den Eingang typischerweise nicht barrierefrei, es sei denn, es gibt eine Rampe oder einen Aufzug.
+    </string>
+
+    <string name="info_step_height">
+        Die Stufenhöhe gibt an, wie hoch die höchste Stufe am Eingang ist.\n\nEine Schwelle oder Stufe unter 3 cm wird allgemein noch als zugänglich betrachtet. Stufen zwischen 3-10 cm können mit Hilfe oder einer kleinen Rampe bewältigbar sein.\n\nAlles über 10 cm ist normalerweise ein Hindernis ohne eine geeignete Rampe oder einen Aufzug.
+    </string>
+
+    <string name="info_ramp">
+        Dies gibt an, ob eine Rampe verfügbar ist, um Stufen zu umgehen.\n\nUm barrierefrei zu sein, sollte eine Rampe eine sanfte Steigung haben (idealerweise 1:12), breit genug für einen Rollstuhl sein, Handläufe haben und eine rutschfeste Oberfläche.\n\nSelbst wenn eine Rampe existiert, kann sie immer noch schwer zu benutzen sein, wenn sie zu steil oder zu schmal ist.
+    </string>
+
+    <string name="info_lift">
+        Dies gibt an, ob ein Aufzug oder eine Plattform-Hebebühne verfügbar ist, um vertikale Barrieren wie Treppen zu überwinden.\n\nAufzüge sind wesentlich für die Barrierefreiheit in mehrstöckigen Gebäuden.\n\nEs ist hilfreich zu wissen, ob der Aufzug selbständig benutzt werden kann oder ob er Hilfe oder einen Schlüssel erfordert.
+    </string>
+
+    <string name="info_entrance_width">
+        Die Eingangsbreite bezieht sich auf die Breite des Hauptzugangspunkts oder der Tür in das Gebäude.\n\nEin barrierefreier Eingang hat typischerweise eine lichte Breite von mindestens 90 cm. Alles unter 75 cm ist meist zu schmal für Rollstühle.\n\nDies hilft festzustellen, ob jemand mit Mobilitätshilfen bequem durch den Eingang gelangen kann.
+    </string>
+
+    <string name="info_door_type">
+        Der Türtyp bezieht sich auf die Art, wie die Tür öffnet und wie geeignet sie für Menschen mit eingeschränkter Mobilität ist.\n\nAutomatische Schiebe- und Schwingtüren sind allgemein am besten barrierefrei, da sie sich ohne körperliche Anstrengung öffnen.\n\nManuelle Schwing- und Schiebetüren können barrierefrei sein, wenn sie leicht sind, einfach zu öffnen und benutzerfreundliche Griffe haben.\n\nDrehtüren, die sich um eine zentrale Achse drehen, können Timing und Koordination erfordern. Doppeltüren mit zwei Flügeln, die sich in der Mitte öffnen, können je nach Platz und Bedienbarkeit unterschiedlich barrierefrei sein.
+    </string>
+
+    <string name="info_door_width">
+        Die Türbreite bestimmt, ob eine Person mit einem Rollstuhl oder Rollator bequem hindurchgehen kann.\n\nEine Breite von mindestens 90 cm gilt als vollständig barrierefrei. Breiten zwischen 75-89 cm können mit kleineren Rollstühlen oder mit Schwierigkeit bewältigbar sein.\n\nAlles unter 75 cm ist typischerweise zu schmal für einen sicheren Zugang mit Mobilitätshilfen.
+    </string>
+
+    <string name="info_room_maneuver">
+        Die Bewegungsfläche bezieht sich auf den Platz innerhalb einer Toilette oder eines anderen barrierefreien Bereichs, um einen Rollstuhl zu bewegen und zu drehen.\n\nUm vollständig barrierefrei zu sein, sollte genügend Platz für eine vollständige 360-Grad-Drehung vorhanden sein — üblicherweise ein Durchmesser von mindestens 150 cm.\n\nBegrenzter Platz kann es sehr schwierig machen, den Raum selbständig zu nutzen.
+    </string>
+
+    <string name="info_grab_rails">
+        Haltegriffe bieten Unterstützung beim Transfer auf und von der Toilette oder für allgemeine Stabilität.\n\nBarrierefreie Toiletten sollten sichere, horizontale und/oder vertikale Stangen neben der Toilette und manchmal auch in der Nähe des Waschbeckens oder der Tür haben.\n\nFehlende oder falsch platzierte Stangen können die Toilette schwierig oder gefährlich zu benutzen machen.
+    </string>
+
+    <string name="info_sink">
+        Das Waschbecken sollte von einer sitzenden Position aus zugänglich sein.\n\nEs sollte genügend freien Platz darunter geben für einen Rollstuhl, und der Wasserhahn sollte erreichbar und mit begrenzter Handkraft bedienbar sein.\n\nSehr hohe, tiefe oder verstopfte Waschbecken könnten nicht zugänglich sein, selbst wenn der Rest der Toilette es ist.
+    </string>
+
+    <string name="info_toilet_seat">
+        Die Höhe des Toilettensitzes sollte komfortabel und sicher für Personen sein, die von einem Rollstuhl umsteigen.\n\nTypischerweise gilt eine Sitzhöhe von 45-50 cm als barrierefrei. Sitze, die zu niedrig oder zu hoch sind, können das Umsteigen schwierig oder riskant machen.\n\nEinige barrierefreie Toiletten können auch Rückenlehnen oder zusätzliche Funktionen beinhalten.
+    </string>
+
+    <string name="info_emergency_alarm">
+        Notrufsysteme ermöglichen es Nutzern, im Falle eines Vorfalls innerhalb der Toilette um Hilfe zu rufen.\n\nBarrierefreie Toiletten sollten klar markierte Alarmschnüre oder -knöpfe haben, die von der Toilette oder vom Boden aus erreichbar sind.\n\nWenn kein Alarm vorhanden ist oder er außer Reichweite ist, könnte es für die selbständige Nutzung nicht sicher sein.
+    </string>
+
+    <string name="info_euro_key">
+        Ein Euro-Key-System wird in vielen europäischen Ländern verwendet, um Zugang zu verschlossenen barrierefreien Toiletten zu ermöglichen.\n\nWenn ein Ort das Euro-Key-System nutzt, können Nutzer mit einem registrierten Schlüssel die Einrichtung selbständig aufschließen und nutzen.\n\nDies kann helfen, die Barrierefreiheit zu gewährleisten und gleichzeitig die Einrichtungen sicher und sauber zu halten.
+    </string>
+
+    <!-- Common Boolean Options -->
+    <string name="checkmark_yes">✅ Ja</string>
+    <string name="cross_no">❌ Nein</string>
+
+    <!-- Place Categories -->
+    <string name="category_cafe">Café</string>
+    <string name="category_restaurant">Restaurant</string>
+    <string name="category_toilets">Toiletten</string>
+    <string name="category_supermarket">Supermarkt</string>
+    <string name="category_pharmacy">Apotheke</string>
+    <string name="category_hospital">Krankenhaus</string>
+    <string name="category_default">Unbekannt</string>
+    <string name="category_bar">Bar</string>
+    <string name="category_pub">Pub</string>
+    <string name="category_gas_station">Tankstelle</string>
+    <string name="category_library">Bibliothek</string>
+    <string name="category_bank">Bank</string>
+    <string name="category_cinema">Kino</string>
+    <string name="category_university">Universität</string>
+    <string name="category_school">Schule</string>
+    <string name="category_kindergarten">Kindergarten</string>
+    <string name="category_college">Hochschule</string>
+    <string name="category_clinic">Klinik</string>
+    <string name="category_nightclub">Nachtclub</string>
+    <string name="category_courthouse">Gericht</string>
+    <string name="category_hotel">Hotel</string>
+    <string name="category_hostel">Hostel</string>
+    <string name="category_museum">Museum</string>
+    <string name="category_bakery">Bäckerei</string>
+    <string name="category_clothes">Bekleidungsgeschäft</string>
+    <string name="category_electronics">Elektronikgeschäft</string>
+    <string name="category_convenience">Convenience-Store</string>
+    <string name="category_cosmetics">Kosmetikgeschäft</string>
+    <string name="category_car">Autohaus</string>
+    <string name="category_bicycle">Fahrradgeschäft</string>
+    <string name="category_motorcycle">Motorradgeschäft</string>
+    <string name="category_furniture">Möbelgeschäft</string>
+    <string name="category_jewelry">Schmuckgeschäft</string>
+    <string name="category_shoes">Schuhgeschäft</string>
+    <string name="category_sports">Sportgeschäft</string>
+    <string name="category_books">Buchhandlung</string>
+</resources>
