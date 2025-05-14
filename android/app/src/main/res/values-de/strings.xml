@@ -351,4 +351,24 @@
     <string name="category_shoes">Schuhgeschäft</string>
     <string name="category_sports">Sportgeschäft</string>
     <string name="category_books">Buchhandlung</string>
+
+    <!-- Success messages -->
+    <string name="success_accessibility_updated">Zugänglichkeitsstatus aktualisiert</string>
+    <string name="success_additional_info_updated">Zusätzliche Informationen aktualisiert</string>
+    <string name="success_entrance_accessibility_updated">Zugänglichkeit des Eingangs aktualisiert</string>
+    <string name="success_restroom_accessibility_updated">Zugänglichkeit der Toilette aktualisiert</string>
+    <string name="success_indoor_accessibility_updated">Innere Zugänglichkeit aktualisiert</string>
+    <string name="success_step_count_updated">Stufenanzahl aktualisiert</string>
+    <string name="success_step_height_updated">Stufenhöhe aktualisiert</string>
+    <string name="success_ramp_updated">Rampeninformationen aktualisiert</string>
+    <string name="success_lift_updated">Aufzugsinformationen aktualisiert</string>
+    <string name="success_entrance_width_updated">Eingangsbreite aktualisiert</string>
+    <string name="success_door_type_updated">Türart aktualisiert</string>
+    <string name="success_door_width_updated">Türbreite aktualisiert</string>
+    <string name="success_room_maneuver_updated">Bewegungsfläche aktualisiert</string>
+    <string name="success_grab_rails_updated">Informationen zu Haltegriffen aktualisiert</string>
+    <string name="success_toilet_seat_updated">Informationen zum Toilettensitz aktualisiert</string>
+    <string name="success_emergency_alarm_updated">Informationen zum Notrufsystem aktualisiert</string>
+    <string name="success_sink_updated">Informationen zum Waschbecken aktualisiert</string>
+    <string name="success_euro_key_updated">EuroKey-Informationen aktualisiert</string>
 </resources>

@@ -350,4 +350,24 @@
     <string name="category_shoes">Magasin de chaussures</string>
     <string name="category_sports">Magasin de sport</string>
     <string name="category_books">Librairie</string>
+
+    <!-- Success messages -->
+    <string name="success_accessibility_updated">Statut d\'accessibilité mis à jour</string>
+    <string name="success_additional_info_updated">Informations supplémentaires mises à jour</string>
+    <string name="success_entrance_accessibility_updated">Accessibilité de l\'entrée mise à jour</string>
+    <string name="success_restroom_accessibility_updated">Accessibilité des toilettes mise à jour</string>
+    <string name="success_indoor_accessibility_updated">Accessibilité intérieure mise à jour</string>
+    <string name="success_step_count_updated">Nombre de marches mis à jour</string>
+    <string name="success_step_height_updated">Hauteur des marches mise à jour</string>
+    <string name="success_ramp_updated">Informations sur la rampe mises à jour</string>
+    <string name="success_lift_updated">Informations sur l\'ascenseur mises à jour</string>
+    <string name="success_entrance_width_updated">Largeur de l\'entrée mise à jour</string>
+    <string name="success_door_type_updated">Type de porte mis à jour</string>
+    <string name="success_door_width_updated">Largeur de la porte mise à jour</string>
+    <string name="success_room_maneuver_updated">Espace de manœuvre mis à jour</string>
+    <string name="success_grab_rails_updated">Informations sur les barres d\'appui mises à jour</string>
+    <string name="success_toilet_seat_updated">Informations sur le siège des toilettes mises à jour</string>
+    <string name="success_emergency_alarm_updated">Informations sur l\'alarme d\'urgence mises à jour</string>
+    <string name="success_sink_updated">Informations sur le lavabo mises à jour</string>
+    <string name="success_euro_key_updated">Informations sur l\'EuroKey mises à jour</string>
 </resources>

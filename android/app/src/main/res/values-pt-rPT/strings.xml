@@ -351,4 +351,24 @@
     <string name="category_shoes">Sapataria</string>
     <string name="category_sports">Loja de desporto</string>
     <string name="category_books">Livraria</string>
+
+    <!-- Success messages -->
+    <string name="success_accessibility_updated">Estado de acessibilidade atualizado</string>
+    <string name="success_additional_info_updated">Informação adicional atualizada</string>
+    <string name="success_entrance_accessibility_updated">Acessibilidade da entrada atualizada</string>
+    <string name="success_restroom_accessibility_updated">Acessibilidade da casa de banho atualizada</string>
+    <string name="success_indoor_accessibility_updated">Acessibilidade interior atualizada</string>
+    <string name="success_step_count_updated">Número de degraus atualizado</string>
+    <string name="success_step_height_updated">Altura do degrau atualizada</string>
+    <string name="success_ramp_updated">Informação da rampa atualizada</string>
+    <string name="success_lift_updated">Informação do elevador atualizada</string>
+    <string name="success_entrance_width_updated">Largura da entrada atualizada</string>
+    <string name="success_door_type_updated">Tipo de porta atualizado</string>
+    <string name="success_door_width_updated">Largura da porta atualizada</string>
+    <string name="success_room_maneuver_updated">Espaço de manobra atualizado</string>
+    <string name="success_grab_rails_updated">Informação sobre barras de apoio atualizada</string>
+    <string name="success_toilet_seat_updated">Informação sobre assento sanitário atualizada</string>
+    <string name="success_emergency_alarm_updated">Informação sobre alarme de emergência atualizada</string>
+    <string name="success_sink_updated">Informação sobre lavatório atualizada</string>
+    <string name="success_euro_key_updated">Informação sobre EuroKey atualizada</string>
 </resources>

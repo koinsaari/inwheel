@@ -22,4 +22,6 @@ import com.aarokoinsaari.inwheel.domain.model.PlaceDetailProperty
 data class PlaceDetailState(
     val place: Place? = null,
     val activeDialog: PlaceDetailProperty? = null,
+    val showSuccessNotification: Boolean = false,
+    val successMessageResId: Int = 0
 )

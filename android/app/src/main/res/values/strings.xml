@@ -360,4 +360,24 @@
     <string name="category_sports">Sports store</string>
     <string name="category_books">Books store</string>
     <string name="terms_of_service_description">This section explains the Terms of Service for using Inwheel. Tap below to view the full Terms of Service.</string>
+
+    <!-- Success messages -->
+    <string name="success_accessibility_updated">Accessibility status updated</string>
+    <string name="success_additional_info_updated">Additional information updated</string>
+    <string name="success_entrance_accessibility_updated">Entrance accessibility updated</string>
+    <string name="success_restroom_accessibility_updated">Restroom accessibility updated</string>
+    <string name="success_indoor_accessibility_updated">Indoor accessibility updated</string>
+    <string name="success_step_count_updated">Step count updated</string>
+    <string name="success_step_height_updated">Step height updated</string>
+    <string name="success_ramp_updated">Ramp information updated</string>
+    <string name="success_lift_updated">Lift information updated</string>
+    <string name="success_entrance_width_updated">Entrance width updated</string>
+    <string name="success_door_type_updated">Door type updated</string>
+    <string name="success_door_width_updated">Door width updated</string>
+    <string name="success_room_maneuver_updated">Room maneuver space updated</string>
+    <string name="success_grab_rails_updated">Grab rails information updated</string>
+    <string name="success_toilet_seat_updated">Toilet seat information updated</string>
+    <string name="success_emergency_alarm_updated">Emergency alarm information updated</string>
+    <string name="success_sink_updated">Sink information updated</string>
+    <string name="success_euro_key_updated">Euro key information updated</string>
 </resources>

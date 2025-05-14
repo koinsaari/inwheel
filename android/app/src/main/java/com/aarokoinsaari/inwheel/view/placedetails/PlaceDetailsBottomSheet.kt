@@ -16,6 +16,11 @@
 
 package com.aarokoinsaari.inwheel.view.placedetails
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,10 +35,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -78,105 +86,144 @@ fun PlaceDetailsBottomSheet(
     val state = stateFlow.collectAsState()
     val place = state.value.place
     val activeDialog = state.value.activeDialog
+    val showNotification = state.value.showSuccessNotification
+    val successMessageResId = state.value.successMessageResId
 
-    if (place != null) {
-        LazyColumn(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            item {
-                PlaceDetailsGeneralAccessibilitySection(
-                    place = place,
-                    onIntent = onIntent,
-                )
-                HorizontalDivider(Modifier.padding(vertical = 16.dp))
-            }
-            if (place.category.rawValue != "toilets") {
+    Box(modifier = modifier.fillMaxWidth()) {
+        if (place != null) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
                 item {
-                    PlaceDetailsContactInfoSection(place)
+                    PlaceDetailsGeneralAccessibilitySection(
+                        place = place,
+                        onIntent = onIntent,
+                    )
                     HorizontalDivider(Modifier.padding(vertical = 16.dp))
                 }
-            }
-            item {
-                Text(
-                    text = stringResource(id = R.string.entrance),
-                    style = MaterialTheme.typography.labelSmall
-                )
-                PlaceDetailsEntranceDetailsSection(
-                    place = place,
-                    onIntent = onIntent,
-                    modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp)
-                )
-                Spacer(Modifier.padding(vertical = 6.dp))
-                Text(
-                    text = stringResource(id = R.string.restroom),
-                    style = MaterialTheme.typography.labelSmall
-                )
-                PlaceDetailsRestroomDetailsSection(
-                    place = place,
-                    onIntent = onIntent,
-                    modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp)
-                )
-                Spacer(Modifier.padding(vertical = 6.dp))
-                Text(
-                    text = stringResource(id = R.string.additional_info),
-                    style = MaterialTheme.typography.labelSmall
-                )
-                Text(
-                    text = place.additionalInfo
-                        ?: stringResource(id = R.string.additional_info_label),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontStyle = FontStyle.Italic,
-                    color = if (place.additionalInfo.isNullOrEmpty())
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    else
-                        MaterialTheme.colorScheme.onSurface,
-                    modifier = if (place.additionalInfo.isNullOrEmpty()) {
-                        Modifier
-                            .padding(vertical = 6.dp, horizontal = 8.dp)
-                            .fillMaxWidth()
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .padding(horizontal = 12.dp, vertical = 8.dp)
-                            .clickable {
-                                onIntent(
-                                    PlaceDetailIntent.OpenDialog(
-                                        place = place,
-                                        property = PlaceDetailProperty.ADDITIONAL_INFO
-                                    )
-                                )
-                            }
-                    } else {
-                        Modifier
-                            .padding(vertical = 6.dp, horizontal = 20.dp)
-                            .fillMaxWidth()
-                            .clickable {
-                                onIntent(
-                                    PlaceDetailIntent.OpenDialog(
-                                        place = place,
-                                        property = PlaceDetailProperty.ADDITIONAL_INFO
-                                    )
-                                )
-                            }
+                if (place.category.rawValue != "toilets") {
+                    item {
+                        PlaceDetailsContactInfoSection(place)
+                        HorizontalDivider(Modifier.padding(vertical = 16.dp))
                     }
+                }
+                item {
+                    Text(
+                        text = stringResource(id = R.string.entrance),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    PlaceDetailsEntranceDetailsSection(
+                        place = place,
+                        onIntent = onIntent,
+                        modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp)
+                    )
+                    Spacer(Modifier.padding(vertical = 6.dp))
+                    Text(
+                        text = stringResource(id = R.string.restroom),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    PlaceDetailsRestroomDetailsSection(
+                        place = place,
+                        onIntent = onIntent,
+                        modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp)
+                    )
+                    Spacer(Modifier.padding(vertical = 6.dp))
+                    Text(
+                        text = stringResource(id = R.string.additional_info),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    Text(
+                        text = place.additionalInfo
+                            ?: stringResource(id = R.string.additional_info_label),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontStyle = FontStyle.Italic,
+                        color = if (place.additionalInfo.isNullOrEmpty())
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        else
+                            MaterialTheme.colorScheme.onSurface,
+                        modifier = if (place.additionalInfo.isNullOrEmpty()) {
+                            Modifier
+                                .padding(vertical = 6.dp, horizontal = 8.dp)
+                                .fillMaxWidth()
+                                .background(
+                                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                                .clickable {
+                                    onIntent(
+                                        PlaceDetailIntent.OpenDialog(
+                                            place = place,
+                                            property = PlaceDetailProperty.ADDITIONAL_INFO
+                                        )
+                                    )
+                                }
+                        } else {
+                            Modifier
+                                .padding(vertical = 6.dp, horizontal = 20.dp)
+                                .fillMaxWidth()
+                                .clickable {
+                                    onIntent(
+                                        PlaceDetailIntent.OpenDialog(
+                                            place = place,
+                                            property = PlaceDetailProperty.ADDITIONAL_INFO
+                                        )
+                                    )
+                                }
+                        }
+                    )
+                }
+
+                item {
+                    HorizontalDivider(Modifier.padding(vertical = 8.dp))
+                    Footer(note = stringResource(id = R.string.place_detail_footer_note))
+                }
+            }
+            
+            AnimatedVisibility(
+                visible = showNotification && successMessageResId != 0,
+                enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
+                exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp)
+            ) {
+                Surface(
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    shape = RoundedCornerShape(8.dp),
+                    tonalElevation = 4.dp,
+                    shadowElevation = 4.dp,
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = stringResource(id = successMessageResId),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            }
+            
+            activeDialog?.let { property ->
+                PlaceDetailPropertyDialog(
+                    place = place,
+                    property = property,
+                    onIntent = onIntent,
+                    onDismiss = { onIntent(PlaceDetailIntent.CloseDialog(place, property)) }
                 )
             }
-
-            item {
-                HorizontalDivider(Modifier.padding(vertical = 8.dp))
-                Footer(note = stringResource(id = R.string.place_detail_footer_note))
-            }
-        }
-        activeDialog?.let { property ->
-            PlaceDetailPropertyDialog(
-                place = place,
-                property = property,
-                onIntent = onIntent,
-                onDismiss = { onIntent(PlaceDetailIntent.CloseDialog(place, property)) }
-            )
         }
     }
 }

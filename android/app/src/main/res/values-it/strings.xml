@@ -350,4 +350,24 @@
     <string name="category_sports">Negozio di articoli sportivi</string>
     <string name="category_books">Libreria</string>
     <string name="terms_of_service_description">Questa sezione spiega i Termini di Servizio per l\'utilizzo di Inwheel. Tocca qui sotto per visualizzare i Termini di Servizio completi.</string>
+
+    <!-- Success messages -->
+    <string name="success_accessibility_updated">Stato di accessibilità aggiornato</string>
+    <string name="success_additional_info_updated">Informazioni aggiuntive aggiornate</string>
+    <string name="success_entrance_accessibility_updated">Accessibilità dell\'ingresso aggiornata</string>
+    <string name="success_restroom_accessibility_updated">Accessibilità del bagno aggiornata</string>
+    <string name="success_indoor_accessibility_updated">Accessibilità interna aggiornata</string>
+    <string name="success_step_count_updated">Numero di gradini aggiornato</string>
+    <string name="success_step_height_updated">Altezza dei gradini aggiornata</string>
+    <string name="success_ramp_updated">Informazioni sulla rampa aggiornate</string>
+    <string name="success_lift_updated">Informazioni sull\'ascensore aggiornate</string>
+    <string name="success_entrance_width_updated">Larghezza dell\'ingresso aggiornata</string>
+    <string name="success_door_type_updated">Tipo di porta aggiornato</string>
+    <string name="success_door_width_updated">Larghezza della porta aggiornata</string>
+    <string name="success_room_maneuver_updated">Spazio di manovra aggiornato</string>
+    <string name="success_grab_rails_updated">Informazioni sui maniglioni aggiornate</string>
+    <string name="success_toilet_seat_updated">Informazioni sul sedile del WC aggiornate</string>
+    <string name="success_emergency_alarm_updated">Informazioni sull\'allarme di emergenza aggiornate</string>
+    <string name="success_sink_updated">Informazioni sul lavandino aggiornate</string>
+    <string name="success_euro_key_updated">Informazioni su EuroKey aggiornate</string>
 </resources>

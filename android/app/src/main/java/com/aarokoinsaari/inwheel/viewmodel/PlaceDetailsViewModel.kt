@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel() {
     private val _state = MutableStateFlow(PlaceDetailState())
@@ -106,6 +107,9 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
                     "PlaceDetailsViewModel",
                     "Updated place general accessibility to: $newStatus"
                 )
+                
+                showSuccessNotification(PlaceDetailProperty.GENERAL_ACCESSIBILITY.successMessageRes)
+                
             } catch (e: Exception) {
                 Log.e("PlaceDetailsViewModel", "Error updating place general accessibility", e)
             }
@@ -135,6 +139,9 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
                     )
                 }
                 Log.d("PlaceDetailsViewModel", "Updated place accessibility detail: $place")
+                
+                showSuccessNotification(detail.successMessageRes)
+                
             } catch (e: Exception) {
                 Log.e("PlaceDetailsViewModel", "Error updating place accessibility detail", e)
             }
@@ -185,4 +192,17 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
             PlaceDetailProperty.SINK -> copy(sink = newValue as? AccessibilityStatus)
             PlaceDetailProperty.EURO_KEY -> copy(euroKey = newValue as? Boolean)
         }
+
+    private fun showSuccessNotification(messageResId: Int) {
+        _state.update {
+            it.copy(showSuccessNotification = true, successMessageResId = messageResId)
+        }
+        
+        viewModelScope.launch {
+            delay(3000)
+            _state.update {
+                it.copy(showSuccessNotification = false)
+            }
+        }
+    }
 }

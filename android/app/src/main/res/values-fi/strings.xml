@@ -350,4 +350,24 @@
     <string name="category_sports">Urheiluliike</string>
     <string name="category_books">Kirjakauppa</string>
     <string name="terms_of_service_description">Tämä osio selittää InWheelin käyttöehdot. Napauta alla nähdäksesi täydelliset käyttöehdot.</string>
+
+    <!-- Success messages -->
+    <string name="success_accessibility_updated">Esteettömyyden tila päivitetty</string>
+    <string name="success_additional_info_updated">Lisätiedot päivitetty</string>
+    <string name="success_entrance_accessibility_updated">Sisäänkäynnin esteettömyys päivitetty</string>
+    <string name="success_restroom_accessibility_updated">WC:n esteettömyys päivitetty</string>
+    <string name="success_indoor_accessibility_updated">Sisätilojen esteettömyys päivitetty</string>
+    <string name="success_step_count_updated">Portaiden määrä päivitetty</string>
+    <string name="success_step_height_updated">Portaan korkeus päivitetty</string>
+    <string name="success_ramp_updated">Rampin tiedot päivitetty</string>
+    <string name="success_lift_updated">Hissin tiedot päivitetty</string>
+    <string name="success_entrance_width_updated">Sisäänkäynnin leveys päivitetty</string>
+    <string name="success_door_type_updated">Oven tyyppi päivitetty</string>
+    <string name="success_door_width_updated">Oven leveys päivitetty</string>
+    <string name="success_room_maneuver_updated">Liikkumatila päivitetty</string>
+    <string name="success_grab_rails_updated">Tukikaiteiden tiedot päivitetty</string>
+    <string name="success_toilet_seat_updated">WC-istuimen tiedot päivitetty</string>
+    <string name="success_emergency_alarm_updated">Hätähälytyksen tiedot päivitetty</string>
+    <string name="success_sink_updated">Pesualtaan tiedot päivitetty</string>
+    <string name="success_euro_key_updated">EuroKey-tiedot päivitetty</string>
 </resources>

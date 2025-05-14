@@ -73,114 +73,133 @@ data class Place(
 enum class PlaceDetailProperty(
     @StringRes val labelRes: Int,
     @StringRes val dialogTitleRes: Int,
+    @StringRes val successMessageRes: Int,
     val dbColumnRoom: String,
     val dbColumnApi: String,
 ) {
     GENERAL_ACCESSIBILITY(
         labelRes = R.string.general_accessibility,
         dialogTitleRes = R.string.general_accessibility_dialog_title,
+        successMessageRes = R.string.success_accessibility_updated,
         dbColumnRoom = "generalAccessibility",
         dbColumnApi = "general_accessibility"
     ),
     INDOOR_ACCESSIBILITY(
         labelRes = R.string.indoor_accessibility,
         dialogTitleRes = R.string.indoor_accessibility_dialog_title,
+        successMessageRes = R.string.success_indoor_accessibility_updated,
         dbColumnRoom = "indoorAccessibility",
         dbColumnApi = "indoor_accessibility"
     ),
     ENTRANCE_ACCESSIBILITY(
         labelRes = R.string.entrance_accessibility,
         dialogTitleRes = R.string.entrance_accessibility_dialog_title,
+        successMessageRes = R.string.success_entrance_accessibility_updated,
         dbColumnRoom = "entranceAccessibility",
         dbColumnApi = "entrance_accessibility"
     ),
     RESTROOM_ACCESSIBILITY(
         labelRes = R.string.restroom_accessibility,
         dialogTitleRes = R.string.restroom_accessibility_dialog_title,
+        successMessageRes = R.string.success_restroom_accessibility_updated,
         dbColumnRoom = "restroomAccessibility",
         dbColumnApi = "restroom_accessibility"
     ),
     ADDITIONAL_INFO(
         labelRes = R.string.additional_info,
         dialogTitleRes = R.string.additional_info_dialog_title,
+        successMessageRes = R.string.success_additional_info_updated,
         dbColumnRoom = "additionalInfo",
         dbColumnApi = "additional_info"
     ),
     STEP_COUNT(
         labelRes = R.string.step_count,
         dialogTitleRes = R.string.step_count_dialog_title,
+        successMessageRes = R.string.success_step_count_updated,
         dbColumnRoom = "stepCount",
         dbColumnApi = "step_count"
     ),
     STEP_HEIGHT(
         labelRes = R.string.step_height,
         dialogTitleRes = R.string.step_height_dialog_title,
+        successMessageRes = R.string.success_step_height_updated,
         dbColumnRoom = "stepHeight",
         dbColumnApi = "step_height"
     ),
     RAMP(
         labelRes = R.string.ramp,
         dialogTitleRes = R.string.ramp_dialog_title,
+        successMessageRes = R.string.success_ramp_updated,
         dbColumnRoom = "ramp",
         dbColumnApi = "ramp"
     ),
     LIFT(
         labelRes = R.string.lift,
         dialogTitleRes = R.string.lift_dialog_title,
+        successMessageRes = R.string.success_lift_updated,
         dbColumnRoom = "lift",
         dbColumnApi = "lift"
     ),
     ENTRANCE_WIDTH( // Note this is entrance width related to entrance table
         labelRes = R.string.entrance_width,
         dialogTitleRes = R.string.entrance_width_dialog_title,
+        successMessageRes = R.string.success_entrance_width_updated,
         dbColumnRoom = "entranceWidth",
         dbColumnApi = "entrance_width"
     ),
     DOOR_TYPE(
         labelRes = R.string.doorType,
         dialogTitleRes = R.string.door_type_dialog_title,
+        successMessageRes = R.string.success_door_type_updated,
         dbColumnRoom = "doorType",
         dbColumnApi = "door_type"
     ),
     DOOR_WIDTH( // Note this is restroom door width related to restroom table
         labelRes = R.string.door_width,
         dialogTitleRes = R.string.door_width_dialog_title,
+        successMessageRes = R.string.success_door_width_updated,
         dbColumnRoom = "doorWidth",
         dbColumnApi = "door_width"
     ),
     ROOM_MANEUVER(
         labelRes = R.string.room_maneuver,
         dialogTitleRes = R.string.room_maneuver_dialog_title,
+        successMessageRes = R.string.success_room_maneuver_updated,
         dbColumnRoom = "roomManeuver",
         dbColumnApi = "room_maneuver"
     ),
     GRAB_RAILS(
         labelRes = R.string.grab_rails,
         dialogTitleRes = R.string.grab_rails_dialog_title,
+        successMessageRes = R.string.success_grab_rails_updated,
         dbColumnRoom = "grabRails",
         dbColumnApi = "grab_rails"
     ),
     TOILET_SEAT(
         labelRes = R.string.toilet_seat,
         dialogTitleRes = R.string.toilet_seat_dialog_title,
+        successMessageRes = R.string.success_toilet_seat_updated,
         dbColumnRoom = "toiletSeat",
         dbColumnApi = "toilet_seat"
     ),
     EMERGENCY_ALARM(
         labelRes = R.string.emergency_alarm,
         dialogTitleRes = R.string.emergency_alarm_dialog_title,
+        successMessageRes = R.string.success_emergency_alarm_updated,
         dbColumnRoom = "emergencyAlarm",
         dbColumnApi = "emergency_alarm"
     ),
     SINK(
         labelRes = R.string.sink,
         dialogTitleRes = R.string.sink_dialog_title,
+        successMessageRes = R.string.success_sink_updated,
         dbColumnRoom = "sink",
         dbColumnApi = "sink"
     ),
     EURO_KEY(
         labelRes = R.string.euro_key,
         dialogTitleRes = R.string.euro_key_dialog_title,
+        successMessageRes = R.string.success_euro_key_updated,
         dbColumnRoom = "euroKey",
         dbColumnApi = "euro_key"
     ),
