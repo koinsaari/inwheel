@@ -30,6 +30,16 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
+
+        val properties = Properties().apply {
+            val localPropsFile = rootProject.file("local.properties")
+            if (localPropsFile.exists()) {
+                load(localPropsFile.inputStream())
+            }
+        }
+        
+        val apiKey = properties.getProperty("MAPS_API_KEY") ?: ""
+        resValue("string", "maps_api_key", apiKey)
     }
 
     signingConfigs {

@@ -22,5 +22,4 @@ class ConfigProvider(private val remoteConfig: FirebaseRemoteConfig) {
 
     fun getSupabaseUrl(): String = remoteConfig.getString("supabase_url")
     fun getSupabaseKey(): String = remoteConfig.getString("supabase_anon_key")
-    fun getMapsApiKey(): String = remoteConfig.getString("maps_api_key")
 }
