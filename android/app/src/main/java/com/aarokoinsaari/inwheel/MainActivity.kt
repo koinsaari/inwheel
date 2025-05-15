@@ -155,7 +155,8 @@ fun MainScreen() {
     val currentRoute = navBackStackEntry.value?.destination?.route
 
     ModalNavigationDrawer(
-        // this has to be false when the map or licenses view is visible or cannot swipe right without opening the drawer
+        // this has to be false when the map or licenses view is visible
+        // or cannot swipe right without opening the drawer
         gesturesEnabled = currentRoute != NavigationRoutes.MAP && currentRoute != NavigationRoutes.LICENSES_WEBVIEW,
         drawerState = drawerState,
         drawerContent = {

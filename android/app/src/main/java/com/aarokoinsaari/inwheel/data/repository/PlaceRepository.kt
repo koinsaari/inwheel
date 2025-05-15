@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("TooManyFunctions", "TooGenericExceptionCaught")
+
 package com.aarokoinsaari.inwheel.data.repository
 
 import android.util.Log

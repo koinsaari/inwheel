@@ -23,7 +23,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SearchResultDto(
+data class PlaceSearchResultDto(
     val id: String,
     val name: String,
     val category: String,
@@ -44,7 +44,7 @@ data class SearchResultDto(
             ?.let { AccessibilityStatus.valueOf(it.uppercase()) }
 }
 
-fun SearchResultDto.toDomain(): Place = 
+fun PlaceSearchResultDto.toDomain(): Place =
     Place(
         id = id,
         name = name,

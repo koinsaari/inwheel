@@ -63,6 +63,7 @@ import com.aarokoinsaari.inwheel.domain.model.PlaceDetailProperty
 import com.aarokoinsaari.inwheel.view.utils.getAccessibilityStatusContentDescStringRes
 import com.aarokoinsaari.inwheel.view.utils.getAccessibilityStatusDrawableRes
 
+@Suppress("MaxLineLength")
 @Composable
 fun PlaceDetailsGeneralAccessibilitySection(
     place: Place,
@@ -236,14 +237,18 @@ fun PlaceDetailsGeneralAccessibilitySection(
                                                 text = {
                                                     Row(
                                                         verticalAlignment = Alignment.CenterVertically,
-                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                        horizontalArrangement = Arrangement.spacedBy(
+                                                            8.dp
+                                                        )
                                                     ) {
                                                         Text(
                                                             text = stringResource(id = R.string.emoji_checkmark),
                                                             style = MaterialTheme.typography.labelSmall,
                                                         )
                                                         Text(
-                                                            text = stringResource(id = R.string.entrance_fully_accessible_label),
+                                                            text = stringResource(
+                                                                id = R.string.entrance_fully_accessible_label
+                                                            ),
                                                             style = MaterialTheme.typography.labelSmall,
                                                         )
                                                     }
@@ -264,14 +269,18 @@ fun PlaceDetailsGeneralAccessibilitySection(
                                                 text = {
                                                     Row(
                                                         verticalAlignment = Alignment.CenterVertically,
-                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                        horizontalArrangement = Arrangement.spacedBy(
+                                                            8.dp
+                                                        )
                                                     ) {
                                                         Text(
                                                             text = stringResource(id = R.string.emoji_warning),
                                                             style = MaterialTheme.typography.labelSmall,
                                                         )
                                                         Text(
-                                                            text = stringResource(id = R.string.entrance_partially_accessible_label),
+                                                            text = stringResource(
+                                                                id = R.string.entrance_partially_accessible_label
+                                                            ),
                                                             style = MaterialTheme.typography.labelSmall,
                                                         )
                                                     }
@@ -292,14 +301,18 @@ fun PlaceDetailsGeneralAccessibilitySection(
                                                 text = {
                                                     Row(
                                                         verticalAlignment = Alignment.CenterVertically,
-                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                        horizontalArrangement = Arrangement.spacedBy(
+                                                            8.dp
+                                                        )
                                                     ) {
                                                         Text(
                                                             text = stringResource(id = R.string.emoji_cross),
                                                             style = MaterialTheme.typography.labelSmall,
                                                         )
                                                         Text(
-                                                            text = stringResource(id = R.string.entrance_not_accessible_label),
+                                                            text = stringResource(
+                                                                id = R.string.entrance_not_accessible_label
+                                                            ),
                                                             style = MaterialTheme.typography.labelSmall,
                                                         )
                                                     }
@@ -322,14 +335,18 @@ fun PlaceDetailsGeneralAccessibilitySection(
                                                 text = {
                                                     Row(
                                                         verticalAlignment = Alignment.CenterVertically,
-                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                        horizontalArrangement = Arrangement.spacedBy(
+                                                            8.dp
+                                                        )
                                                     ) {
                                                         Text(
                                                             text = stringResource(id = R.string.emoji_checkmark),
                                                             style = MaterialTheme.typography.labelSmall,
                                                         )
                                                         Text(
-                                                            text = stringResource(id = R.string.indoor_fully_accessible_status_label),
+                                                            text = stringResource(
+                                                                id = R.string.indoor_fully_accessible_status_label
+                                                            ),
                                                             style = MaterialTheme.typography.labelSmall,
                                                         )
                                                     }
@@ -350,14 +367,20 @@ fun PlaceDetailsGeneralAccessibilitySection(
                                                 text = {
                                                     Row(
                                                         verticalAlignment = Alignment.CenterVertically,
-                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                        horizontalArrangement = Arrangement.spacedBy(
+                                                            8.dp
+                                                        )
                                                     ) {
                                                         Text(
-                                                            text = stringResource(id = R.string.emoji_warning),
+                                                            text = stringResource(
+                                                                id = R.string.emoji_warning
+                                                            ),
                                                             style = MaterialTheme.typography.labelSmall,
                                                         )
                                                         Text(
-                                                            text = stringResource(id = R.string.indoor_partially_accessible_status_label),
+                                                            text = stringResource(
+                                                                id = R.string.indoor_partially_accessible_status_label
+                                                            ),
                                                             style = MaterialTheme.typography.labelSmall,
                                                         )
                                                     }
@@ -378,7 +401,9 @@ fun PlaceDetailsGeneralAccessibilitySection(
                                                 text = {
                                                     Row(
                                                         verticalAlignment = Alignment.CenterVertically,
-                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                        horizontalArrangement = Arrangement.spacedBy(
+                                                            8.dp
+                                                        )
                                                     ) {
                                                         Text(
                                                             text = stringResource(id = R.string.emoji_cross),
@@ -408,7 +433,9 @@ fun PlaceDetailsGeneralAccessibilitySection(
                                                 text = {
                                                     Row(
                                                         verticalAlignment = Alignment.CenterVertically,
-                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                        horizontalArrangement = Arrangement.spacedBy(
+                                                            8.dp
+                                                        )
                                                     ) {
                                                         Text(
                                                             text = stringResource(id = R.string.emoji_checkmark),
@@ -436,7 +463,9 @@ fun PlaceDetailsGeneralAccessibilitySection(
                                                 text = {
                                                     Row(
                                                         verticalAlignment = Alignment.CenterVertically,
-                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                        horizontalArrangement = Arrangement.spacedBy(
+                                                            8.dp
+                                                        )
                                                     ) {
                                                         Text(
                                                             text = stringResource(id = R.string.emoji_warning),
@@ -466,7 +495,9 @@ fun PlaceDetailsGeneralAccessibilitySection(
                                                 text = {
                                                     Row(
                                                         verticalAlignment = Alignment.CenterVertically,
-                                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                                        horizontalArrangement = Arrangement.spacedBy(
+                                                            8.dp
+                                                        )
                                                     ) {
                                                         Text(
                                                             text = stringResource(id = R.string.emoji_cross),

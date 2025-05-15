@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("CyclomaticComplexMethod", "TooGenericExceptionCaught")
+
 package com.aarokoinsaari.inwheel.viewmodel
 
 import android.util.Log
@@ -88,7 +90,6 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
         }
     }
 
-    @Suppress("TooGenericExceptionCaught")
     private fun updatePlaceGeneralAccessibility(place: Place, status: AccessibilityStatus) {
         viewModelScope.launch {
             try {
@@ -107,9 +108,9 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
                     "PlaceDetailsViewModel",
                     "Updated place general accessibility to: $newStatus"
                 )
-                
+
                 showSuccessNotification(PlaceDetailProperty.GENERAL_ACCESSIBILITY.successMessageRes)
-                
+
             } catch (e: Exception) {
                 Log.e("PlaceDetailsViewModel", "Error updating place general accessibility", e)
             }
@@ -126,7 +127,7 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
             try {
                 val currentValue = getCurrentValue(place, detail)
                 val valueToUpdate = if (currentValue == newValue) null else newValue
-                
+
                 repository.updatePlaceDetailProperty(
                     place = place,
                     property = detail,
@@ -139,9 +140,9 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
                     )
                 }
                 Log.d("PlaceDetailsViewModel", "Updated place accessibility detail: $place")
-                
+
                 showSuccessNotification(detail.successMessageRes)
-                
+
             } catch (e: Exception) {
                 Log.e("PlaceDetailsViewModel", "Error updating place accessibility detail", e)
             }
@@ -171,6 +172,7 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
             PlaceDetailProperty.EURO_KEY -> place.euroKey
         }
 
+    @Suppress("CyclomaticComplexMethod")
     private fun Place.update(detail: PlaceDetailProperty, newValue: Any?): Place =
         when (detail) {
             PlaceDetailProperty.GENERAL_ACCESSIBILITY -> copy(generalAccessibility = newValue as? AccessibilityStatus)
@@ -197,7 +199,7 @@ class PlaceDetailsViewModel(private val repository: PlaceRepository) : ViewModel
         _state.update {
             it.copy(showSuccessNotification = true, successMessageResId = messageResId)
         }
-        
+
         viewModelScope.launch {
             delay(3000)
             _state.update {

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("TooGenericExceptionCaught", "CyclomaticComplexMethod")
+
 package com.aarokoinsaari.inwheel.data.remote.supabase
 
 import android.util.Log
@@ -35,11 +37,11 @@ import java.util.concurrent.CancellationException
 
 class SupabaseApiService(
     private val httpClient: HttpClient,
-    configProvider: ConfigProvider
+    configProvider: ConfigProvider,
 ) {
     private val supabaseUrl = configProvider.getSupabaseUrl()
     private val supabaseKey = configProvider.getSupabaseKey()
-    
+
     suspend fun fetchPlacesInBBox(
         westLon: Double,
         southLat: Double,
@@ -93,7 +95,7 @@ class SupabaseApiService(
      */
     suspend fun updatePlaceGeneralAccessibility(placeId: String, status: String?) {
         val url = "$supabaseUrl/rest/v1/general_accessibility?place_id=eq.$placeId"
-        
+
         Log.d("SupabaseApiService", "Status: $status")
         try {
             val response1: HttpResponse = httpClient.patch(url) {
@@ -102,17 +104,23 @@ class SupabaseApiService(
                 contentType(ContentType.Application.Json)
                 setBody(mapOf("accessibility" to status))
             }
-            
+
             val response2: HttpResponse = httpClient.patch(url) {
                 header("apikey", supabaseKey)
                 header("Authorization", "Bearer $supabaseKey")
                 contentType(ContentType.Application.Json)
                 setBody(mapOf("user_modified" to true))
             }
-            
-            Log.d("SupabaseApiService", "Update response status: ${response1.status}, ${response2.status}")
+
+            Log.d(
+                "SupabaseApiService",
+                "Update response status: ${response1.status}, ${response2.status}"
+            )
             if (!response1.status.isSuccess() || !response2.status.isSuccess()) {
-                Log.e("SupabaseApiService", "Error updating place: ${response1.status}, ${response2.status}")
+                Log.e(
+                    "SupabaseApiService",
+                    "Error updating place: ${response1.status}, ${response2.status}"
+                )
             }
         } catch (e: CancellationException) {
             Log.d("SupabaseApiService", "Request was cancelled $e")
@@ -149,17 +157,23 @@ class SupabaseApiService(
                 contentType(ContentType.Application.Json)
                 setBody(mapOf(column to newValue))
             }
-            
+
             val response2: HttpResponse = httpClient.patch(url) {
                 header("apikey", supabaseKey)
                 header("Authorization", "Bearer $supabaseKey")
                 contentType(ContentType.Application.Json)
                 setBody(mapOf("user_modified" to true))
             }
-            
-            Log.d("SupabaseApiService", "Update response status: ${response1.status}, ${response2.status}")
+
+            Log.d(
+                "SupabaseApiService",
+                "Update response status: ${response1.status}, ${response2.status}"
+            )
             if (!response1.status.isSuccess() || !response2.status.isSuccess()) {
-                Log.e("SupabaseApiService", "Error updating place: ${response1.status}, ${response2.status}")
+                Log.e(
+                    "SupabaseApiService",
+                    "Error updating place: ${response1.status}, ${response2.status}"
+                )
             }
         } catch (e: CancellationException) {
             Log.d("SupabaseApiService", "Request was cancelled $e")
@@ -171,13 +185,14 @@ class SupabaseApiService(
     /**
      * Searches for places by name globally.
      */
-    suspend fun searchPlaces(query: String): List<SearchResultDto> {
+    suspend fun searchPlaces(query: String): List<PlaceSearchResultDto> {
         val endpoint = "$supabaseUrl/rest/v1/places"
         return try {
             val response = httpClient.get(endpoint) {
                 header("apikey", supabaseKey)
                 header("Authorization", "Bearer $supabaseKey")
-                parameter("select",
+                parameter(
+                    "select",
                     "id,name,category,lat,lon,region," +
                             "contact(address)," +
                             "general_accessibility(accessibility)"
@@ -185,9 +200,9 @@ class SupabaseApiService(
                 parameter("name", "ilike.*$query*")
                 parameter("limit", "50")
             }
-            
+
             if (response.status.isSuccess()) {
-                response.body<List<SearchResultDto>>()
+                response.body<List<PlaceSearchResultDto>>()
             } else {
                 Log.d("SupabaseApiService", "Global search response status: ${response.status}")
                 emptyList()
@@ -201,8 +216,8 @@ class SupabaseApiService(
     /**
      * Maps a PlaceDetailProperty to its corresponding database table and column.
      */
-    private fun mapPropertyToTableAndColumn(property: PlaceDetailProperty): Pair<String, String> {
-        return when (property) {
+    private fun mapPropertyToTableAndColumn(property: PlaceDetailProperty): Pair<String, String> =
+        when (property) {
             // General accessibility table
             PlaceDetailProperty.GENERAL_ACCESSIBILITY -> "general_accessibility" to "accessibility"
             PlaceDetailProperty.INDOOR_ACCESSIBILITY -> "general_accessibility" to "indoor_accessibility"
@@ -227,5 +242,4 @@ class SupabaseApiService(
             PlaceDetailProperty.EMERGENCY_ALARM -> "restroom_accessibility" to "emergency_alarm"
             PlaceDetailProperty.EURO_KEY -> "restroom_accessibility" to "euro_key"
         }
-    }
 }

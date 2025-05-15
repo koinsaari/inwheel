@@ -21,19 +21,18 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 
 class PreferencesManager(context: Context) {
-    private val sharedPreferences: SharedPreferences = 
+    private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("inwheel_preferences", Context.MODE_PRIVATE)
-    
-    fun hasAcceptedTerms(): Boolean {
-        return sharedPreferences.getBoolean(KEY_TERMS_ACCEPTED, false)
-    }
-    
+
+    fun hasAcceptedTerms(): Boolean =
+        sharedPreferences.getBoolean(KEY_TERMS_ACCEPTED, false)
+
     fun setTermsAccepted(accepted: Boolean) {
         sharedPreferences.edit {
             putBoolean(KEY_TERMS_ACCEPTED, accepted)
         }
     }
-    
+
     companion object {
         private const val KEY_TERMS_ACCEPTED = "terms_accepted"
     }

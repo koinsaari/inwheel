@@ -57,21 +57,20 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
-private fun Color.adjustForDarkTheme(): Color {
-    return copy(
+private fun Color.adjustForDarkTheme(): Color =
+    copy(
         red = red * 0.6f,
         green = green * 0.6f,
         blue = blue * 0.6f,
         alpha = 1f
     )
-}
 
 @Composable
 fun InWheelTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {

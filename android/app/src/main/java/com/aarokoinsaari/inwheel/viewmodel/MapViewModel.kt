@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("TooGenericExceptionCaught", "CyclomaticComplexMethod")
+
 package com.aarokoinsaari.inwheel.viewmodel
 
 import android.util.Log
@@ -84,7 +86,8 @@ class MapViewModel(
 
                     Log.d(
                         "MapViewModel",
-                        "Applied ${categories.size} filters: ${filteredItems.size}/${cachedClusterItems.size} places shown"
+                        "Applied ${categories.size} filters: " +
+                                "${filteredItems.size}/${cachedClusterItems.size} places shown"
                     )
                     _state.update {
                         it.copy(
@@ -199,7 +202,7 @@ class MapViewModel(
                         )
                     }
                     Log.d("MapViewModel", "State after move: ${_state.value}")
-                    
+
                     // Add a minimum loading time to give feedback to the user
                     delay(MINIMUM_LOADING_DISPLAY_TIME)
                 } catch (e: Exception) {
@@ -246,35 +249,38 @@ class MapViewModel(
                 return@launch
             }
             _state.update { it.copy(isSearching = true) }
-            
+
             val cachedResults = cachedPlaces.filter { place ->
                 place.name.contains(query, ignoreCase = true) &&
                         place.name != place.category.rawValue
             }
-            
+
             if (cachedResults.isNotEmpty()) {
                 Log.d("MapViewModel", "Found ${cachedResults.size} places in cache matching query")
                 _state.update { it.copy(filteredPlaces = cachedResults, isSearching = false) }
                 return@launch
             }
-            
+
             Log.d("MapViewModel", "No cached results, searching Room...")
             _state.update { it.copy(isSearching = true) }
-            
+
             try {
                 val databaseResults = repository.searchPlacesInRoom("%$query%")
                 if (databaseResults.isNotEmpty()) {
-                    Log.d("MapViewModel", "Found ${databaseResults.size} places in database matching query")
+                    Log.d(
+                        "MapViewModel",
+                        "Found ${databaseResults.size} places in database matching query"
+                    )
                     _state.update { it.copy(filteredPlaces = databaseResults, isSearching = false) }
                     return@launch
                 }
-                
+
                 Log.d("MapViewModel", "No database results, searching API...")
                 delay(500) // Small delay to show loading state and avoid flooding API
-                
+
                 val apiResults = repository.searchPlacesViaApi(query)
                 Log.d("MapViewModel", "Found ${apiResults.size} places via API matching query")
-                
+
                 _state.update { it.copy(filteredPlaces = apiResults, isSearching = false) }
             } catch (e: Exception) {
                 Log.e("MapViewModel", "Error searching places: ${e.message}")

@@ -181,7 +181,7 @@ fun PlaceDetailsBottomSheet(
                     Footer(note = stringResource(id = R.string.place_detail_footer_note))
                 }
             }
-            
+
             AnimatedVisibility(
                 visible = showNotification && successMessageResId != 0,
                 enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
@@ -215,7 +215,7 @@ fun PlaceDetailsBottomSheet(
                     }
                 }
             }
-            
+
             activeDialog?.let { property ->
                 PlaceDetailPropertyDialog(
                     place = place,
@@ -409,7 +409,7 @@ fun PlaceDetailPropertyDialog(
                                     style = MaterialTheme.typography.bodyMedium,
                                     modifier = Modifier.padding(bottom = 16.dp)
                                 )
-                                
+
                                 Row(
                                     horizontalArrangement = Arrangement.End,
                                     modifier = Modifier.fillMaxWidth()
@@ -426,7 +426,8 @@ fun PlaceDetailPropertyDialog(
                     HorizontalDivider()
 
                     val footerMessage = if (property == PlaceDetailProperty.GENERAL_ACCESSIBILITY ||
-                        property == PlaceDetailProperty.ADDITIONAL_INFO) {
+                        property == PlaceDetailProperty.ADDITIONAL_INFO
+                    ) {
                         stringResource(id = R.string.update_dialog_footer)
                     } else {
                         stringResource(id = R.string.info_dialog_footer)
@@ -438,8 +439,9 @@ fun PlaceDetailPropertyDialog(
     }
 }
 
-private fun PlaceDetailProperty.getPropertyInfoStringRes(): Int {
-    return when (this) {
+@Suppress("CyclomaticComplexMethod")
+private fun PlaceDetailProperty.getPropertyInfoStringRes(): Int =
+    when (this) {
         PlaceDetailProperty.GENERAL_ACCESSIBILITY -> R.string.info_general_accessibility
         PlaceDetailProperty.INDOOR_ACCESSIBILITY -> R.string.info_indoor_accessibility
         PlaceDetailProperty.ENTRANCE_ACCESSIBILITY -> R.string.info_entrance_accessibility
@@ -458,8 +460,8 @@ private fun PlaceDetailProperty.getPropertyInfoStringRes(): Int {
         PlaceDetailProperty.TOILET_SEAT -> R.string.info_toilet_seat
         PlaceDetailProperty.EMERGENCY_ALARM -> R.string.info_emergency_alarm
         PlaceDetailProperty.EURO_KEY -> R.string.info_euro_key
+
     }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
