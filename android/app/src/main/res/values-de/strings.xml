@@ -234,7 +234,6 @@
     <string name="contact_body">
         Wenn Sie Feedback haben, mitwirken möchten oder einfach eine Frage haben, zögern Sie nicht, uns zu kontaktieren.
     </string>
-    <string name="made_by_footer">"Gemacht mit 💚 von "</string>
     <string name="accessibility_guidelines">Richtlinien für Barrierefreiheit</string>
 
     <!-- Info Dialogs -->
@@ -371,4 +370,6 @@
     <string name="success_emergency_alarm_updated">Informationen zum Notrufsystem aktualisiert</string>
     <string name="success_sink_updated">Informationen zum Waschbecken aktualisiert</string>
     <string name="success_euro_key_updated">EuroKey-Informationen aktualisiert</string>
+
+    <string name="logo_design_by_footer">Logo erstellt von Cindy Ribeiro Pinto</string>
 </resources>

@@ -243,6 +243,7 @@
         If you have feedback, want to contribute, or just have a question, feel free to reach out to us.
     </string>
     <string name="made_by_footer" translatable="false">"Made with 💚 by "</string>
+    <string name="logo_design_by_footer">Logo design by Cindy Ribeiro Pinto</string>
     <string name="accessibility_guidelines">Accessibility Guidelines</string>
 
     <!-- Info Dialogs -->

@@ -273,7 +273,7 @@ fun MainScreen() {
 
                     Footer(
                         leftContent = {
-                            Row {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 val context = LocalContext.current
                                 Text(
                                     text = stringResource(id = R.string.made_by_footer),
@@ -285,14 +285,13 @@ fun MainScreen() {
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.primary,
                                     textDecoration = TextDecoration.Underline,
-                                    modifier = Modifier
-                                        .clickable {
-                                            val intent = Intent(
-                                                Intent.ACTION_VIEW,
-                                                "https://www.linkedin.com/in/aarokoinsaari/".toUri()
-                                            )
-                                            context.startActivity(intent)
-                                        }
+                                    modifier = Modifier.clickable {
+                                        val intent = Intent(
+                                            Intent.ACTION_VIEW,
+                                            "https://www.linkedin.com/in/aarokoinsaari/".toUri()
+                                        )
+                                        context.startActivity(intent)
+                                    }
                                 )
                             }
                         },
@@ -302,8 +301,13 @@ fun MainScreen() {
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                             )
-                        },
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        }
+                    )
+                    Text(
+                        text = stringResource(id = R.string.logo_design_by_footer),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
                     )
                 }
 

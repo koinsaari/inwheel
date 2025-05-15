@@ -370,4 +370,6 @@
     <string name="success_emergency_alarm_updated">Hätähälytyksen tiedot päivitetty</string>
     <string name="success_sink_updated">Pesualtaan tiedot päivitetty</string>
     <string name="success_euro_key_updated">EuroKey-tiedot päivitetty</string>
+
+    <string name="logo_design_by_footer">Logon suunnittelu: Cindy Ribeiro Pinto</string>
 </resources>

@@ -15,14 +15,23 @@
  */
 
 import { Link } from 'react-router-dom';
+import title from '../assets/title.png';
+import icon from '../assets/icon.png';
 
 export default function Header({ showNavLinks = true }) {
   return (
-    <header className="bg-white shadow-sm py-4 px-6 flex flex-col sm:flex-row justify-between items-center">
-      <Link to="/" className="inline-block">
-        <h1 className="text-blue-600 text-2xl font-bold hover:text-blue-800 transition-colors mb-3 sm:mb-0">
-          InWheel
-        </h1>
+    <header className="bg-white shadow-sm py-4 px-12 flex flex-col sm:flex-row justify-between items-center">
+      <Link to="/" className="inline-flex items-center">
+        <img
+          src={icon}
+          alt="InWheel Logo"
+          className="h-14 w-14 hover:opacity-90 transition-opacity"
+        />
+        <img
+          src={title}
+          alt="InWheel Logo title"
+          className="h-14 hover:opacity-90 transition-opacity"
+        />
       </Link>
 
       {showNavLinks && (
@@ -31,19 +40,19 @@ export default function Header({ showNavLinks = true }) {
             href="https://github.com/koinsaari/inwheel"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-gray-700 hover:text-blue-600 transition-colors"
+            className="text-gray-700 hover:text-[#0e65b3] transition-colors"
           >
             GitHub
           </a>
           <Link
             to="/privacy-policy"
-            className="text-gray-700 hover:text-blue-600 transition-colors"
+            className="text-gray-700 hover:text-[#0e65b3] transition-colors"
           >
             Privacy Policy
           </Link>
           <Link
             to="/terms-of-service"
-            className="text-gray-700 hover:text-blue-600 transition-colors"
+            className="text-gray-700 hover:text-[#0e65b3] transition-colors"
           >
             Terms of Service
           </Link>

@@ -18,6 +18,10 @@ InWheel is an application designed to provide detailed accessibility information
 
 InWheel leverages OpenStreetMap (OSM) data as its foundation, enriched with additional accessibility details. The app uses a community-driven approach to ensure the data remains accurate and up-to-date. Users can edit the accessibility details of places directly through the app.
 
+## Credits
+
+Special credit to **Cindy Ribeiro Pinto** who not only made and designed the app logo but also helped define the detailed accessibility criteria that this app is built around.
+
 ## Contact
 
 For any questions, feedback, or support, please contact [info@inwheel.ch](mailto:info@inwheel.ch).

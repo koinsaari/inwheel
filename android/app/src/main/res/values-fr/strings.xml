@@ -370,4 +370,6 @@
     <string name="success_emergency_alarm_updated">Informations sur l\'alarme d\'urgence mises à jour</string>
     <string name="success_sink_updated">Informations sur le lavabo mises à jour</string>
     <string name="success_euro_key_updated">Informations sur l\'EuroKey mises à jour</string>
+
+    <string name="logo_design_by_footer">Logo réalisé par Cindy Ribeiro Pinto</string>
 </resources>

@@ -26,15 +26,17 @@ export default function HomePage() {
         <section className="py-16 px-6">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-6">
-              Accessibility information for places around Europe
+              Help build the world's most detailed accessibility map application
             </h2>
             <p className="text-lg text-gray-600 mb-8">
-              InWheel provides detailed accessibility information for places in Finland and
-              Switzerland, helping people with mobility disabilities navigate with confidence.
+              InWheel aims to become the best way to find real, practical accessibility information
+              about each place you go. It starts with Switzerland and Finland, and with people like
+              you 🫵
             </p>
+
             <a
               href="#download"
-              className="!text-white inline-block bg-blue-600 hover:bg-blue-700 font-medium px-6 py-3 rounded-lg transition-colors"
+              className="!text-white inline-block bg-[#0e65b3] hover:bg-[#0b5596] font-medium px-6 py-3 rounded-lg transition-colors"
             >
               Download Coming Soon
             </a>
@@ -46,19 +48,25 @@ export default function HomePage() {
           <h2 className="text-2xl font-bold text-center mb-10">Features</h2>
           <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold text-blue-600 mb-3">
+              <h3 className="text-xl font-semibold text-[#009b4a] mb-3">
                 Detailed Accessibility Data
               </h3>
-              <p className="text-gray-600">Information about entrances, ramps, steps, and more.</p>
-            </div>
-            <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold text-blue-600 mb-3">Europe Focus</h3>
-              <p className="text-gray-600">Currently available in Finland and Switzerland.</p>
-            </div>
-            <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold text-blue-600 mb-3">Community Contributions</h3>
               <p className="text-gray-600">
-                Users can contribute and verify accessibility information.
+                Find real details that matter — entrances, steps, ramps, toilets, and more.
+              </p>
+            </div>
+            <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+              <h3 className="text-xl font-semibold text-[#0e65b3] mb-3">Starting in Europe</h3>
+              <p className="text-gray-600">
+                Currently covering Finland and Switzerland — with plans to expand across Europe.
+              </p>
+            </div>
+            <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
+              <h3 className="text-xl font-semibold text-[#009b4a] mb-3">
+                Powered by the Community
+              </h3>
+              <p className="text-gray-600">
+                Anyone can add, update, and verify accessibility data — together we build the map.
               </p>
             </div>
           </div>

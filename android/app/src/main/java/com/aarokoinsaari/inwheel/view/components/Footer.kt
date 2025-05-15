@@ -46,11 +46,11 @@ fun Footer(
         )
     } else {
         Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
         ) {
             if (leftContent != null) {
                 Box(Modifier.weight(1f, fill = false)) {
